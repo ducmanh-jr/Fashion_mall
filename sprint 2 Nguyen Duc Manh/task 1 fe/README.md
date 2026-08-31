@@ -86,7 +86,6 @@ task 1 fe/
 │   └── 📁 img/                         # Thư mục chứa 17 ảnh chất lượng cao (1.jpg -> 17.jpg)
 ├── 📁 test/                            # Thư mục kiểm thử tự động
 │   └── 📄 test.js                      # Automated Test Suite (20/20 PASS)
-└── 📁 kết quả/                         # Ảnh chụp minh chứng kiểm thử
 ```
 
 ---
