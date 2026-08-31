@@ -1,0 +1,315 @@
+/* ==============================================================================
+ * SHOPAI MARKET — LIGHT THEME DESIGN SYSTEM (Task 6 FE: HTTMDTTHA-51)
+ * Style: Light / Clean / Professional / Soft Glassmorphism (Identical to Task 1)
+ * ============================================================================== */
+
+/* ─── AMBIENT BACKGROUND BLOBS ─── */
+.ambient-blobs {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.5;
+    animation: blobFloat 20s ease-in-out infinite;
+}
+
+.blob-1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, rgba(99,102,241,0.15), transparent 70%);
+    top: -10%;
+    right: -5%;
+    animation-delay: 0s;
+}
+
+.blob-2 {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, rgba(139,92,246,0.12), transparent 70%);
+    bottom: -5%;
+    left: -5%;
+    animation-delay: -7s;
+}
+
+.blob-3 {
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(236,72,153,0.08), transparent 70%);
+    top: 40%;
+    left: 30%;
+    animation-delay: -14s;
+}
+
+@keyframes blobFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(30px, -25px) scale(1.05); }
+    66% { transform: translate(-20px, 20px) scale(0.95); }
+}
+
+/* ─── ENTRY ANIMATIONS ─── */
+@keyframes fadeSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(28px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.anim-entry {
+    opacity: 0;
+    animation: fadeSlideUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.anim-delay-1 { animation-delay: 0.1s; }
+.anim-delay-2 { animation-delay: 0.25s; }
+
+/* ─── FEATURE CARDS (Left Column) ─── */
+.feature-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: white;
+    border: 1px solid #f1f5f9;
+    border-radius: 14px;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.feature-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    border-color: #e2e8f0;
+}
+
+/* ─── AUTH CARD ─── */
+.auth-card {
+    position: relative;
+    z-index: 1;
+    transition: box-shadow 0.3s ease;
+}
+
+.auth-card:hover {
+    box-shadow: 0 25px 60px -12px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.03);
+}
+
+/* ─── TAB SWITCHER (Segmented Control) ─── */
+.tab-slider {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    width: calc(50% - 4px);
+    height: calc(100% - 8px);
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+}
+
+.tab-slider.slide-right {
+    transform: translateX(100%);
+}
+
+.tab-button {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    padding: 10px 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #94a3b8;
+    background: transparent;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+.tab-button.active {
+    color: #0f172a;
+}
+
+/* ─── FORM PANELS ─── */
+.form-panel {
+    display: none;
+}
+
+.form-panel.active {
+    display: block;
+    animation: fadeSlideUp 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ─── INPUT FIELDS ─── */
+.input-group {
+    position: relative;
+}
+
+.input-label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+}
+
+.input-wrapper {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 18px;
+    height: 18px;
+    color: #94a3b8;
+    pointer-events: none;
+    transition: color 0.2s;
+}
+
+.input-field {
+    width: 100%;
+    padding: 12px 16px 12px 44px;
+    background: #f8fafc;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    font-family: inherit;
+    font-size: 0.925rem;
+    color: #0f172a;
+    outline: none;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.input-field::placeholder {
+    color: #94a3b8;
+}
+
+.input-field:focus {
+    background: white;
+    border-color: #818cf8;
+    box-shadow: 0 0 0 4px rgba(99,102,241,0.08);
+}
+
+.input-field:focus ~ .input-icon,
+.input-wrapper:focus-within .input-icon {
+    color: #6366f1;
+}
+
+/* ─── TOGGLE PASSWORD ─── */
+.toggle-eye {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #94a3b8;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.toggle-eye:hover {
+    color: #475569;
+    background: rgba(0,0,0,0.04);
+}
+
+/* ─── PRIMARY CTA BUTTON ─── */
+.btn-primary {
+    position: relative;
+    width: 100%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: white;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary:hover {
+    box-shadow: 0 8px 25px rgba(79,70,229,0.35);
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: scale(0.97) translateY(0);
+}
+
+/* Shimmer Glow Effect */
+.btn-shimmer {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        105deg,
+        transparent 30%,
+        rgba(255,255,255,0.2) 45%,
+        rgba(255,255,255,0.3) 50%,
+        rgba(255,255,255,0.2) 55%,
+        transparent 70%
+    );
+    transform: translateX(-100%);
+    transition: none;
+}
+
+.btn-primary:hover .btn-shimmer {
+    animation: shimmerSlide 0.8s ease forwards;
+}
+
+@keyframes shimmerSlide {
+    to { transform: translateX(100%); }
+}
+
+/* ─── TOAST NOTIFICATION ─── */
+.toast-notification {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 14px 20px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+    z-index: 9999;
+    transform: translateY(120%);
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.toast-notification.show {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* ─── PASSWORD STRENGTH COLORS ─── */
+.strength-weak    { color: #ef4444 !important; }
+.strength-medium  { color: #f59e0b !important; }
+.strength-strong  { color: #3b82f6 !important; }
+.strength-very-strong { color: #10b981 !important; }
+
+/* ─── RESPONSIVE ─── */
+@media (max-width: 1024px) {
+    .main-wrapper {
+        grid-template-columns: 1fr;
+    }
+}

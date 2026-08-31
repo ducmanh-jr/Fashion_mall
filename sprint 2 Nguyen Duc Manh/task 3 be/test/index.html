@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopAI — Mail Service & OTP Simulation</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: { extend: { fontFamily: { jakarta: ['"Plus Jakarta Sans"', 'system-ui'] } } }
+        }
+    </script>
+    <style>
+        * { font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+        .blob { position: fixed; border-radius: 50%; filter: blur(80px); opacity: .4; pointer-events: none; z-index: 0; }
+        .blob-1 { width: 400px; height: 400px; background: radial-gradient(circle, rgba(99,102,241,.12), transparent 70%); top: -5%; right: 10%; }
+        .blob-2 { width: 350px; height: 350px; background: radial-gradient(circle, rgba(16,185,129,.1), transparent 70%); bottom: 5%; left: 5%; }
+        @keyframes fadeUp { from { opacity:0; transform:translateY(24px) } to { opacity:1; transform:translateY(0) } }
+        .anim { opacity:0; animation: fadeUp .6s cubic-bezier(.16,1,.3,1) forwards; }
+        .anim-d1 { animation-delay:.1s } .anim-d2 { animation-delay:.2s }
+    </style>
+</head>
+<body class="bg-[#F8FAFC] text-slate-800 min-h-screen">
+    <div class="blob blob-1" aria-hidden="true"></div>
+    <div class="blob blob-2" aria-hidden="true"></div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="#" class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-indigo-600 to-indigo-400 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 2.3c-.5.5-.1 1.3.6 1.3H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
+                </div>
+                <span class="text-xl font-extrabold text-slate-900">Shop<span class="text-indigo-600">AI</span></span>
+            </a>
+            <div class="text-sm font-semibold text-slate-500">
+                Task 3: Dịch vụ Email OTP Quên Mật Khẩu
+            </div>
+        </div>
+    </header>
+
+    <main class="relative z-10 max-w-4xl mx-auto px-6 py-12">
+        <div class="anim anim-d1 bg-white rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/50 p-8 mb-8">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
+                </div>
+                <div>
+                    <h2 class="text-xl font-bold text-slate-900">Mô Phỏng Gửi OTP Xác Thực qua Email</h2>
+                    <p class="text-sm text-slate-400">Hệ thống tạo mã OTP 6 chữ số có hiệu lực 10 phút & Token Reset CSDL</p>
+                </div>
+            </div>
+
+            <form onsubmit="handleSendOTP(event)" class="space-y-4 max-w-md">
+                <div>
+                    <label class="block text-sm font-semibold text-slate-700 mb-1">Email Nhận Mã OTP</label>
+                    <input type="email" id="emailInput" value="user_demo@shopai.vn" required class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all">
+                </div>
+                <button type="submit" class="w-full py-3 bg-gradient-to-r from-indigo-600 to-indigo-500 text-white font-bold rounded-xl hover:shadow-lg hover:shadow-indigo-500/25 active:scale-95 transition-all">
+                    Gửi Mã OTP Ngay
+                </button>
+            </form>
+        </div>
+
+        <!-- Result Box -->
+        <div id="resultCard" class="anim anim-d2 hidden bg-white rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/50 p-8">
+            <div class="flex items-center justify-between border-b border-slate-100 pb-4 mb-6">
+                <span class="text-sm font-bold text-slate-900">Hộp Thư Mô Phỏng (Inbox Simulation)</span>
+                <span class="px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full text-xs font-bold">Vừa nhận</span>
+            </div>
+
+            <div class="bg-indigo-50/50 border border-indigo-100 rounded-xl p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <span class="text-xs text-slate-400">Từ: no-reply@shopai.vn</span>
+                    <span class="text-xs text-slate-400">Hiệu lực: <strong class="text-indigo-600">10:00 phút</strong></span>
+                </div>
+
+                <h3 class="text-base font-bold text-slate-800 mb-2">Mã xác thực Quên Mật Khẩu của bạn</h3>
+                <p class="text-sm text-slate-600 mb-4">Xin chào, dưới đây là mã OTP 6 số để xác thực yêu cầu cấp lại mật khẩu cho tài khoản <span id="targetEmail" class="font-bold text-slate-800"></span>:</p>
+
+                <div class="flex items-center justify-center my-6">
+                    <div id="otpDisplay" class="tracking-widest text-3xl font-extrabold text-indigo-600 bg-white border-2 border-indigo-200 rounded-2xl px-8 py-4 shadow-sm">
+                        ------
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-400 bg-white/80 p-3 rounded-lg border border-indigo-50 font-mono">
+                    <p>Reset Token (CSDL): <span id="tokenDisplay" class="text-slate-600"></span></p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="mail-service.js"></script>
+    <script>
+        function handleSendOTP(e) {
+            e.preventDefault();
+            const email = document.getElementById('emailInput').value;
+            const res = requestForgotPasswordOTP(email);
+            
+            document.getElementById('targetEmail').textContent = res.email;
+            document.getElementById('otpDisplay').textContent = res.otp;
+            document.getElementById('tokenDisplay').textContent = res.resetToken;
+            
+            document.getElementById('resultCard').classList.remove('hidden');
+        }
+    </script>
+</body>
+</html>

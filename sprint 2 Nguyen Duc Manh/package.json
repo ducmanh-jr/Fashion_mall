@@ -1,0 +1,20 @@
+{
+  "name": "sprint-2-nguyen-duc-manh",
+  "version": "1.0.0",
+  "description": "Thư mục Sprint 2 chứa 5 task độc lập của Nguyễn Đức Mạnh",
+  "scripts": {
+    "test:task1": "cd \"task 1\" && node test.js",
+    "test:task2": "cd \"task 2\" && node test.js",
+    "test:task3": "cd \"task 3\" && node test.js",
+    "test:task4": "cd \"task 4\" && node test.js",
+    "test:task5": "cd \"task 5\" && node test.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "jsonwebtoken": "^9.0.2",
+    "nodemailer": "^6.9.13"
+  }
+}
