@@ -61,9 +61,11 @@ function handlePasswordInput(value) {
 
     if (!value) {
         box.style.opacity = '0';
+        box.style.display = 'none';
         return;
     }
 
+    box.style.display = 'block';
     box.style.opacity = '1';
 
     const result = evaluatePasswordStrength(value);
