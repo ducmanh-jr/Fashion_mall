@@ -110,20 +110,55 @@ function showToast(msg, isError) {
 // ─── FORM SUBMISSIONS ───
 function onRegisterSubmit(e) {
     e.preventDefault();
-    const pass = document.getElementById('regPassword').value;
-    const result = evaluatePasswordStrength(pass);
 
-    if (result.score < 2) {
-        showToast('Mật khẩu quá yếu! Cần ít nhất 8 ký tự, chữ hoa, chữ thường và chữ số.', true);
+    const nameVal = document.getElementById('regName').value;
+    const emailVal = document.getElementById('regEmail').value;
+    const passVal = document.getElementById('regPassword').value;
+
+    if (typeof validateFullName === 'function') {
+        const nameRes = validateFullName(nameVal);
+        if (!nameRes.isValid) {
+            showToast(nameRes.message, true);
+            return;
+        }
+    }
+
+    if (typeof validateEmail === 'function') {
+        const emailRes = validateEmail(emailVal);
+        if (!emailRes.isValid) {
+            showToast(emailRes.message, true);
+            return;
+        }
+    }
+
+    if (typeof validatePassword === 'function') {
+        const passRes = validatePassword(passVal);
+        if (!passRes.isValid) {
+            showToast(passRes.message, true);
+            return;
+        }
+    }
+
+    const passStrength = evaluatePasswordStrength(passVal);
+    if (passStrength.score < 2) {
+        showToast('Mật khẩu quá yếu! Cần đáp ứng ít nhất 2 tiêu chí bảo mật.', true);
         return;
     }
 
-    const name = document.getElementById('regName').value;
-    showToast(`Chào mừng ${name}! Tài khoản Aethelgard đã được tạo thành công.`);
+    const sanitizedName = typeof validateFullName === 'function' ? validateFullName(nameVal).value : nameVal.trim();
+    showToast(`Chào mừng ${sanitizedName}! Tài khoản Aethelgard đã được tạo thành công.`);
 }
 
 function onLoginSubmit(e) {
     e.preventDefault();
+    const emailVal = document.getElementById('loginEmail').value;
+    if (typeof validateEmail === 'function') {
+        const emailRes = validateEmail(emailVal);
+        if (!emailRes.isValid) {
+            showToast(emailRes.message, true);
+            return;
+        }
+    }
     showToast('Đăng nhập thành công! Đang chuyển hướng đến trang chính...');
 }
 
