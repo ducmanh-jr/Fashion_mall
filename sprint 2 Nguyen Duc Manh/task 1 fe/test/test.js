@@ -33,5 +33,14 @@ assert(resStrong.score === 4 && resStrong.label.includes('Mạnh'), "Mật khẩ
 const resVeryStrong = evaluatePasswordStrength('StrongPass123!@#');
 assert(resVeryStrong.score === 5 && resVeryStrong.label.includes('Rất Mạnh'), "Mật khẩu 'StrongPass123!@#' đánh giá đúng mức RẤT MẠNH.");
 
+// Test 5: Detailed Rules Breakdown
+const rulesBreakdown = resVeryStrong.rules;
+assert(rulesBreakdown.hasMin && rulesBreakdown.hasUpper && rulesBreakdown.hasLower && rulesBreakdown.hasNumber && rulesBreakdown.hasSpecial, "Quy tắc phân tích chi tiết (Rules breakdown) trả về đầy đủ 5 tiêu chuẩn.");
+
+// Test 6: Dynamic Brand Config Check
+const { BRAND_CONFIG } = require('../mã nguồn/brand-config');
+assert(BRAND_CONFIG && BRAND_CONFIG.name && BRAND_CONFIG.slogan, "Cấu hình thương hiệu động (Brand Config System) nạp thành công.");
+
 console.log(`\n📊 Kết quả Task 1: ${passed}/${passed + failed} PASS\n`);
 process.exit(failed === 0 ? 0 : 1);
+
