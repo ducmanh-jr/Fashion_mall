@@ -1,23 +1,12 @@
-let validateFEForgotFlow, validateFEChangeFlow;
+/**
+ * ==============================================================================
+ * SHOPAI MARKET — TASK 6: HTTMDTTHA-51 AUTOMATED UNIT TEST SUITE
+ * Test suite for FE Password Recovery & Change Password validation logic
+ * ==============================================================================
+ */
 
-try {
-    const appModule = require('../mã nguồn/app');
-    validateFEForgotFlow = appModule.validateFEForgotFlow;
-    validateFEChangeFlow = appModule.validateFEChangeFlow;
-} catch (e) {
-    validateFEForgotFlow = function(email, otp, newPass) {
-        if (!email || !email.includes('@')) return { valid: false, msg: 'Email không hợp lệ.' };
-        if (!otp || otp.length !== 6) return { valid: false, msg: 'Mã OTP phải đúng 6 chữ số.' };
-        if (!newPass || newPass.length < 6) return { valid: false, msg: 'Mật khẩu mới phải từ 6 ký tự.' };
-        return { valid: true, msg: 'Form hợp lệ.' };
-    };
-
-    validateFEChangeFlow = function(oldPass, newPass) {
-        if (!oldPass) return { valid: false, msg: 'Mật khẩu cũ không được để trống.' };
-        if (!newPass || newPass.length < 6) return { valid: false, msg: 'Mật khẩu mới phải từ 6 ký tự.' };
-        return { valid: true, msg: 'Form đổi mật khẩu hợp lệ.' };
-    };
-}
+const { validateFEForgotFlow, validateFEChangeFlow } = require('../mã nguồn/app');
+const { validateEmail, validatePassword } = require('../mã nguồn/form-validator');
 
 console.log("===============================================================");
 console.log("🧪 KIỂM THỬ THỰC NGHIỆM TASK 6: HTTMDTTHA-51 (FE Quên & Đổi Mật Khẩu)");
@@ -36,17 +25,51 @@ function assert(condition, msg) {
     }
 }
 
-// Test 1: Forgot FE validation
-const resF1 = validateFEForgotFlow('ducmanh@shopai.vn', '654321', 'NewPass123!');
-assert(resF1.valid === true, "Form FE Quên mật khẩu chấp nhận dữ liệu hợp lệ (Email, OTP 6 số, Mật khẩu mới).");
+// ─── TEST SUITE 1: QUÊN MẬT KHẨU (FORGOT PASSWORD FLOW) ───
+console.log("--- 1. Kiểm thử Luồng Quên Mật Khẩu (Forgot Flow) ---");
 
-// Test 2: Invalid OTP check
-const resF2 = validateFEForgotFlow('ducmanh@shopai.vn', '12', 'NewPass123!');
-assert(resF2.valid === false, "Form FE Quên mật khẩu từ chối OTP ngắn hơn 6 chữ số.");
+const resF1 = validateFEForgotFlow('ducmanh@gmail.com', '000000', 'NewPass123!');
+assert(resF1.valid === true, "Chấp nhận dữ liệu hợp lệ (Email @gmail.com chuẩn, OTP 6 số mặc định: 000000, Mật khẩu mới >= 6 ký tự).");
 
-// Test 3: Change FE validation
+const resF2 = validateFEForgotFlow('ducmanh@gmail.com', '123', 'NewPass123!');
+assert(resF2.valid === false, "Từ chối OTP chưa đủ 6 chữ số (ví dụ: '123').");
+
+const resF3 = validateFEForgotFlow('ducmanh@yahoo.com', '000000', 'NewPass123!');
+assert(resF3.valid === false, "Từ chối Email không có đuôi @gmail.com (ví dụ: @yahoo.com).");
+
+const resF4 = validateFEForgotFlow('ducmanh@gmail.com', '000000', '12345');
+assert(resF4.valid === false, "Từ chối mật khẩu mới ngắn hơn 6 ký tự.");
+
+// ─── TEST SUITE 2: ĐỔI MẬT KHẨU (CHANGE PASSWORD FLOW) ───
+console.log("\n--- 2. Kiểm thử Luồng Đổi Mật Khẩu (Change Flow) ---");
+
 const resC1 = validateFEChangeFlow('OldPass123!', 'NewPass123!');
-assert(resC1.valid === true, "Form FE Đổi mật khẩu chấp nhận mật khẩu cũ và mật khẩu mới hợp lệ.");
+assert(resC1.valid === true, "Chấp nhận mật khẩu cũ và mật khẩu mới hợp lệ.");
 
-console.log(`\n📊 Kết quả Task 6: ${passed}/${passed + failed} PASS\n`);
+const resC2 = validateFEChangeFlow('', 'NewPass123!');
+assert(resC2.valid === false, "Từ chối khi để trống mật khẩu cũ.");
+
+const resC3 = validateFEChangeFlow('OldPass123!', '123');
+assert(resC3.valid === false, "Từ chối mật khẩu mới ngắn hơn 6 ký tự.");
+
+// ─── TEST SUITE 3: STRICTION EMAIL DOMAIN (@gmail.com ONLY) ───
+console.log("\n--- 3. Kiểm thử Ràng Buộc Tên Miền Email (@gmail.com) ---");
+
+const gmailValid = validateEmail('ducmanh@gmail.com');
+assert(gmailValid.isValid === true, "Chấp nhận Email chuẩn có đuôi @gmail.com.");
+
+const yahooInvalid = validateEmail('ducmanh@yahoo.com');
+assert(yahooInvalid.isValid === false, "Từ chối Email có đuôi @yahoo.com.");
+
+const outlookInvalid = validateEmail('ducmanh@outlook.com');
+assert(outlookInvalid.isValid === false, "Từ chối Email có đuôi @outlook.com.");
+
+const passTest = validatePassword('SecurePass2026!');
+assert(passTest.isValid === true, "Validate độ dài và yêu cầu mật khẩu.");
+
+// ─── BÁO CÁO KẾT QUẢ ───
+console.log(`\n===============================================================`);
+console.log(`📊 KẾT QUẢ KIỂM THỬ TASK 6: ${passed}/${passed + failed} TEST CASES PASS`);
+console.log(`===============================================================\n`);
+
 process.exit(failed === 0 ? 0 : 1);

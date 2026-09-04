@@ -66,20 +66,19 @@ function validateEmail(email) {
         return { isValid: false, message: 'Địa chỉ Email không được vượt quá 254 ký tự (chuẩn RFC).' };
     }
 
+    const lowercased = trimmed.toLowerCase();
+
     // RFC 5322 standard email regex pattern with valid domain & extension
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
-    if (!emailRegex.test(trimmed)) {
-        return { isValid: false, message: 'Định dạng Email không hợp lệ (cần đúng dạng username@domain.extension).' };
+    if (!emailRegex.test(lowercased)) {
+        return { isValid: false, message: 'Định dạng Email không hợp lệ (cần đúng dạng username@gmail.com).' };
     }
 
-    // Ensure domain extension is at least 2 chars (e.g. .com, .vn)
-    const domainParts = trimmed.split('@')[1].split('.');
-    const ext = domainParts[domainParts.length - 1];
-    if (!ext || ext.length < 2) {
-        return { isValid: false, message: 'Tên miền Email phải có phần mở rộng tối thiểu 2 ký tự (VD: .com, .vn).' };
+    // Strict constraint: Must end with @gmail.com
+    if (!lowercased.endsWith('@gmail.com')) {
+        return { isValid: false, message: 'Hệ thống chỉ chấp nhận địa chỉ Email có đuôi @gmail.com (VD: example@gmail.com).' };
     }
 
-    const lowercased = trimmed.toLowerCase();
     const sanitized = sanitizeHTML(lowercased);
     return { isValid: true, value: sanitized, message: 'Hợp lệ.' };
 }

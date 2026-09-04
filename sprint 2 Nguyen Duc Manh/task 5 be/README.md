@@ -1,4 +1,4 @@
-# ⚙️ Task 5: HTTMDTTHA-47 — (BE) xây api đổi mật khẩu
+# 🔒 Task 5: HTTMDTTHA-47 — (BE) Change Password API
 
 ![Type](https://img.shields.io/badge/Task_Type-BACKEND_(BE)-blue?style=for-the-badge)
 ![Build Status](https://img.shields.io/badge/Test_Suite-3%2F3_PASS-10b981?style=for-the-badge&logo=github)
@@ -11,24 +11,23 @@
 
 - **Mã Jira Issue:** `HTTMDTTHA-47`
 - **Loại nhiệm vụ:** `Backend (BE)`
-- **Tên nhiệm vụ:** `(BE) xây api đổi mật khẩu`
+- **Tên nhiệm vụ:** `(BE) API Đổi mật khẩu tài khoản người dùng`
 - **Mục tiêu:**
-  - Viết Backend API `/api/auth/change-password` xác thực mật khẩu cũ qua `bcrypt.compareSync`.
-  - Mã hóa mật khẩu mới bằng `bcrypt.hashSync` (10 rounds).
-  - Trả về thông báo thành công hoặc lỗi chi tiết.
+  - Xây dựng Backend Service `changePassword` cho người dùng đã xác thực JWT.
+  - Đối soát mật khẩu cũ qua mã hóa Bcrypt.
+  - Kiểm tra độ dài mật khẩu mới tối thiểu 6 ký tự và cập nhật vào CSDL.
 
 ---
 
 ## 📁 2. CẤU TRÚC THƯ MỤC BE
 
 ```
-task 5/
+task 5 be/
 ├── 📄 README.md                        # Báo cáo tổng quan Task 5
 ├── 📁 mã nguồn/                        # Mã nguồn BE chính
-│   └── 📄 change-pass-service.js       # Logic kiểm tra & đổi mật khẩu bcrypt
-├── 📁 test/                            # Thư mục kiểm thử & Test UI Client
-│   ├── 📄 test.js                      # Automated Test Suite (3/3 PASS)
-│   └── 📄 index.html                   # HTML Test Client
+│   └── 📄 change-pass-service.js       # Service Đổi Mật Khẩu
+├── 📁 test/                            # Thư mục kiểm thử tự động
+│   └── 📄 test.js                      # Automated Test Suite (3/3 PASS - Pure Node.js)
 └── 📁 kết quả/                         # Kết quả kiểm thử & Minh chứng
     ├── 📄 README.md                    # Báo cáo chi tiết kết quả
     └── 🖼️ task 5.png                   # Ảnh chụp giao diện minh chứng
@@ -39,7 +38,7 @@ task 5/
 ## 🧪 3. HƯỚNG DẪN CHẠY KIỂM THỬ
 
 ```bash
-cd test
+cd "sprint 2 Nguyen Duc Manh/task 5 be/test"
 node test.js
 ```
 

@@ -1,51 +1,50 @@
-# 🎨 Task 6: HTTMDTTHA-51 — (FE) giao diện quên & đổi mật khẩu
+# 🎨 Báo Cáo Kết Quả Task 6: HTTMDTTHA-51 — (FE) Giao diện Quên & Đổi Mật Khẩu
 
 ![Type](https://img.shields.io/badge/Task_Type-FRONTEND_(FE)-indigo?style=for-the-badge)
-![Build Status](https://img.shields.io/badge/Test_Suite-3%2F3_PASS-10b981?style=for-the-badge&logo=github)
+![Build Status](https://img.shields.io/badge/Test_Suite-11%2F11_PASS-10b981?style=for-the-badge&logo=github)
 ![Sprint](https://img.shields.io/badge/Sprint-Sprint_2-indigo?style=for-the-badge)
 ![Member](https://img.shields.io/badge/Developer-Nguyen_Duc_Manh-blue?style=for-the-badge)
 
 ---
 
-## 📌 1. TỔNG QUAN NHIỆM VỤ JIRA
+## 📌 1. BÁO CÁO THỰC HIỆN
 
-- **Mã Jira Issue:** `HTTMDTTHA-51` (Parent: `HTTMDTTHA-37 Tài khoản & người dùng`)
-- **Loại nhiệm vụ:** `Frontend (FE)`
-- **Tên nhiệm vụ:** `(FE) giao diện quên & đổi mật khẩu`
-- **Mục tiêu:**
-  - Xây dựng giao diện Frontend hoàn chỉnh cho tính năng **Quên Mật Khẩu (3 Bước)** với trình nhập OTP 6 số và đặt mật khẩu mới.
-  - Xây dựng giao diện Frontend **Cài Đặt Đổi Mật Khẩu** bảo mật bởi JWT cho người dùng đã đăng nhập.
-
----
-
-## 📁 2. CẤU TRÚC THƯ MỤC FE
-
-```
-task 6/
-├── 📄 README.md                        # Báo cáo tổng quan Task 6
-├── 📁 mã nguồn/                        # Mã nguồn FE chính
-│   └── 📄 index.html                   # Giao diện Frontend Quên & Đổi Mật Khẩu
-├── 📁 test/                            # Thư mục kiểm thử & Demo UI
-│   ├── 📄 test.js                      # Automated Test Suite (3/3 PASS)
-│   └── 📄 index.html                   # Giao diện test
-└── 📁 kết quả/                         # Kết quả kiểm thử & Minh chứng
-    ├── 📄 README.md                    # Báo cáo chi tiết kết quả
-    └── 🖼️ task 6.png                   # Ảnh chụp giao diện Jira minh chứng
-```
+Nhiệm vụ `HTTMDTTHA-51` thuộc Sprint 2 đã hoàn thành 100% yêu cầu tính năng Frontend:
+1. **Ràng buộc đuôi Email bắt buộc là `@gmail.com`**:
+   - Tất cả các trường Email (Đăng ký, Đăng nhập, Quên mật khẩu) đều được kiểm tra chặt chẽ bởi `validateEmail`.
+   - Nếu người dùng nhập địa chỉ không có đuôi `@gmail.com` (VD: `@yahoo.com`, `@outlook.com`), hệ thống từ chối ngay lập tức với thông báo rõ ràng.
+2. **Giao diện 3 Bước Quên Mật Khẩu (Sketch Wireframe)**:
+   - Nhập sai OTP -> 6 ô OTP đổi màu viền/nền **đỏ** (`.error`).
+   - Nhập đủ 6 số OTP đúng -> Tự động xác thực & chuyển thẳng sang Bước 3.
 
 ---
 
-## 🧪 3. HƯỚNG DẪN CHẠY KIỂM THỬ
+## 🧪 2. KẾT QUẢ TEST SUITE (11/11 PASS)
 
 ```bash
-cd test
+cd "sprint 2 Nguyen Duc Manh/task 6 fe/test"
 node test.js
 ```
 
-### Kết Quả Thực Nghiệm (3/3 PASS):
 ```text
-  ✅ [PASS] Form FE Quên mật khẩu chấp nhận dữ liệu hợp lệ (Email, OTP 6 số, Mật khẩu mới).
-  ✅ [PASS] Form FE Quên mật khẩu từ chối OTP ngắn hơn 6 chữ số.
-  ✅ [PASS] Form FE Đổi mật khẩu chấp nhận mật khẩu cũ và mật khẩu mới hợp lệ.
-📊 Kết quả Task 6: 3/3 PASS
+🧪 KIỂM THỬ THỰC NGHIỆM TASK 6: HTTMDTTHA-51 (FE Quên & Đổi Mật Khẩu)
+
+--- 1. Kiểm thử Luồng Quên Mật Khẩu (Forgot Flow) ---
+  ✅ [PASS] Chấp nhận dữ liệu hợp lệ (Email @gmail.com chuẩn, OTP 6 số mặc định: 000000, Mật khẩu mới >= 6 ký tự).
+  ✅ [PASS] Từ chối OTP chưa đủ 6 chữ số (ví dụ: '123').
+  ✅ [PASS] Từ chối Email không có đuôi @gmail.com (ví dụ: @yahoo.com).
+  ✅ [PASS] Từ chối mật khẩu mới ngắn hơn 6 ký tự.
+
+--- 2. Kiểm thử Luồng Đổi Mật Khẩu (Change Flow) ---
+  ✅ [PASS] Chấp nhận mật khẩu cũ và mật khẩu mới hợp lệ.
+  ✅ [PASS] Từ chối khi để trống mật khẩu cũ.
+  ✅ [PASS] Từ chối mật khẩu mới ngắn hơn 6 ký tự.
+
+--- 3. Kiểm thử Ràng Buộc Tên Miền Email (@gmail.com) ---
+  ✅ [PASS] Chấp nhận Email chuẩn có đuôi @gmail.com.
+  ✅ [PASS] Từ chối Email có đuôi @yahoo.com.
+  ✅ [PASS] Từ chối Email có đuôi @outlook.com.
+  ✅ [PASS] Validate độ dài và yêu cầu mật khẩu.
+
+📊 KẾT QUẢ KIỂM THỬ TASK 6: 11/11 TEST CASES PASS
 ```

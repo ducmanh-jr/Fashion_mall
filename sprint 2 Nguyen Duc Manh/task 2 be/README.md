@@ -27,9 +27,8 @@ task 2 be/
 ├── 📁 mã nguồn/                        # Mã nguồn BE chính
 │   ├── 📄 route-guard.js               # Middleware authenticateToken & requireRole
 │   └── 📄 auth-api.js                  # Router API Auth
-├── 📁 test/                            # Thư mục kiểm thử & Test UI Client
-│   ├── 📄 test.js                      # Automated Test Suite (3/3 PASS)
-│   └── 📄 index.html                   # Interactive RBAC Admin Dashboard (Light Theme)
+├── 📁 test/                            # Thư mục kiểm thử tự động
+│   └── 📄 test.js                      # Automated Test Suite (3/3 PASS - Pure Node.js)
 └── 📁 kết quả/                         # Kết quả kiểm thử & Minh chứng
     ├── 📄 README.md                    # Báo cáo chi tiết kết quả
     └── 🖼️ task 2.png                   # Ảnh chụp giao diện minh chứng
@@ -40,7 +39,7 @@ task 2 be/
 ## 🧪 3. HƯỚNG DẪN CHẠY KIỂM THỬ
 
 ```bash
-cd test
+cd "sprint 2 Nguyen Duc Manh/task 2 be/test"
 node test.js
 ```
 

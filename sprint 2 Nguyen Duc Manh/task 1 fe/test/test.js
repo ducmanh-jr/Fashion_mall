@@ -33,9 +33,9 @@ assert(sanitizeHTML('<script>alert(1)</script>') === '&lt;script&gt;alert(1)&lt;
 // ─── 2. EMAIL ADDRESS VALIDATION TESTS ───
 assert(!validateEmail('').isValid, "Email: Từ chối khi để trống.");
 assert(!validateEmail('invalid-email').isValid, "Email: Từ chối khi thiếu ký tự '@' và domain.");
-assert(!validateEmail('user@domain').isValid, "Email: Từ chối khi thiếu phần mở rộng extension (.com, .vn).");
-assert(validateEmail('name@aethelgard.com').isValid, "Email: Hợp lệ đúng chuẩn RFC 5322.");
-assert(validateEmail('ADMIN@AETHELGARD.COM').value === 'admin@aethelgard.com', "Email: Tự động chuyển về dạng chữ thường (lowercase).");
+assert(!validateEmail('user@aethelgard.com').isValid, "Email: Từ chối tên miền không phải @gmail.com.");
+assert(validateEmail('name@gmail.com').isValid, "Email: Hợp lệ đúng chuẩn với đuôi @gmail.com.");
+assert(validateEmail('ADMIN@GMAIL.COM').value === 'admin@gmail.com', "Email: Tự động chuyển về dạng chữ thường (lowercase).");
 
 // ─── 3. PASSWORD VALIDATION & STRENGTH TESTS ───
 const resWeak = evaluatePasswordStrength('123');

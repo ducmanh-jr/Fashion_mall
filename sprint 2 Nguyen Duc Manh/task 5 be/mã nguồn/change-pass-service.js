@@ -2,7 +2,7 @@ const bcrypt = require('bcryptjs');
 
 const mockUserDb = {
     id: 'u123',
-    email: 'user_change_test@ecommerce.vn',
+    email: 'user_change_test@gmail.com',
     passwordHash: bcrypt.hashSync('CurrentSecret123!', 10)
 };
 
@@ -28,4 +28,4 @@ function checkCurrentPassword(password) {
     return bcrypt.compareSync(password, mockUserDb.passwordHash);
 }
 
-module.exports = { changePassword, checkCurrentPassword };
+module.exports = { changePassword, checkCurrentPassword, mockUserDb };

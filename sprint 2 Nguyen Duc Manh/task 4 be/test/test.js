@@ -17,7 +17,7 @@ function assert(condition, msg) {
     }
 }
 
-const testEmail = 'user_reset_test@ecommerce.vn';
+const testEmail = 'user_reset_test@gmail.com';
 const validOtp = '654321';
 const validToken = 'reset_token_test_abc123';
 
@@ -38,7 +38,11 @@ assert(resResetPass.success, "Cập nhật mật khẩu mới thành công.");
 
 // Test 4: Verify Login with new password
 const isLoginValid = verifyLogin(testEmail, newPass);
-assert(isLoginValid === true, "Đăng nhập thành công bằng mật khẩu vừa reset.");
+assert(isLoginValid === true, "Đăng nhập thành công bằng mật khẩu vừa reset cho tài khoản @gmail.com.");
+
+// Test 5: Verify non-gmail email rejection
+const resNonGmail = verifyOTP('user@yahoo.com', '654321');
+assert(!resNonGmail.success, "Từ chối xác thực OTP với Email không phải đuôi @gmail.com.");
 
 console.log(`\n📊 Kết quả Task 4: ${passed}/${passed + failed} PASS\n`);
 process.exit(failed === 0 ? 0 : 1);

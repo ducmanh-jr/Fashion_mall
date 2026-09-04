@@ -7,9 +7,9 @@
 
 // ─── 1. REAL BUSINESS STATE & USER DATABASE STORE ───
 const userAccountStore = {
-    'ducmanh@shopai.vn': 'CurrentSecret123!',
-    'admin@aethelgard.com': 'AdminSecret2026!',
-    'user_test_forgot@ecommerce.vn': 'OldPass123!'
+    'ducmanh@gmail.com': 'CurrentSecret123!',
+    'admin@gmail.com': 'AdminSecret2026!',
+    'user_test_forgot@gmail.com': 'OldPass123!'
 };
 
 const otpSession = {
@@ -130,17 +130,64 @@ function clearPasswordInputs() {
     }
 }
 
-// ─── 5. STRICT 1-CHARACTER OTP BOX GRID (PREVENTS OVERFLOW BUG) ───
+// ─── 5. STRICT 1-CHARACTER OTP BOX GRID (PREVENTS OVERFLOW BUG) & AUTO-ADVANCE ───
+function showOTPError(msg) {
+    const boxes = document.querySelectorAll('.otp-box');
+    boxes.forEach(box => {
+        box.classList.add('error');
+    });
+}
+
+function clearOTPError() {
+    const boxes = document.querySelectorAll('.otp-box');
+    boxes.forEach(box => {
+        box.classList.remove('error');
+    });
+}
+
+function verifyOTPCode(otpInputVal) {
+    if (!otpInputVal || otpInputVal.length !== 6) {
+        showOTPError('Vui lòng nhập đủ 6 chữ số OTP.');
+        showToast('Vui lòng nhập đủ 6 chữ số OTP.', true);
+        return false;
+    }
+
+    if (Date.now() > otpSession.expiresAt) {
+        showOTPError('Mã OTP đã hết hạn (10 phút). Vui lòng bấm Gửi lại OTP.');
+        showToast('Mã OTP đã hết hạn (10 phút). Vui lòng bấm Gửi lại OTP.', true);
+        return false;
+    }
+
+    // Default valid OTP code is 000000 or otpSession.code or 654321
+    if (otpInputVal !== '000000' && otpInputVal !== otpSession.code && otpInputVal !== '654321') {
+        showOTPError('Mã OTP không chính xác. Vui lòng nhập lại (Mã mặc định: 000000)');
+        showToast(`Mã OTP không chính xác. Vui lòng nhập mã mặc định: 000000`, true);
+        return false;
+    }
+
+    clearOTPError();
+    otpSession.isVerified = true;
+    otpSession.resetToken = 'rst_' + Math.random().toString(36).substring(2) + Date.now();
+
+    showToast('Xác thực OTP 6 số thành công! Vui lòng tạo mật khẩu mới.');
+    goToStep(3);
+    return true;
+}
+
 function initOTPBoxGrid() {
     const boxes = document.querySelectorAll('.otp-box');
     if (!boxes.length) return;
 
     boxes.forEach((box, index) => {
         box.addEventListener('input', (e) => {
-            // Keep ONLY digits 0-9 and restrict length strictly to 1 character
+            clearOTPError();
+
+            // Keep ONLY digits 0-9
             let val = e.target.value.replace(/\D/g, '');
-            if (val.length > 1) {
-                val = val.substring(0, 1);
+            
+            // Fix: If box already had a character, take the newest typed character (last digit)
+            if (val.length > 0) {
+                val = val.slice(-1);
             }
             box.value = val;
 
@@ -148,6 +195,7 @@ function initOTPBoxGrid() {
                 box.classList.add('filled');
                 if (index < boxes.length - 1) {
                     boxes[index + 1].focus();
+                    boxes[index + 1].select();
                 } else {
                     // On box 6 (last box), blur so extra typing cannot overflow
                     box.blur();
@@ -155,11 +203,19 @@ function initOTPBoxGrid() {
             } else {
                 box.classList.remove('filled');
             }
+
+            // AUTO-VERIFY & ADVANCE WHEN 6 DIGITS ARE ENTERED
+            const entered = getEnteredOTP();
+            if (entered.length === 6) {
+                verifyOTPCode(entered);
+            }
         });
 
         box.addEventListener('keydown', (e) => {
             if (e.key === 'Backspace') {
+                clearOTPError();
                 if (!box.value && index > 0) {
+                    e.preventDefault();
                     const prevBox = boxes[index - 1];
                     prevBox.value = '';
                     prevBox.classList.remove('filled');
@@ -168,25 +224,39 @@ function initOTPBoxGrid() {
                     box.value = '';
                     box.classList.remove('filled');
                 }
+            } else if (e.key === 'ArrowLeft' && index > 0) {
+                boxes[index - 1].focus();
+            } else if (e.key === 'ArrowRight' && index < boxes.length - 1) {
+                boxes[index + 1].focus();
             }
+        });
+
+        box.addEventListener('focus', (e) => {
+            e.target.select();
         });
 
         box.addEventListener('paste', (e) => {
             e.preventDefault();
+            clearOTPError();
             const pasteData = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').substring(0, 6);
             if (pasteData) {
                 fillOTPBoxes(pasteData);
+                if (pasteData.length === 6) {
+                    verifyOTPCode(pasteData);
+                }
             }
         });
     });
 }
 
 function clearOTPBoxes() {
+    clearOTPError();
     for (let i = 1; i <= 6; i++) {
         const box = document.getElementById(`otp${i}`);
         if (box) {
             box.value = '';
             box.classList.remove('filled');
+            box.classList.remove('error');
         }
     }
 }
@@ -244,30 +314,9 @@ function onForgotStep1Submit(e) {
 }
 
 function onForgotStep2Submit(e) {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
     const otpInputVal = getEnteredOTP();
-
-    if (!otpInputVal || otpInputVal.length !== 6) {
-        showToast('Vui lòng nhập đủ 6 chữ số OTP.', true);
-        return;
-    }
-
-    if (Date.now() > otpSession.expiresAt) {
-        showToast('Mã OTP đã hết hạn (10 phút). Vui lòng bấm Gửi lại OTP.', true);
-        return;
-    }
-
-    // Default valid OTP code is 000000
-    if (otpInputVal !== '000000' && otpInputVal !== otpSession.code && otpInputVal !== '654321') {
-        showToast(`Mã OTP không chính xác. Vui lòng nhập mã mặc định: 000000`, true);
-        return;
-    }
-
-    otpSession.isVerified = true;
-    otpSession.resetToken = 'rst_' + Math.random().toString(36).substring(2) + Date.now();
-
-    showToast('Xác thực OTP 6 số thành công! Vui lòng tạo mật khẩu mới.');
-    goToStep(3);
+    verifyOTPCode(otpInputVal);
 }
 
 function onForgotStep3Submit(e) {
@@ -482,7 +531,7 @@ function showToast(msg, isError) {
 
 // ─── TASK 6 CORE VALIDATION LOGIC ───
 function validateFEForgotFlow(email, otp, newPass) {
-    if (!email || !email.includes('@')) return { valid: false, msg: 'Email không hợp lệ.' };
+    if (!email || !email.toLowerCase().trim().endsWith('@gmail.com')) return { valid: false, msg: 'Email phải có đuôi @gmail.com.' };
     if (!otp || otp.trim().length !== 6) return { valid: false, msg: 'Mã OTP phải đúng 6 chữ số.' };
     if (!newPass || newPass.length < 6) return { valid: false, msg: 'Mật khẩu mới phải từ 6 ký tự.' };
     return { valid: true, msg: 'Xác thực OTP & đặt lại mật khẩu thành công!' };
@@ -567,21 +616,23 @@ function stopSliderTimer() {
     clearTimeout(pairTimer);
 }
 
-document.addEventListener('visibilitychange', () => {
-    if (document.hidden) {
-        stopSliderTimer();
-    } else {
-        startSliderTimer();
-    }
-});
+if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) {
+            stopSliderTimer();
+        } else {
+            startSliderTimer();
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+        switchTask1Tab('login');
+        initOTPBoxGrid();
+        initDualColumnSlider();
+    });
+}
 
 // Export functions for node test environment if applicable
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = { validateFEForgotFlow, validateFEChangeFlow };
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    switchTask1Tab('login');
-    initOTPBoxGrid();
-    initDualColumnSlider();
-});
