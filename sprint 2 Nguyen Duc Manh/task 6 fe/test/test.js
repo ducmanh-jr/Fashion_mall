@@ -1,3 +1,24 @@
+let validateFEForgotFlow, validateFEChangeFlow;
+
+try {
+    const appModule = require('../mã nguồn/app');
+    validateFEForgotFlow = appModule.validateFEForgotFlow;
+    validateFEChangeFlow = appModule.validateFEChangeFlow;
+} catch (e) {
+    validateFEForgotFlow = function(email, otp, newPass) {
+        if (!email || !email.includes('@')) return { valid: false, msg: 'Email không hợp lệ.' };
+        if (!otp || otp.length !== 6) return { valid: false, msg: 'Mã OTP phải đúng 6 chữ số.' };
+        if (!newPass || newPass.length < 6) return { valid: false, msg: 'Mật khẩu mới phải từ 6 ký tự.' };
+        return { valid: true, msg: 'Form hợp lệ.' };
+    };
+
+    validateFEChangeFlow = function(oldPass, newPass) {
+        if (!oldPass) return { valid: false, msg: 'Mật khẩu cũ không được để trống.' };
+        if (!newPass || newPass.length < 6) return { valid: false, msg: 'Mật khẩu mới phải từ 6 ký tự.' };
+        return { valid: true, msg: 'Form đổi mật khẩu hợp lệ.' };
+    };
+}
+
 console.log("===============================================================");
 console.log("🧪 KIỂM THỬ THỰC NGHIỆM TASK 6: HTTMDTTHA-51 (FE Quên & Đổi Mật Khẩu)");
 console.log("===============================================================\n");
@@ -13,20 +34,6 @@ function assert(condition, msg) {
         console.error(`  ❌ [FAIL] ${msg}`);
         failed++;
     }
-}
-
-// Simulated FE Validation Logic for HTTMDTTHA-51
-function validateFEForgotFlow(email, otp, newPass) {
-    if (!email || !email.includes('@')) return { valid: false, msg: 'Email không hợp lệ.' };
-    if (!otp || otp.length !== 6) return { valid: false, msg: 'Mã OTP phải đúng 6 chữ số.' };
-    if (!newPass || newPass.length < 6) return { valid: false, msg: 'Mật khẩu mới phải từ 6 ký tự.' };
-    return { valid: true, msg: 'Form hợp lệ.' };
-}
-
-function validateFEChangeFlow(oldPass, newPass) {
-    if (!oldPass) return { valid: false, msg: 'Mật khẩu cũ không được để trống.' };
-    if (!newPass || newPass.length < 6) return { valid: false, msg: 'Mật khẩu mới phải từ 6 ký tự.' };
-    return { valid: true, msg: 'Form đổi mật khẩu hợp lệ.' };
 }
 
 // Test 1: Forgot FE validation

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShopAI Market — Quên & Đổi Mật Khẩu (HTTMDTTHA-51)</title>
-    <meta name="description" content="Cổng xác thực quên & đổi mật khẩu ShopAI Market - Hệ thống thương mại điện tử tích hợp AI">
+    <title>Aethelgard — Reset Your Password</title>
+    <meta name="description" content="Aethelgard AI Shopping Mall - Reset your password.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
@@ -14,7 +14,8 @@
                 extend: {
                     fontFamily: { jakarta: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'] },
                     colors: {
-                        brand: { 50:'#eef2ff', 100:'#e0e7ff', 200:'#c7d2fe', 300:'#a5b4fc', 400:'#818cf8', 500:'#6366f1', 600:'#4f46e5', 700:'#4338ca' }
+                        brand: { 50:'#f5f3ff', 100:'#ede9fe', 200:'#ddd6fe', 300:'#c4b5fd', 400:'#a78bfa', 500:'#8b5cf6', 600:'#7c3aed', 700:'#6d28d9' },
+                        sketch: { purple: '#8065c9', light: '#f3f0ff', text: '#3c3a50' }
                     }
                 }
             }
@@ -22,234 +23,341 @@
     </script>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="font-jakarta bg-[#F8FAFC] text-slate-800 min-h-screen flex flex-col overflow-x-hidden">
+<body class="font-jakarta bg-white text-slate-900 min-h-screen overflow-x-hidden antialiased">
 
-    <!-- ═══════════════ AMBIENT BACKGROUND BLOBS ═══════════════ -->
-    <div class="ambient-blobs" aria-hidden="true">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
-        <div class="blob blob-3"></div>
-    </div>
+    <!-- ═══════════════ MAIN 50:50 AETHELGARD SPLIT LAYOUT ═══════════════ -->
+    <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
 
-    <!-- ═══════════════ HEADER NAV (GIỐNG TASK 1 100%) ═══════════════ -->
-    <header class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100">
-        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
-            <!-- Logo -->
-            <a href="#" class="flex items-center gap-2.5 group">
-                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-brand-600 to-brand-400 flex items-center justify-center shadow-lg shadow-brand-500/25 group-hover:shadow-brand-500/40 transition-shadow">
-                    <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.3 2.3c-.5.5-.1 1.3.6 1.3H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
-                </div>
-                <span class="text-xl font-800 tracking-tight text-slate-900">Shop<span class="text-brand-600">AI</span></span>
-            </a>
+        <!-- ────────────────── LEFT COLUMN: AUTH & RECOVERY CONTAINERS ────────────────── -->
+        <div class="flex flex-col justify-between p-6 sm:p-12 lg:p-16 max-w-xl mx-auto w-full z-20 bg-white">
+            
+            <!-- Header Brand Logo & Top Bar (Task 1 Standard) -->
+            <div class="mb-4 flex items-center justify-between">
+                <a href="#" class="inline-flex items-center gap-3.5 group">
+                    <div class="w-10 h-10 rounded-xl bg-slate-950 flex items-center justify-center text-white font-serif font-700 text-xl shadow-md border border-slate-800 tracking-tighter group-hover:scale-105 transition-all">
+                        <span class="bg-gradient-to-tr from-slate-200 via-white to-slate-400 bg-clip-text text-transparent italic">Æ</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xl font-800 tracking-[0.18em] text-slate-900 uppercase font-serif">Aethelgard</span>
+                        <span class="text-[10px] tracking-[0.2em] text-slate-400 font-600 uppercase -mt-0.5">Shopping Mall • AI Powered</span>
+                    </div>
+                </a>
 
-            <!-- Search -->
-            <div class="hidden md:flex flex-1 max-w-md mx-8">
-                <div class="relative w-full">
-                    <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
-                    <input type="text" placeholder="Tìm kiếm sản phẩm..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-400 transition-all">
+                <!-- Right Header Accent Badge -->
+                <div class="hidden sm:flex items-center gap-3 text-xs text-slate-400 font-500">
+                    <span class="px-3 py-1 rounded-full border border-slate-200 bg-slate-50/80 text-[11px] font-600 tracking-wider text-slate-600 uppercase">Wireframe Sketch Mode</span>
+                    <button type="button" onclick="showToast('Phác thảo 3 bước')" class="hover:text-slate-900 transition-colors font-600">VI / EN</button>
                 </div>
             </div>
 
-            <!-- Actions -->
-            <div class="flex items-center gap-5 text-sm text-slate-500">
-                <a href="#" class="hidden sm:flex items-center gap-1.5 hover:text-slate-800 transition-colors">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.05 11a9 9 0 1117.9 0M12 2a9.96 9.96 0 00-4 .83M12 2c1.66 0 3 4.03 3 9s-1.34 9-3 9-3-4.03-3-9 1.34-9 3-9z"/></svg>
-                    <span>VN</span>
-                </a>
-                <a href="#" class="hidden sm:flex items-center gap-1.5 hover:text-slate-800 transition-colors">
-                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2 3h6a4 4 0 014 4v14l-3-3H2z"/><path stroke-linecap="round" stroke-linejoin="round" d="M22 3h-6a4 4 0 00-4 4v14l3-3h7z"/></svg>
-                    <span>Hỗ trợ</span>
-                </a>
-                <a href="#" class="relative flex items-center gap-1.5 hover:text-slate-800 transition-colors">
-                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-                    <span class="absolute -top-1.5 -right-2 w-4.5 h-4.5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">3</span>
-                </a>
-            </div>
-        </div>
-    </header>
-
-    <!-- ═══════════════ MAIN TWO-COLUMN AUTH SECTION ═══════════════ -->
-    <main class="flex-1 flex items-center justify-center py-10 px-4 sm:px-6">
-        <div class="max-w-6xl w-full grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-
-            <!-- ──── LEFT: BRANDING SIDE (GIỐNG TASK 1 100%) ──── -->
-            <div class="anim-entry anim-delay-1 hidden lg:block">
-                <div class="mb-6">
-                    <span class="inline-flex items-center gap-2 text-xs font-semibold text-brand-600 bg-brand-50 border border-brand-100 rounded-full px-3.5 py-1.5">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"/></svg>
-                        Khôi phục & Đổi mật khẩu an toàn
-                    </span>
-                </div>
-
-                <h1 class="text-4xl sm:text-[2.75rem] font-800 leading-[1.18] tracking-tight text-slate-900 mb-5">
-                    Bảo vệ tài khoản<br>
-                    <span class="bg-gradient-to-r from-brand-600 to-violet-500 bg-clip-text text-transparent">tối ưu</span> cùng ShopAI
+            <!-- ══════════════════════════════════════════════════════════════ -->
+            <!-- 1. MAIN TASK 1 AUTH CARD (LOG IN & SIGN UP) — DEFAULT ACTIVE VIEW -->
+            <!-- ══════════════════════════════════════════════════════════════ -->
+            <div id="authCardMain" class="my-auto py-2 transition-all duration-300">
+                <h1 id="task1Title" class="text-3xl sm:text-4xl font-800 tracking-tight text-slate-900 mb-2">
+                    Log in to your account
                 </h1>
-
-                <p class="text-slate-500 text-[1.05rem] leading-relaxed mb-10 max-w-lg">
-                    Xác thực OTP 6 số qua email hoặc đổi mật khẩu tài khoản trực tiếp được bảo vệ bởi thuật toán mã hóa băm Bcrypt 10 salt rounds chuẩn ngân hàng.
+                <p id="task1Sub" class="text-slate-500 text-sm sm:text-base leading-relaxed mb-6">
+                    Welcome back! Log in to access your personal space, exclusive deals, and AI smart shopping.
                 </p>
 
-                <!-- Feature Cards -->
-                <div class="space-y-4">
-                    <div class="feature-card group">
-                        <div class="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shrink-0 group-hover:bg-emerald-100 transition-colors">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12"/></svg>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-700 text-slate-800">Xác Thực OTP Khôi Phục</h4>
-                            <p class="text-xs text-slate-400 mt-0.5">Tự động gửi mã 6 số hiệu lực 10 phút</p>
-                        </div>
-                    </div>
+                <!-- Social OAuth Button -->
+                <button type="button" class="w-full py-3 px-4 bg-white border border-slate-200 hover:border-slate-300 rounded-full font-600 text-sm text-slate-700 flex items-center justify-center gap-3 shadow-sm transition-all hover:bg-slate-50 mb-6" onclick="showToast('Đăng nhập nhanh qua Google')">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                    <span>Continue with Google</span>
+                </button>
 
-                    <div class="feature-card group">
-                        <div class="w-11 h-11 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 shrink-0 group-hover:bg-blue-100 transition-colors">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-700 text-slate-800">Bảo Mật Mã Hóa Bcrypt</h4>
-                            <p class="text-xs text-slate-400 mt-0.5">Băm mật khẩu 10 salt rounds ngăn bẻ khóa</p>
-                        </div>
-                    </div>
-
-                    <div class="feature-card group">
-                        <div class="w-11 h-11 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shrink-0 group-hover:bg-amber-100 transition-colors">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99"/></svg>
-                        </div>
-                        <div>
-                            <h4 class="text-sm font-700 text-slate-800">Đo Độ Mạnh Real-time</h4>
-                            <p class="text-xs text-slate-400 mt-0.5">Gợi ý mật khẩu tối ưu 4 cấp độ trực quan</p>
-                        </div>
-                    </div>
+                <!-- Divider -->
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="flex-1 h-px bg-slate-200"></div>
+                    <span class="text-xs text-slate-400 font-500">or</span>
+                    <div class="flex-1 h-px bg-slate-200"></div>
                 </div>
+
+                <!-- Segmented Control Tab (Task 1: Sign Up / Log In) -->
+                <div class="relative bg-slate-100 rounded-xl p-1 flex mb-6">
+                    <div id="task1TabSlider" class="tab-slider slide-right"></div>
+                    <button id="task1RegBtn" class="tab-button" onclick="switchTask1Tab('register')">Sign Up</button>
+                    <button id="task1LogBtn" class="tab-button active" onclick="switchTask1Tab('login')">Log In</button>
+                </div>
+
+                <!-- Task 1: Log In Form Panel (Active by default) -->
+                <form id="formLogin" class="form-panel active space-y-4" onsubmit="onLoginSubmit(event)">
+                    <div>
+                        <label class="input-label">Email Address</label>
+                        <input type="email" id="loginEmail" class="input-field !pl-4" placeholder="admin@aethelgard.com" value="ducmanh@shopai.vn" required>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="input-label mb-0">Password</label>
+                            <a href="#" onclick="event.preventDefault(); openForgotFlow();" class="text-xs font-600 text-sketch-purple hover:underline transition-colors flex items-center gap-1">
+                                <span>Forgot your password ?</span>
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                            </a>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="password" id="loginPassword" class="input-field !pl-4 pr-12" placeholder="••••••••" value="CurrentSecret123!" required>
+                            <button type="button" class="toggle-eye" onclick="togglePass('loginPassword', this)" aria-label="Toggle password">
+                                <svg class="eye-open w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <svg class="eye-closed w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 px-4 bg-sketch-purple hover:opacity-90 text-white rounded-lg font-700 text-sm transition-all shadow-md mt-4">
+                        Log In
+                    </button>
+                </form>
+
+                <!-- Task 1: Sign Up Form Panel -->
+                <form id="formRegister" class="form-panel space-y-4" onsubmit="onRegisterSubmit(event)">
+                    <div>
+                        <label class="input-label">Full Name</label>
+                        <input type="text" id="regName" class="input-field !pl-4" placeholder="Nguyễn Đức Mạnh" required>
+                    </div>
+
+                    <div>
+                        <label class="input-label">Email Address</label>
+                        <input type="email" id="regEmail" class="input-field !pl-4" placeholder="ducmanh@shopai.vn" required>
+                    </div>
+
+                    <div>
+                        <label class="input-label">Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="regPassword" class="input-field !pl-4 pr-12" placeholder="Create a secure password" required oninput="handlePasswordInput(this.value, 'strengthBoxReg', 'strengthBarReg', 'strengthLabelReg', 'strengthHintReg')">
+                            <button type="button" class="toggle-eye" onclick="togglePass('regPassword', this)" aria-label="Toggle password">
+                                <svg class="eye-open w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <svg class="eye-closed w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                            </button>
+                        </div>
+
+                        <!-- Strength Meter -->
+                        <div id="strengthBoxReg" class="mt-3 opacity-0 transition-all duration-300 hidden">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs text-slate-400">Độ mạnh mật khẩu</span>
+                                <span id="strengthLabelReg" class="text-xs font-600 text-slate-400">—</span>
+                            </div>
+                            <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden mb-1.5">
+                                <div id="strengthBarReg" class="h-full rounded-full transition-all duration-400 ease-out" style="width: 0%; background: #cbd5e1;"></div>
+                            </div>
+                            <p id="strengthHintReg" class="text-[11px] text-slate-400">Mật khẩu đạt tiêu chuẩn an toàn khi đáp ứng đủ tiêu chuẩn</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 px-4 bg-sketch-purple hover:opacity-90 text-white rounded-lg font-700 text-sm transition-all shadow-md mt-4">
+                        Continue
+                    </button>
+                </form>
+
+                <p class="text-xs text-slate-400 mt-5 leading-relaxed text-center">
+                    By continuing, you agree to Aethelgard's <a href="#" onclick="event.preventDefault(); showToast('Terms of Service')" class="text-slate-700 underline font-500">Terms of Service</a> and <a href="#" onclick="event.preventDefault(); showToast('Privacy Policy')" class="text-slate-700 underline font-500">Privacy Policy</a>.
+                </p>
             </div>
 
-            <!-- ──── RIGHT: FORM CARD (TAB QUÊN & ĐỔI MẬT KHẨU) ──── -->
-            <div class="anim-entry anim-delay-2">
-                <div class="auth-card bg-white rounded-2xl border border-slate-100 shadow-xl shadow-slate-200/50 p-8 sm:p-10 relative overflow-hidden">
 
-                    <!-- Segmented Tab Switcher (Slider Animation) -->
-                    <div class="relative bg-slate-100 rounded-xl p-1 flex mb-8">
-                        <div id="tabSlider" class="tab-slider"></div>
-                        <button id="tabForgotBtn" class="tab-button active" onclick="switchTab('forgot')">Quên Mật Khẩu</button>
-                        <button id="tabChangeBtn" class="tab-button" onclick="switchTab('change')">Đổi Mật Khẩu</button>
+            <!-- ══════════════════════════════════════════════════════════════ -->
+            <!-- 2. TASK 6 SKETCH WIREFRAME CONTAINER (EXACT 3 SKETCH SCREENS) -->
+            <!-- ══════════════════════════════════════════════════════════════ -->
+            <div id="recoveryCardMain" class="my-auto py-2 hidden opacity-0 transition-all duration-300 text-center max-w-sm mx-auto w-full">
+                
+                <!-- ════ SCREEN 1 SKETCH: Forgot your password ? ════ -->
+                <div id="sketchScreen1" class="sketch-screen">
+                    <!-- SVG Illustration 1: Person thinking with ? marks -->
+                    <div class="sketch-illustration-box">
+                        <div class="sketch-semicircle-bg"></div>
+                        <svg class="sketch-svg" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Dashed ground line -->
+                            <line x1="20" y1="140" x2="180" y2="140" stroke="#8065c9" stroke-width="2.5" stroke-dasharray="14 8 4 6" stroke-linecap="round"/>
+                            <!-- Person body -->
+                            <path d="M70 140 C70 115, 80 105, 100 105 C120 105, 130 115, 130 140" stroke="#8065c9" stroke-width="3.5" fill="#e8e2fc" stroke-linecap="round"/>
+                            <!-- Person neck & head -->
+                            <circle cx="100" cy="80" r="22" stroke="#8065c9" stroke-width="3.5" fill="#ffffff"/>
+                            <!-- Hair cap -->
+                            <path d="M78 78 C78 60, 122 60, 122 78 C120 62, 80 62, 78 78 Z" fill="#8065c9"/>
+                            <!-- Eyes & Mouth -->
+                            <circle cx="93" cy="78" r="2.5" fill="#8065c9"/>
+                            <circle cx="107" cy="78" r="2.5" fill="#8065c9"/>
+                            <path d="M96 90 Q100 88 104 90" stroke="#8065c9" stroke-width="2" stroke-linecap="round"/>
+                            <!-- Question Marks -->
+                            <text x="60" y="55" font-family="sans-serif" font-weight="bold" font-size="22" fill="#8065c9">?</text>
+                            <text x="135" y="50" font-family="sans-serif" font-weight="bold" font-size="24" fill="#8065c9">?</text>
+                            <text x="145" y="80" font-family="sans-serif" font-weight="bold" font-size="18" fill="#8065c9">?</text>
+                            <text x="50" y="85" font-family="sans-serif" font-weight="bold" font-size="18" fill="#8065c9">?</text>
+                        </svg>
                     </div>
 
-                    <!-- ════ 1. FORM QUÊN MẬT KHẨU ════ -->
-                    <form id="formForgot" class="form-panel active" onsubmit="onForgotSubmit(event)">
+                    <h2 class="text-2xl font-800 text-slate-800 mb-1.5">Forgot your password ?</h2>
+                    <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto mb-6">
+                        Enter your e-mail address and we'll send you a link to reset your password
+                    </p>
 
-                        <div class="space-y-5">
-                            <!-- Email -->
-                            <div class="input-group">
-                                <label class="input-label">Email Đăng Ký</label>
-                                <div class="input-wrapper">
-                                    <svg class="input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"/></svg>
-                                    <input type="email" id="forgotEmail" class="input-field" placeholder="ducmanh@shopai.vn" required>
-                                </div>
-                            </div>
+                    <form onsubmit="onForgotStep1Submit(event)" class="space-y-4">
+                        <div>
+                            <input type="email" id="forgotEmailInput" class="sketch-input" placeholder="Email Address" value="ducmanh@shopai.vn" required>
+                        </div>
 
-                            <!-- Mã OTP 6 số -->
-                            <div class="input-group">
-                                <div class="flex justify-between items-center mb-1.5">
-                                    <label class="input-label mb-0">Mã OTP (6 Chữ Số)</label>
-                                    <span class="text-xs text-brand-600 font-semibold">Mã test: 654321</span>
-                                </div>
-                                <div class="input-wrapper">
-                                    <svg class="input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
-                                    <input type="text" id="forgotOTP" maxlength="6" value="654321" class="input-field font-mono font-bold tracking-widest text-brand-600" placeholder="654321" required>
-                                </div>
-                            </div>
-
-                            <!-- Mật khẩu mới -->
-                            <div class="input-group">
-                                <label class="input-label">Mật Khẩu Mới</label>
-                                <div class="input-wrapper">
-                                    <svg class="input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
-                                    <input type="password" id="forgotNewPass" class="input-field" placeholder="••••••••" oninput="handlePasswordInput(this.value)" required>
-                                    <button type="button" class="toggle-eye" onclick="togglePass('forgotNewPass', this)">
-                                        <svg class="w-4 h-4 eye-open" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-                                    </button>
-                                </div>
-                                <!-- Password Strength Box -->
-                                <div id="strengthBox" class="mt-2 transition-opacity opacity-0">
-                                    <div class="flex justify-between items-center text-xs mb-1">
-                                        <span class="text-slate-400">Độ mạnh:</span>
-                                        <span id="strengthLabel" class="font-semibold">—</span>
-                                    </div>
-                                    <div class="h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
-                                        <div id="strengthBar" class="h-full w-0 transition-all duration-300"></div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- CTA Button -->
-                            <button type="submit" class="btn-primary mt-2">
-                                <span class="btn-shimmer"></span>
-                                <span class="relative z-10">Xác Thực OTP & Đặt Lại Mật Khẩu</span>
+                        <div class="grid grid-cols-2 gap-3 pt-2">
+                            <button type="button" onclick="closeForgotFlow()" class="sketch-btn-cancel">
+                                Cancel
+                            </button>
+                            <button type="submit" id="btnSendOTP" class="sketch-btn-purple">
+                                Reset
                             </button>
                         </div>
                     </form>
+                </div>
 
 
-                    <!-- ════ 2. FORM ĐỔI MẬT KHẨU ════ -->
-                    <form id="formChange" class="form-panel" onsubmit="onChangeSubmit(event)">
+                <!-- ════ SCREEN 2 SKETCH: Check in your mail ! ════ -->
+                <div id="sketchScreen2" class="sketch-screen hidden">
+                    <!-- SVG Illustration 2: Open Envelope with RESET Paper -->
+                    <div class="sketch-illustration-box">
+                        <div class="sketch-semicircle-bg"></div>
+                        <svg class="sketch-svg" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Dashed ground line -->
+                            <line x1="20" y1="140" x2="180" y2="140" stroke="#8065c9" stroke-width="2.5" stroke-dasharray="14 8 4 6" stroke-linecap="round"/>
+                            <!-- Paper sheet inside -->
+                            <rect x="75" y="45" width="50" height="55" rx="3" fill="#ffffff" stroke="#8065c9" stroke-width="3"/>
+                            <text x="82" y="64" font-family="sans-serif" font-weight="bold" font-size="10" fill="#8065c9" letter-spacing="1">RESET</text>
+                            <line x1="84" y1="74" x2="116" y2="74" stroke="#8065c9" stroke-width="2.5" stroke-linecap="round"/>
+                            <line x1="86" y1="82" x2="114" y2="82" stroke="#8065c9" stroke-width="2.5" stroke-linecap="round"/>
+                            <!-- Envelope main body -->
+                            <path d="M60 80 L100 105 L140 80 L140 135 L60 135 Z" fill="#e8e2fc" stroke="#8065c9" stroke-width="3.5" stroke-linejoin="round"/>
+                            <!-- Envelope flap folds -->
+                            <path d="M60 80 L100 110 L140 80" stroke="#8065c9" stroke-width="3" fill="none" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
 
-                        <div class="space-y-5">
-                            <!-- Mật khẩu hiện tại -->
-                            <div class="input-group">
-                                <div class="flex justify-between items-center mb-1.5">
-                                    <label class="input-label mb-0">Mật Khẩu Hiện Tại</label>
-                                    <span class="text-xs text-brand-600 font-semibold">Test: CurrentSecret123!</span>
-                                </div>
-                                <div class="input-wrapper">
-                                    <svg class="input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25a3 3 0 013 3m3 0a6 6 0 01-7.029 5.912c-.563-.097-1.159.026-1.563.43L10.5 17.25H8.25v2.25H6v2.25H2.25v-2.818c0-.597.237-1.17.659-1.591l6.499-6.499c.404-.404.527-1 .43-1.563A6 6 0 1121 7.5z"/></svg>
-                                    <input type="password" id="changeOldPass" value="CurrentSecret123!" class="input-field" placeholder="••••••••" required>
-                                </div>
-                            </div>
+                    <h2 class="text-2xl font-800 text-slate-800 mb-1.5">Check in your mail !</h2>
+                    <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto mb-4">
+                        We just emailed you with the instructions to reset your password.
+                    </p>
 
-                            <!-- Mật khẩu mới -->
-                            <div class="input-group">
-                                <label class="input-label">Mật Khẩu Mới</label>
-                                <div class="input-wrapper">
-                                    <svg class="input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
-                                    <input type="password" id="changeNewPass" value="BrandNewPass2026!" class="input-field" placeholder="••••••••" required>
-                                </div>
-                            </div>
-
-                            <!-- Nhập lại mật khẩu mới -->
-                            <div class="input-group">
-                                <label class="input-label">Nhập Lại Mật Khẩu Mới</label>
-                                <div class="input-wrapper">
-                                    <svg class="input-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z"/></svg>
-                                    <input type="password" id="changeConfirmPass" value="BrandNewPass2026!" class="input-field" placeholder="••••••••" required>
-                                </div>
-                            </div>
-
-                            <!-- CTA Button -->
-                            <button type="submit" class="btn-primary mt-2">
-                                <span class="btn-shimmer"></span>
-                                <span class="relative z-10">Cập Nhật Mật Khẩu Mới</span>
-                            </button>
+                    <!-- Interactive OTP Verification Box -->
+                    <form onsubmit="onForgotStep2Submit(event)" class="space-y-4 mb-6">
+                        <div class="flex items-center justify-center gap-2" id="otpBoxGrid">
+                            <input type="text" maxlength="1" class="otp-box" id="otp1" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-box" id="otp2" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-box" id="otp3" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-box" id="otp4" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-box" id="otp5" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" class="otp-box" id="otp6" autocomplete="off" inputmode="numeric">
                         </div>
+
+                        <div class="flex items-center justify-between text-xs px-2">
+                            <button type="button" onclick="goToStep(1)" class="text-slate-400 hover:text-slate-700">← Back</button>
+                            <button type="button" id="btnResendOTP" onclick="onResendOTPClick()" class="text-sketch-purple font-600">Resend OTP (60s)</button>
+                        </div>
+
+                        <button type="submit" id="btnVerifyOTP" class="sketch-btn-purple w-full">
+                            Verify OTP & Continue
+                        </button>
                     </form>
 
+                    <!-- Sketch Footer Note -->
+                    <div class="border-t border-slate-100 pt-4 mt-4">
+                        <p class="text-[11px] text-slate-400">For any questions or problems please email us at</p>
+                        <a href="mailto:helpdesk@aethelgard.com" class="text-xs font-700 text-sketch-purple hover:underline mt-0.5 inline-block">helpdesk@aethelgard.com</a>
+                    </div>
                 </div>
+
+
+                <!-- ════ SCREEN 3 SKETCH: Reset your password ════ -->
+                <div id="sketchScreen3" class="sketch-screen hidden">
+                    <!-- SVG Illustration 3: Curved Arrow with Lock Badge -->
+                    <div class="sketch-illustration-box">
+                        <div class="sketch-semicircle-bg"></div>
+                        <svg class="sketch-svg" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Dashed ground line -->
+                            <line x1="20" y1="140" x2="180" y2="140" stroke="#8065c9" stroke-width="2.5" stroke-dasharray="14 8 4 6" stroke-linecap="round"/>
+                            <!-- Big Curved Loop Arrow -->
+                            <path d="M60 115 C50 60, 150 50, 140 120 M60 115 L80 100 M60 115 L80 130" stroke="#8065c9" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            <!-- Lock Badge Circle -->
+                            <circle cx="130" cy="55" r="18" fill="#ffffff" stroke="#8065c9" stroke-width="3"/>
+                            <!-- Lock body -->
+                            <rect x="122" y="55" width="16" height="13" rx="2" fill="#8065c9"/>
+                            <!-- Lock shackle -->
+                            <path d="M125 55 V50 A5 5 0 0 1 135 50 V55" stroke="#8065c9" stroke-width="2.5" fill="none"/>
+                        </svg>
+                    </div>
+
+                    <h2 class="text-2xl font-800 text-slate-800 mb-1.5">Reset your password</h2>
+                    <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto mb-6">
+                        What would you like your new password to be ?
+                    </p>
+
+                    <form onsubmit="onForgotStep3Submit(event)" class="space-y-4">
+                        <div>
+                            <div class="input-wrapper">
+                                <input type="password" id="forgotNewPassInput" class="sketch-input pr-12" placeholder="Password" value="BrandNewPass2026!" required oninput="handlePasswordInput(this.value, 'strengthBoxForgot', 'strengthBarForgot', 'strengthLabelForgot', 'strengthHintForgot')">
+                                <button type="button" class="toggle-eye" onclick="togglePass('forgotNewPassInput', this)" aria-label="Toggle password">
+                                    <svg class="eye-open w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    <svg class="eye-closed w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                                </button>
+                            </div>
+
+                            <!-- Minimalist Password Strength Bar -->
+                            <div id="strengthBoxForgot" class="mt-2.5 transition-all duration-300 text-left">
+                                <div class="flex items-center justify-between mb-1 text-xs">
+                                    <span class="text-slate-400">Độ mạnh mật khẩu:</span>
+                                    <span id="strengthLabelForgot" class="font-600 text-slate-500">—</span>
+                                </div>
+                                <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden mb-2">
+                                    <div id="strengthBarForgot" class="h-full rounded-full transition-all duration-300" style="width: 0%; background: #cbd5e1;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <input type="password" id="forgotConfirmPassInput" class="sketch-input" placeholder="Confirm Password" value="BrandNewPass2026!" required>
+                        </div>
+
+                        <button type="submit" id="btnSubmitNewPass" class="sketch-btn-purple w-full">
+                            Save
+                        </button>
+                    </form>
+                </div>
+
             </div>
 
+            <!-- Footer Trusted By / Categories -->
+            <div class="pt-4 border-t border-slate-100 text-center">
+                <p class="text-[11px] font-600 tracking-wider text-slate-400 uppercase mb-2">Explore Top E-Commerce Categories</p>
+                <div class="flex items-center justify-center gap-3 flex-wrap opacity-75 grayscale hover:grayscale-0 transition-all">
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 font-700 text-[10px] text-slate-700 tracking-wider uppercase">FASHION</span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 font-700 text-[10px] text-slate-700 tracking-wider uppercase">ELECTRONICS</span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 font-700 text-[10px] text-slate-700 tracking-wider uppercase">BEAUTY</span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 font-700 text-[10px] text-slate-700 tracking-wider uppercase">HOME LIVING</span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 font-700 text-[10px] text-slate-700 tracking-wider uppercase">AI ASSISTANT</span>
+                </div>
+            </div>
         </div>
-    </main>
 
-    <!-- ═══════════════ TOAST NOTIFICATION (GIỐNG TASK 1 100%) ═══════════════ -->
-    <div id="toastEl" class="toast-notification flex items-center gap-3">
-        <div id="toastIcon"></div>
-        <div id="toastText" class="text-sm font-semibold text-slate-700"></div>
+
+        <!-- ────────────────── RIGHT COLUMN: DUAL-COLUMN 15S AUTO-SLIDER ────────────────── -->
+        <div class="hidden lg:block relative w-full h-full min-h-screen overflow-hidden bg-slate-950" id="visualPanel">
+            <!-- Dual-Column Slides Container (Rendered dynamically by JS) -->
+            <div class="dual-slider-wrapper relative w-full h-full min-h-screen" id="dualSliderWrapper">
+                <!-- 2-column image pairs inserted by JS -->
+            </div>
+        </div>
+
     </div>
 
-    <!-- ═══════════════ FOOTER ═══════════════ -->
-    <footer class="border-t border-slate-100 bg-white/50 backdrop-blur-sm py-6 text-center text-xs text-slate-400">
-        © 2026 ShopAI Market — Task 6 FE: Giao Diện Quên & Đổi Mật Khẩu (HTTMDTTHA-51)
-    </footer>
+    <!-- Toast Notification -->
+    <div id="toastEl" class="toast-notification">
+        <div class="flex items-center gap-3">
+            <div id="toastIcon" class="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>
+            </div>
+            <p id="toastText" class="text-sm text-slate-700 font-500"></p>
+        </div>
+    </div>
 
+    <script src="brand-config.js"></script>
+    <script src="form-validator.js"></script>
+    <script src="password-meter.js"></script>
     <script src="app.js"></script>
 </body>
 </html>
