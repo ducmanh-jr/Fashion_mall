@@ -114,6 +114,19 @@ function goToStep(stepNum) {
         if (firstOtp) setTimeout(() => firstOtp.focus(), 100);
     } else if (stepNum === 3) {
         s3.classList.remove('hidden');
+        clearPasswordInputs();
+    }
+}
+
+function clearPasswordInputs() {
+    const p1 = document.getElementById('forgotNewPassInput');
+    const p2 = document.getElementById('forgotConfirmPassInput');
+    if (p1) p1.value = '';
+    if (p2) p2.value = '';
+    const strengthBox = document.getElementById('strengthBoxForgot');
+    if (strengthBox) {
+        strengthBox.style.opacity = '0';
+        strengthBox.classList.add('hidden');
     }
 }
 
