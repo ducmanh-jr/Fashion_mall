@@ -90,16 +90,9 @@ function showToast(msg, isError) {
 
     if (text) text.textContent = msg;
 
-    if (isError) {
-        if (icon) {
-            icon.style.display = 'flex';
-            icon.className = 'w-6 h-6 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center shrink-0';
-            icon.innerHTML = '<svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>';
-        }
-    } else {
-        if (icon) {
-            icon.style.display = 'none';
-        }
+    if (icon) {
+        icon.style.display = 'none';
+        icon.classList.add('hidden');
     }
 
     clearTimeout(toastTimer);

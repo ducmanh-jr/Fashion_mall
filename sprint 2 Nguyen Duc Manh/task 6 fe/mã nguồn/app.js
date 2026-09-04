@@ -239,7 +239,7 @@ function onForgotStep1Submit(e) {
     startResendTimer();
     start10MinOTPCountdown();
 
-    showToast(`✉️ [MAIL SERVICE] Đã gửi OTP xác thực tới ${otpSession.email} (Mã mặc định: 000000)`);
+    showToast(`[MAIL SERVICE] Đã gửi OTP xác thực tới ${otpSession.email} (Mã mặc định: 000000)`);
     goToStep(2);
 }
 
@@ -259,14 +259,14 @@ function onForgotStep2Submit(e) {
 
     // Default valid OTP code is 000000
     if (otpInputVal !== '000000' && otpInputVal !== otpSession.code && otpInputVal !== '654321') {
-        showToast(`❌ Mã OTP không chính xác. Vui lòng nhập mã mặc định: 000000`, true);
+        showToast(`Mã OTP không chính xác. Vui lòng nhập mã mặc định: 000000`, true);
         return;
     }
 
     otpSession.isVerified = true;
     otpSession.resetToken = 'rst_' + Math.random().toString(36).substring(2) + Date.now();
 
-    showToast('✅ Xác thực OTP 6 số thành công! Vui lòng tạo mật khẩu mới.');
+    showToast('Xác thực OTP 6 số thành công! Vui lòng tạo mật khẩu mới.');
     goToStep(3);
 }
 
@@ -292,7 +292,7 @@ function onForgotStep3Submit(e) {
 
     userAccountStore[otpSession.email] = newPassVal;
 
-    showToast(`🎉 Đặt lại mật khẩu thành công cho ${otpSession.email}! Hãy đăng nhập bằng mật khẩu mới.`);
+    showToast(`Đặt lại mật khẩu thành công cho ${otpSession.email}! Hãy đăng nhập bằng mật khẩu mới.`);
 
     const loginEmailInput = document.getElementById('loginEmail');
     const loginPasswordInput = document.getElementById('loginPassword');
@@ -313,7 +313,7 @@ function onResendOTPClick() {
 
     clearOTPBoxes();
     startResendTimer();
-    showToast(`✉️ [MAIL SERVICE] Đã gửi lại mã OTP. Vui lòng nhập mã mặc định: 000000`);
+    showToast(`[MAIL SERVICE] Đã gửi lại mã OTP. Vui lòng nhập mã mặc định: 000000`);
 }
 
 function startResendTimer() {
@@ -343,7 +343,7 @@ function start10MinOTPCountdown() {
         if (remainingMs <= 0) {
             clearInterval(otpSession.otpTimerInterval);
             if (badge) badge.textContent = 'Expired';
-            showToast('⚠️ Mã OTP đã hết hạn. Vui lòng bấm gửi lại OTP mới.', true);
+            showToast('Mã OTP đã hết hạn. Vui lòng bấm gửi lại OTP mới.', true);
             return;
         }
         const totalSec = Math.floor(remainingMs / 1000);
@@ -374,11 +374,11 @@ function onLoginSubmit(e) {
     }
 
     if (storedPass !== passVal) {
-        showToast('❌ Mật khẩu không chính xác! Vui lòng kiểm tra lại hoặc Quên mật khẩu.', true);
+        showToast('Mật khẩu không chính xác! Vui lòng kiểm tra lại hoặc Quên mật khẩu.', true);
         return;
     }
 
-    showToast(`🎉 Đăng nhập thành công! Chào mừng ${emailVal} trở lại Aethelgard.`);
+    showToast(`Đăng nhập thành công! Chào mừng ${emailVal} trở lại Aethelgard.`);
 }
 
 function onRegisterSubmit(e) {
@@ -470,16 +470,9 @@ function showToast(msg, isError) {
 
     text.textContent = msg;
 
-    if (isError) {
-        if (icon) {
-            icon.className = 'w-8 h-8 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0';
-            icon.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z"/></svg>';
-        }
-    } else {
-        if (icon) {
-            icon.className = 'w-8 h-8 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center shrink-0';
-            icon.innerHTML = '<svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"/></svg>';
-        }
+    if (icon) {
+        icon.style.display = 'none';
+        icon.classList.add('hidden');
     }
 
     clearTimeout(toastTimer);

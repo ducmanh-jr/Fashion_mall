@@ -22,16 +22,16 @@ function evaluatePasswordStrength(password) {
     let color = '#ef4444'; // Red
 
     if (score <= 2) {
-        label = 'Yếu ❌';
+        label = 'Yếu';
         color = '#ef4444';
     } else if (score === 3) {
-        label = 'Trung Bình ⚠️';
+        label = 'Trung Bình';
         color = '#f59e0b'; // Yellow
     } else if (score === 4) {
-        label = 'Mạnh 💪';
+        label = 'Mạnh';
         color = '#3b82f6'; // Blue
     } else if (score >= 5) {
-        label = 'Rất Mạnh 🛡️';
+        label = 'Rất Mạnh';
         color = '#10b981'; // Green
     }
 
