@@ -234,15 +234,15 @@
                         We just emailed you with the instructions to reset your password.
                     </p>
 
-                    <!-- Interactive OTP Verification Box -->
+                    <!-- Interactive OTP Verification Box (Strict Max 1 Character per box) -->
                     <form onsubmit="onForgotStep2Submit(event)" class="space-y-4 mb-6">
                         <div class="flex items-center justify-center gap-2" id="otpBoxGrid">
-                            <input type="text" maxlength="1" class="otp-box" id="otp1" autocomplete="off" inputmode="numeric">
-                            <input type="text" maxlength="1" class="otp-box" id="otp2" autocomplete="off" inputmode="numeric">
-                            <input type="text" maxlength="1" class="otp-box" id="otp3" autocomplete="off" inputmode="numeric">
-                            <input type="text" maxlength="1" class="otp-box" id="otp4" autocomplete="off" inputmode="numeric">
-                            <input type="text" maxlength="1" class="otp-box" id="otp5" autocomplete="off" inputmode="numeric">
-                            <input type="text" maxlength="1" class="otp-box" id="otp6" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" pattern="[0-9]*" class="otp-box" id="otp1" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" pattern="[0-9]*" class="otp-box" id="otp2" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" pattern="[0-9]*" class="otp-box" id="otp3" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" pattern="[0-9]*" class="otp-box" id="otp4" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" pattern="[0-9]*" class="otp-box" id="otp5" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" pattern="[0-9]*" class="otp-box" id="otp6" autocomplete="off" inputmode="numeric">
                         </div>
 
                         <div class="flex items-center justify-between text-xs px-2">

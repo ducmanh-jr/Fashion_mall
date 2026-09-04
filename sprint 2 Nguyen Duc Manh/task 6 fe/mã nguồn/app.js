@@ -2,6 +2,7 @@
  * SHOPAI MARKET — SKETCH WIREFRAME AUTH & RECOVERY ENGINE (app.js)
  * Task 6: HTTMDTTHA-51 — Exact 3-Step Wireframe Sketch Implementation
  * Default OTP: 000000 (Empty boxes on UI load, user types manually)
+ * Strict 1-Character Cap per OTP Box (Prevents Overflow Bug)
  * ============================================================================== */
 
 // ─── 1. REAL BUSINESS STATE & USER DATABASE STORE ───
@@ -116,18 +117,27 @@ function goToStep(stepNum) {
     }
 }
 
-// ─── 5. SLEEK 6-BOX OTP GRID AUTO-ADVANCE & PASTE HANDLER ───
+// ─── 5. STRICT 1-CHARACTER OTP BOX GRID (PREVENTS OVERFLOW BUG) ───
 function initOTPBoxGrid() {
     const boxes = document.querySelectorAll('.otp-box');
     if (!boxes.length) return;
 
     boxes.forEach((box, index) => {
         box.addEventListener('input', (e) => {
-            const val = e.target.value;
+            // Keep ONLY digits 0-9 and restrict length strictly to 1 character
+            let val = e.target.value.replace(/\D/g, '');
+            if (val.length > 1) {
+                val = val.substring(0, 1);
+            }
+            box.value = val;
+
             if (val) {
                 box.classList.add('filled');
                 if (index < boxes.length - 1) {
                     boxes[index + 1].focus();
+                } else {
+                    // On box 6 (last box), blur so extra typing cannot overflow
+                    box.blur();
                 }
             } else {
                 box.classList.remove('filled');
@@ -135,15 +145,23 @@ function initOTPBoxGrid() {
         });
 
         box.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && !box.value && index > 0) {
-                boxes[index - 1].focus();
+            if (e.key === 'Backspace') {
+                if (!box.value && index > 0) {
+                    const prevBox = boxes[index - 1];
+                    prevBox.value = '';
+                    prevBox.classList.remove('filled');
+                    prevBox.focus();
+                } else {
+                    box.value = '';
+                    box.classList.remove('filled');
+                }
             }
         });
 
         box.addEventListener('paste', (e) => {
             e.preventDefault();
-            const pasteData = (e.clipboardData || window.clipboardData).getData('text').trim();
-            if (/^\d{6}$/.test(pasteData)) {
+            const pasteData = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').substring(0, 6);
+            if (pasteData) {
                 fillOTPBoxes(pasteData);
             }
         });
@@ -161,7 +179,7 @@ function clearOTPBoxes() {
 }
 
 function fillOTPBoxes(otpCode) {
-    const digits = otpCode.split('');
+    const digits = otpCode.substring(0, 6).split('');
     digits.forEach((digit, i) => {
         const box = document.getElementById(`otp${i + 1}`);
         if (box) {
@@ -177,7 +195,7 @@ function getEnteredOTP() {
     let otp = '';
     for (let i = 1; i <= 6; i++) {
         const box = document.getElementById(`otp${i}`);
-        if (box) otp += box.value.trim();
+        if (box) otp += box.value.trim().substring(0, 1);
     }
     return otp;
 }
