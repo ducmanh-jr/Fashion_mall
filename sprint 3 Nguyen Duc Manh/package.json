@@ -1,0 +1,22 @@
+{
+  "name": "sprint-3-nguyen-duc-manh",
+  "version": "1.0.0",
+  "description": "Thư mục Sprint 3 chứa 6 task độc lập của Nguyễn Đức Mạnh (Catalog, Giỏ hàng, Đơn hàng & Thanh toán)",
+  "scripts": {
+    "test:task1": "cd \"task 1\" && node test/test.js",
+    "test:task2": "cd \"task 2 be\" && node test/test.js",
+    "test:task3": "cd \"task 3 be\" && node test/test.js",
+    "test:task4": "cd \"task 4 be\" && node test/test.js",
+    "test:task5": "cd \"task 5 be\" && node test/test.js",
+    "test:task6": "cd \"task 6 and 7 fe\" && node test/test.js",
+    "test:task6and7": "cd \"task 6 and 7 fe\" && node test/test.js",
+    "test:all": "npm run test:task1 && npm run test:task2 && npm run test:task3 && npm run test:task4 && npm run test:task5 && npm run test:task6"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.6",
+    "dotenv": "^16.6.1",
+    "express": "^4.22.2",
+    "jsonwebtoken": "^9.0.3"
+  }
+}
