@@ -1,0 +1,5 @@
+﻿node_modules/
+dist/
+branches/
+*.log
+fashion_mall.db
