@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "dm-fashion-mall-core",
   "version": "1.0.0",
   "description": "Core E-Commerce Backend and Frontend Portal built with TypeScript",
@@ -10,7 +10,8 @@
     "start": "node dist/server.js",
     "migrate": "tsx src/database/migrator.ts up",
     "seed": "tsx src/database/migrator.ts seed",
-    "test": "tsx tests/e2e.test.ts"
+    "test": "tsx tests/e2e.test.ts",
+    "update-team": "powershell -ExecutionPolicy Bypass -File ../update-team.ps1"
   },
   "dependencies": {
     "bcrypt": "^5.1.1",
