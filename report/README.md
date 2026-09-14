@@ -1,9 +1,9 @@
-﻿# 📊 BÁO CÁO TỔNG HỢP CÔNG VIỆC ĐÃ HOÀN THÀNH
+# 📊 BÁO CÁO TỔNG HỢP CÔNG VIỆC ĐÃ HOÀN THÀNH
 ## DỰ ÁN: DM FASHION MALL (AETHELGARD SHOPPING MALL)
 ### Đề tài: Hệ Thống Thương Mại Điện Tử Tích Hợp AI (HTTMDTTHA)
 
 - **Người thực hiện:** Nguyễn Đức Mạnh
-- **Vai trò:** Fullstack Developer
+- **Vai trò:** Phụ trách Phân hệ Người Bán (Seller / Merchant System) & E-Commerce Core
 - **Tình trạng tổng thể:** **100% HOÀN THÀNH (DONE)**
 - **Kiểm thử tự động (Automated Test Suite):** **100% PASS**
 
