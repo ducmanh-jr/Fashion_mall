@@ -1,4 +1,4 @@
-﻿# 🛍️ DM Fashion Mall — Hệ Thống Thương Mại Điện Tử Thời Trang Tích Hợp AI
+# 🛍️ DM Fashion Mall — Hệ Thống Thương Mại Điện Tử Thời Trang Tích Hợp AI
 
 [![GitHub Repo](https://img.shields.io/badge/GitHub-ducmanh--jr%2FFashion__mall-181717?style=for-the-badge&logo=github)](https://github.com/ducmanh-jr/Fashion_mall)
 [![Team Project](https://img.shields.io/badge/Team_Repo-longthan12334%2FHTTMDTTHA-blue?style=for-the-badge&logo=git)](https://github.com/longthan12334/He-thong-thuong-mai-ien-tu-tich-hop-AI)
@@ -21,6 +21,10 @@ Dự án được xây dựng theo mô hình phát triển **Agile/Scrum**, phâ
 
 ```text
 DM_Fashion_mall_other_ducmanh/
+├── 📁 report/                           # Thư mục Báo cáo chi tiết toàn bộ công việc đã hoàn thành
+│   ├── 📄 README.md                     # Báo cáo tổng hợp tiến độ, thống kê Jira & kết quả test
+│   ├── 📄 sprint-2-auth-security.md     # Báo cáo chuyên sâu Sprint 2 (Xác thực & Bảo mật)
+│   └── 📄 sprint-3-ecommerce-core.md    # Báo cáo chuyên sâu Sprint 3 (Core E-Commerce & CSDL)
 ├── 📁 sprint/                           # Toàn bộ mã nguồn phát triển theo các Sprint
 │   ├── 📁 sprint 2 Nguyen Duc Manh/     # Sprint 2: Hệ thống Xác thực, Tài khoản & Bảo mật
 │   │   ├── 📁 task 1 fe/                # [FE] Form Đăng ký & Đăng nhập (50:50 Split-screen)
