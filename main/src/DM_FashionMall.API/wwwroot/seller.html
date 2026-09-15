@@ -1,0 +1,831 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kênh Người Bán - DM Fashion Mall (Seller Center)</title>
+  <link rel="stylesheet" href="css/seller.css">
+</head>
+<body>
+
+  <!-- SIDEBAR NAVIGATION (15 PHÂN HỆ) -->
+  <aside class="seller-sidebar">
+    <div class="seller-brand">
+      <div class="brand-logo">DM</div>
+      <div>
+        <div class="brand-title">Seller Center</div>
+        <span class="brand-badge">.NET 10 Pro</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-group-title">Tổng Quan</div>
+      <a class="nav-item active" data-view="dashboard">
+        <span class="icon">📊</span>
+        <span>2. Dashboard</span>
+      </a>
+
+      <div class="nav-group-title">Quản Lý Sản Phẩm</div>
+      <a class="nav-item" data-view="products">
+        <span class="icon">👗</span>
+        <span>4. Danh Sách Sản Phẩm</span>
+      </a>
+      <a class="nav-item" data-view="add-product">
+        <span class="icon">✨</span>
+        <span>5. Đăng Bán SP (AI)</span>
+      </a>
+      <a class="nav-item" data-view="inventory">
+        <span class="icon">📦</span>
+        <span>7. Quản Lý Tồn Kho</span>
+        <span class="nav-badge" id="badge-low-stock" style="display:none;">0</span>
+      </a>
+
+      <div class="nav-group-title">Đơn Hàng & Vận Chuyển</div>
+      <a class="nav-item" data-view="orders">
+        <span class="icon">📑</span>
+        <span>8. Danh Sách Đơn Hàng</span>
+        <span class="nav-badge" id="badge-pending-orders" style="display:none;">0</span>
+      </a>
+      <a class="nav-item" data-view="shipping">
+        <span class="icon">🚚</span>
+        <span>10. Cài Đặt Vận Chuyển</span>
+      </a>
+
+      <div class="nav-group-title">Marketing & Khách Hàng</div>
+      <a class="nav-item" data-view="promotions">
+        <span class="icon">🎁</span>
+        <span>11. Mã Giảm Giá</span>
+      </a>
+      <a class="nav-item" data-view="reviews">
+        <span class="icon">⭐</span>
+        <span>14. Đánh Giá Khách Hàng</span>
+      </a>
+
+      <div class="nav-group-title">Tài Chính & Báo Cáo</div>
+      <a class="nav-item" data-view="finance">
+        <span class="icon">💰</span>
+        <span>12. Ví & Doanh Thu</span>
+      </a>
+      <a class="nav-item" data-view="analytics">
+        <span class="icon">📈</span>
+        <span>13. Phân Tích Kinh Doanh</span>
+      </a>
+
+      <div class="nav-group-title">Cài Đặt Cửa Hàng</div>
+      <a class="nav-item" data-view="profile">
+        <span class="icon">🏪</span>
+        <span>3. Hồ Sơ Shop</span>
+      </a>
+      <a class="nav-item" data-view="settings">
+        <span class="icon">⚙️</span>
+        <span>15. Cài Đặt Hệ Thống</span>
+      </a>
+      <a class="nav-item" data-view="login" style="color: #ef4444; margin-top: 10px;">
+        <span class="icon">🔐</span>
+        <span>1. Đăng Nhập / Đổi TK</span>
+      </a>
+    </nav>
+  </aside>
+
+  <!-- MAIN WORKSPACE -->
+  <main class="seller-main">
+    <!-- Top Header -->
+    <header class="seller-header">
+      <div class="header-left">
+        <div class="header-search">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="global-search-input" placeholder="Tìm đơn hàng, SKU, sản phẩm...">
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="shop-status-pill" id="shop-status-display">
+          <span class="dot"></span>
+          <span id="shop-status-text">Đang Mở Cửa</span>
+        </div>
+        <div class="user-profile-menu" onclick="switchView('profile')">
+          <img src="img/fashion_mood_board.jpg" alt="Shop Avatar" class="user-avatar" id="header-shop-logo">
+          <div class="user-info">
+            <span class="user-name" id="header-shop-name">Aethelgard Luxury Store</span>
+            <span class="user-role" id="header-user-role">Người Bán VIP (.NET C#)</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- VIEWS CONTAINER -->
+    <div class="content-body">
+
+      <!-- 1. LOGIN VIEW -->
+      <section id="view-login" class="view-section">
+        <div class="card" style="max-width: 480px; margin: 40px auto;">
+          <h2 style="font-size: 20px; font-weight: 700; margin-bottom: 8px; text-align: center;">🔐 Cổng Đăng Nhập Người Bán</h2>
+          <p style="font-size: 13.5px; color: var(--text-muted); text-align: center; margin-bottom: 24px;">Truy cập vào trung tâm điều hành gian hàng DM Fashion Mall</p>
+          <form id="form-login" onsubmit="handleLogin(event)">
+            <div class="form-group">
+              <label class="form-label">Email Người Bán</label>
+              <input type="email" id="login-email" class="form-control" value="seller@dmfashionmall.vn" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Mật Khẩu</label>
+              <input type="password" id="login-password" class="form-control" value="123456" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center; padding: 12px;">Đăng Nhập Ngay</button>
+            <div style="margin-top: 16px; font-size: 12px; color: var(--text-muted); text-align: center;">
+              Tài khoản mẫu: <b>seller@dmfashionmall.vn</b> / Mật khẩu: <b>123456</b>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <!-- 2. DASHBOARD VIEW -->
+      <section id="view-dashboard" class="view-section active">
+        <div class="view-header">
+          <div class="title-area">
+            <h2>Tổng Quan Kinh Doanh Hôm Nay</h2>
+            <p>Số liệu cập nhật thời gian thực từ hệ thống C# .NET 10 Web API</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-ai" onclick="switchView('add-product')">✨ Đăng Sản Phẩm Mới</button>
+            <button class="btn btn-secondary" onclick="loadDashboard()">🔄 Làm Mới</button>
+          </div>
+        </div>
+
+        <div class="grid-4">
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <div class="kpi-label">DOANH THU HÔM NAY</div>
+              <div class="kpi-value" id="kpi-today-revenue">0 ₫</div>
+              <div class="kpi-sub">↑ Tăng trưởng tích cực</div>
+            </div>
+            <div class="kpi-icon" style="background:#e0e7ff; color:#4f46e5;">💵</div>
+          </div>
+          <div class="kpi-card" onclick="switchView('orders'); filterOrders('PENDING');" style="cursor:pointer;">
+            <div class="kpi-info">
+              <div class="kpi-label">ĐƠN CẦN XÁC NHẬN</div>
+              <div class="kpi-value" id="kpi-pending-orders">0</div>
+              <div class="kpi-sub" style="color:#f59e0b;">Chờ bạn xử lý ngay</div>
+            </div>
+            <div class="kpi-icon" style="background:#fef3c7; color:#d97706;">📦</div>
+          </div>
+          <div class="kpi-card" onclick="switchView('inventory'); loadInventory(true);" style="cursor:pointer;">
+            <div class="kpi-info">
+              <div class="kpi-label">CẢNH BÁO HẾT HÀNG</div>
+              <div class="kpi-value" id="kpi-low-stock">0</div>
+              <div class="kpi-sub" style="color:#ef4444;">Tồn kho &lt; 5 chiếc</div>
+            </div>
+            <div class="kpi-icon" style="background:#fee2e2; color:#dc2626;">⚠️</div>
+          </div>
+          <div class="kpi-card" onclick="switchView('reviews')" style="cursor:pointer;">
+            <div class="kpi-info">
+              <div class="kpi-label">ĐÁNH GIÁ MỚI</div>
+              <div class="kpi-value" id="kpi-new-reviews">0</div>
+              <div class="kpi-sub">⭐ Điểm TB: <span id="kpi-avg-rating">5.0</span>/5</div>
+            </div>
+            <div class="kpi-icon" style="background:#fce7f3; color:#db2777;">⭐</div>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <div class="card-title">
+              <span>📈 Biểu Đồ Doanh Thu 7 Ngày Gần Nhất</span>
+              <span class="badge badge-info">VND</span>
+            </div>
+            <canvas id="salesCanvas" width="550" height="260" style="width:100%; height:260px;"></canvas>
+          </div>
+          <div class="card">
+            <div class="card-title">
+              <span>⚡ Việc Cần Làm Ngay (To-Do List)</span>
+            </div>
+            <div id="dashboard-todo-list" style="display: flex; flex-direction: column; gap: 12px;">
+              <!-- Dynamic Todo -->
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. SHOP PROFILE VIEW -->
+      <section id="view-profile" class="view-section">
+        <div class="view-header">
+          <div class="title-area">
+            <h2>Hồ Sơ Gian Hàng & Định Danh</h2>
+            <p>Quản lý thông tin hiển thị thương hiệu và kho vận</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-primary" onclick="saveShopProfile()">💾 Lưu Thay Đổi</button>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3 class="card-title">Hình Ảnh Đại Diện & Banner</h3>
+            <div style="margin-bottom: 20px;">
+              <label class="form-label">Ảnh Bìa Gian Hàng (Banner)</label>
+              <img id="profile-banner-preview" src="img/fashion_mood_board.jpg" style="width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 10px; border: 1px solid var(--border-color);">
+              <input type="text" id="profile-banner-url" class="form-control" placeholder="Đường dẫn ảnh bìa">
+            </div>
+            <div>
+              <label class="form-label">Logo Gian Hàng</label>
+              <div style="display: flex; gap: 16px; align-items: center;">
+                <img id="profile-logo-preview" src="img/fashion_mood_board.jpg" style="width: 72px; height: 72px; border-radius: 50%; object-fit: cover; border: 2px solid var(--primary-accent);">
+                <input type="text" id="profile-logo-url" class="form-control" placeholder="Đường dẫn logo">
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">Thông Tin Liên Hệ & Vận Hành</h3>
+            <div class="form-group">
+              <label class="form-label">Tên Gian Hàng</label>
+              <input type="text" id="profile-shop-name" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Đường Dẫn Cửa Hàng (Slug)</label>
+              <input type="text" id="profile-shop-slug" class="form-control" readonly style="background:#f1f5f9;">
+            </div>
+            <div class="grid-2" style="margin-bottom: 0;">
+              <div class="form-group">
+                <label class="form-label">Hotline</label>
+                <input type="text" id="profile-phone" class="form-control">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Email CSKH</label>
+                <input type="email" id="profile-email" class="form-control">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Địa Chỉ Kho Hàng (Lấy hàng)</label>
+              <input type="text" id="profile-warehouse" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Giới Thiệu Shop (Bio)</label>
+              <textarea id="profile-bio" class="form-control" style="min-height: 80px;"></textarea>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. PRODUCT LIST VIEW -->
+      <section id="view-products" class="view-section">
+        <div class="view-header">
+          <div class="title-area">
+            <h2>Tất Cả Sản Phẩm Của Shop</h2>
+            <p>Quản lý danh mục sản phẩm, biến thể, giá bán và trạng thái hiển thị</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-primary" onclick="switchView('add-product')">+ Đăng Sản Phẩm Mới</button>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 16px; margin-bottom: 20px;">
+          <div style="display: flex; gap: 14px; flex-wrap: wrap;">
+            <input type="text" id="prod-filter-search" class="form-control" placeholder="Tìm kiếm theo tên sản phẩm..." style="width: 280px;" oninput="loadProducts()">
+            <select id="prod-filter-cat" class="form-control" style="width: 200px;" onchange="loadProducts()">
+              <option value="0">Tất cả danh mục</option>
+            </select>
+            <select id="prod-filter-status" class="form-control" style="width: 160px;" onchange="loadProducts()">
+              <option value="ALL">Mọi trạng thái</option>
+              <option value="ACTIVE">Đang Bán</option>
+              <option value="INACTIVE">Tạm Ẩn</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 0;">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 70px;">Hình Ảnh</th>
+                  <th>Tên Sản Phẩm</th>
+                  <th>Danh Mục</th>
+                  <th>Thương Hiệu</th>
+                  <th>Giá Bán Niêm Yết</th>
+                  <th>Tồn Kho</th>
+                  <th>Trạng Thái</th>
+                  <th style="text-align: right;">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="products-table-body">
+                <!-- Dynamic Products -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+      <!-- 5. ADD PRODUCT VIEW (TÍCH HỢP TRỢ LÝ AI) -->
+      <section id="view-add-product" class="view-section">
+        <div class="view-header">
+          <div class="title-area">
+            <h2 id="add-product-title">Đăng Sản Phẩm Mới Vào Gian Hàng</h2>
+            <p>Điền thông số sản phẩm hoặc bấm Trợ Lý AI để tự động sinh mô tả chuẩn SEO</p>
+          </div>
+          <div class="view-actions">
+            <button type="button" class="btn btn-ai" onclick="openAiGeneratorModal()">✨ Trợ Lý AI Viết Mô Tả</button>
+            <button type="button" class="btn btn-secondary" onclick="switchView('products')">Hủy Bỏ</button>
+            <button type="button" class="btn btn-primary" onclick="saveProductForm()">🚀 Đăng Bán Ngay</button>
+          </div>
+        </div>
+
+        <input type="hidden" id="edit-product-id" value="0">
+
+        <div class="grid-2">
+          <!-- Left: Thông tin chính -->
+          <div class="card">
+            <h3 class="card-title">1. Thông Tin Cơ Bản</h3>
+            <div class="form-group">
+              <label class="form-label">Tên Sản Phẩm *</label>
+              <input type="text" id="prod-form-name" class="form-control" placeholder="Ví dụ: Giày Sneaker Balenciaga Track 4.0 Black Edition" required>
+            </div>
+            <div class="grid-2" style="margin-bottom:0;">
+              <div class="form-group">
+                <label class="form-label">Danh Mục *</label>
+                <select id="prod-form-category" class="form-control"></select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Thương Hiệu</label>
+                <select id="prod-form-brand" class="form-control"></select>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Giá Cơ Bản (VND) *</label>
+              <input type="number" id="prod-form-price" class="form-control" placeholder="1000000" min="0" required>
+            </div>
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+                <label class="form-label" style="margin-bottom:0;">Mô Tả Sản Phẩm Chi Tiết</label>
+                <button type="button" class="btn btn-sm btn-ai" onclick="openAiGeneratorModal()">✨ Viết bằng AI</button>
+              </div>
+              <textarea id="prod-form-desc" class="form-control" style="min-height: 220px;" placeholder="Nhập mô tả sản phẩm hoặc sử dụng AI để tự động tạo..."></textarea>
+            </div>
+          </div>
+
+          <!-- Right: Hình ảnh & Biến thể -->
+          <div class="card">
+            <h3 class="card-title">2. Hình Ảnh Đại Diện</h3>
+            <div class="form-group">
+              <label class="form-label">Đường dẫn ảnh sản phẩm (Cách nhau bằng dấu phẩy hoặc xuống dòng)</label>
+              <textarea id="prod-form-images" class="form-control" style="min-height: 80px;" placeholder="img/Balenciaga_Track_4_0_570391_W2GN7_2009.jpg"></textarea>
+              <div id="image-preview-strip" style="display:flex; gap:10px; margin-top:10px; overflow-x:auto;"></div>
+            </div>
+
+            <h3 class="card-title" style="margin-top: 24px;">
+              <span>3. Phân Loại Hàng (Biến Thể)</span>
+              <button type="button" class="btn btn-sm btn-secondary" onclick="addVariantRow()">+ Thêm Phân Loại</button>
+            </h3>
+            <div class="table-responsive">
+              <table class="data-table" style="font-size:12.5px;">
+                <thead>
+                  <tr>
+                    <th>SKU</th>
+                    <th>Kích Cỡ</th>
+                    <th>Màu Sắc</th>
+                    <th>Giá Bán</th>
+                    <th>Tồn Kho</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="variants-table-body">
+                  <!-- Variant Rows -->
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 7. INVENTORY VIEW -->
+      <section id="view-inventory" class="view-section">
+        <div class="view-header">
+          <div class="title-area">
+            <h2>Quản Lý Tồn Kho & Cảnh Báo</h2>
+            <p>Kiểm soát số lượng tồn thực tế, số lượng tạm giữ và cảnh báo hết hàng</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-secondary" onclick="loadInventory(false)">Tất Cả Tồn Kho</button>
+            <button class="btn btn-danger" onclick="loadInventory(true)">⚠️ Hàng Sắp Hết (&lt; 5 chiếc)</button>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 0;">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 70px;">Ảnh</th>
+                  <th>Sản Phẩm</th>
+                  <th>Tổng Tồn Kho</th>
+                  <th>Đang Tạm Giữ</th>
+                  <th>Khả Dụng Bán</th>
+                  <th>Mức Báo Động</th>
+                  <th>Trạng Thái</th>
+                  <th>Cập Nhật Nhanh</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-table-body">
+                <!-- Dynamic Inventory -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. ORDER LIST VIEW -->
+      <section id="view-orders" class="view-section">
+        <div class="view-header">
+          <div class="title-area">
+            <h2>Quản Lý Luồng Đơn Hàng</h2>
+            <p>Xử lý đơn hàng từ lúc đặt hàng đến khi giao vận thành công</p>
+          </div>
+        </div>
+
+        <div class="tabs-nav">
+          <button class="tab-btn active" onclick="filterOrders('ALL', this)">Tất Cả</button>
+          <button class="tab-btn" onclick="filterOrders('PENDING', this)">Chờ Xác Nhận</button>
+          <button class="tab-btn" onclick="filterOrders('CONFIRMED', this)">Đã Xác Nhận</button>
+          <button class="tab-btn" onclick="filterOrders('SHIPPING', this)">Đang Vận Chuyển</button>
+          <button class="tab-btn" onclick="filterOrders('COMPLETED', this)">Đã Hoàn Thành</button>
+          <button class="tab-btn" onclick="filterOrders('CANCELLED', this)">Đã Hủy</button>
+        </div>
+
+        <div class="card" style="padding: 0;">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mã Đơn Hàng</th>
+                  <th>Khách Hàng</th>
+                  <th>Số Điện Thoại</th>
+                  <th>Mặt Hàng</th>
+                  <th>Tổng Tiền</th>
+                  <th>Thanh Toán</th>
+                  <th>Trạng Thái</th>
+                  <th>Mã Vận Đơn</th>
+                  <th style="text-align: right;">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="orders-table-body">
+                <!-- Dynamic Orders -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 10. SHIPPING VIEW -->
+      <section id="view-shipping" class="view-section">
+        <div class="view-header">
+          <div class="title-area">
+            <h2>Cài Đặt Đơn Vị Vận Chuyển</h2>
+            <p>Bật hoặc tắt các kênh giao hàng được hỗ trợ tại gian hàng của bạn</p>
+          </div>
+        </div>
+
+        <div class="grid-2" id="shipping-channels-grid">
+          <!-- Dynamic Shipping Channels -->
+        </div>
+      </section>
+
+      <!-- 11. PROMOTION VIEW -->
+      <section id="view-promotions" class="view-section">
+        <div class="view-header">
+          <div class="title-area">
+            <h2>Quản Lý Mã Khuyến Mãi (Voucher)</h2>
+            <p>Tạo chiến dịch kích cầu doanh số với mã giảm giá độc quyền</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-primary" onclick="openCreatePromoModal()">+ Tạo Mã Giảm Giá Mới</button>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 0;">
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mã Voucher</th>
+                  <th>Tên Chương Trình</th>
+                  <th>Mức Giảm</th>
+                  <th>Đơn Tối Thiểu</th>
+                  <th>Lượt Dùng</th>
+                  <th>Hạn Sử Dụng</th>
+                  <th>Trạng Thái</th>
+                  <th style="text-align: right;">Thao Tác</th>
+                </tr>
+              </thead>
+              <tbody id="promotions-table-body">
+                <!-- Dynamic Promos -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 12. FINANCE & WALLET VIEW -->
+      <section id="view-finance" class="view-section">
+        <div class="view-header">
+          <div class="title-area">
+            <h2>Ví Người Bán & Quản Trị Dòng Tiền</h2>
+            <p>Theo dõi doanh thu thanh toán, quyết toán đơn hàng và rút tiền</p>
+          </div>
+          <div class="view-actions">
+            <button class="btn btn-primary" onclick="openWithdrawModal()">💵 Yêu Cầu Rút Tiền</button>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card" style="background: linear-gradient(135deg, #1e1b4b, #312e81); color: #fff;">
+            <div style="font-size: 13px; color: #a5b4fc; font-weight: 600;">SỐ DƯ KHẢ DỤNG (RÚT ĐƯỢC)</div>
+            <div style="font-size: 32px; font-weight: 800; margin: 10px 0;" id="wallet-available-balance">0 ₫</div>
+            <div style="font-size: 12.5px; color: #c7d2fe; display: flex; justify-content: space-between;">
+              <span>Đang chờ quyết toán: <b id="wallet-pending-balance" style="color: #fde047;">0 ₫</b></span>
+              <span>Ngân hàng: <b id="wallet-bank-info">Chưa liên kết</b></span>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">Tài Khoản Nhận Tiền Mặc Định</h3>
+            <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 12px;">Tiền rút sẽ được chuyển khoản nhanh 24/7 vào tài khoản bên dưới:</p>
+            <div style="padding: 12px; background: #f8fafc; border-radius: 8px; border: 1px solid var(--border-color);">
+              <div style="font-size: 14px; font-weight: 700;" id="bank-card-name">NGUYEN DUC MANH</div>
+              <div style="font-size: 13px; color: var(--text-muted);" id="bank-card-details">Vietcombank - 1018293847</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 0;">
+          <div class="card-title" style="padding: 18px 20px 0;">Lịch Sử Giao Dịch Ví</div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Mã GD</th>
+                  <th>Loại Giao Dịch</th>
+                  <th>Số Tiền</th>
+                  <th>Ghi Chú</th>
+                  <th>Trạng Thái</th>
+                  <th>Thời Gian</th>
+                </tr>
+              </thead>
+              <tbody id="transactions-table-body">
+                <!-- Dynamic Transactions -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 13. ANALYTICS VIEW -->
+      <section id="view-analytics" class="view-section">
+        <div class="view-header">
+          <div class="title-area">
+            <h2>Phân Tích Dữ Liệu Kinh Doanh</h2>
+            <p>Báo cáo tỷ lệ chuyển đổi và các sản phẩm sinh lời cao nhất</p>
+          </div>
+        </div>
+
+        <div class="grid-4">
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <div class="kpi-label">TỔNG DOANH THU LŨY KẾ</div>
+              <div class="kpi-value" id="analytics-revenue">0 ₫</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <div class="kpi-label">TỔNG ĐƠN ĐÃ XỬ LÝ</div>
+              <div class="kpi-value" id="analytics-orders">0</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <div class="kpi-label">LƯỢT XEM SẢN PHẨM</div>
+              <div class="kpi-value" id="analytics-views">0</div>
+            </div>
+          </div>
+          <div class="kpi-card">
+            <div class="kpi-info">
+              <div class="kpi-label">TỶ LỆ CHUYỂN ĐỔI</div>
+              <div class="kpi-value" id="analytics-conversion">0%</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card" style="padding: 0;">
+          <div class="card-title" style="padding: 18px 20px 0;">🏆 Top 5 Sản Phẩm Bán Chạy Nhất</div>
+          <div class="table-responsive">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width: 70px;">Ảnh</th>
+                  <th>Tên Sản Phẩm</th>
+                  <th>Số Lượng Bán Ra</th>
+                  <th>Doanh Thu Đem Về</th>
+                </tr>
+              </thead>
+              <tbody id="top-products-table-body">
+                <!-- Dynamic Top Products -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- 14. REVIEWS VIEW -->
+      <section id="view-reviews" class="view-section">
+        <div class="view-header">
+          <div class="title-area">
+            <h2>Đánh Giá Của Khách Hàng</h2>
+            <p>Phản hồi và lắng nghe góp ý từ người mua để cải thiện chất lượng phục vụ</p>
+          </div>
+        </div>
+
+        <div id="reviews-list-container" style="display: flex; flex-direction: column; gap: 16px;">
+          <!-- Dynamic Reviews -->
+        </div>
+      </section>
+
+      <!-- 15. SETTINGS VIEW -->
+      <section id="view-settings" class="view-section">
+        <div class="view-header">
+          <div class="title-area">
+            <h2>Cài Đặt Gian Hàng & Bảo Mật</h2>
+            <p>Quản lý chế độ tạm nghỉ bán và đổi mật khẩu tài khoản</p>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="card">
+            <h3 class="card-title">Trạng Thái Mở Cửa & Chế Độ Tạm Nghỉ (Vacation Mode)</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 16px;">
+              Khi bật chế độ tạm nghỉ, người mua sẽ không thể đặt đơn mới cho đến khi bạn mở lại shop.
+            </p>
+            <div style="display:flex; align-items:center; gap: 12px; margin-bottom: 20px;">
+              <input type="checkbox" id="setting-vacation-mode" style="width: 20px; height: 20px; cursor: pointer;">
+              <label for="setting-vacation-mode" style="font-weight: 600; cursor: pointer;">Kích hoạt Chế Độ Tạm Nghỉ Bán</label>
+            </div>
+            <button class="btn btn-primary" onclick="saveSettings()">Lưu Cài Đặt</button>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">Đổi Mật Khẩu Đăng Nhập</h3>
+            <form onsubmit="handleChangePassword(event)">
+              <div class="form-group">
+                <label class="form-label">Mật khẩu hiện tại</label>
+                <input type="password" id="pw-current" class="form-control" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Mật khẩu mới (Tối thiểu 6 ký tự)</label>
+                <input type="password" id="pw-new" class="form-control" required minlength="6">
+              </div>
+              <button type="submit" class="btn btn-secondary">Cập Nhật Mật Khẩu</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- MODAL: ORDER DETAIL (9. CHI TIẾT ĐƠN HÀNG) -->
+  <div class="modal-overlay" id="modal-order-detail">
+    <div class="modal-box" style="max-width: 680px;">
+      <div class="modal-header">
+        <h3 id="modal-order-title">Chi Tiết Đơn Hàng #000</h3>
+        <button class="modal-close" onclick="closeModal('modal-order-detail')">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-order-content">
+        <!-- Dynamic Order Detail Content -->
+      </div>
+      <div class="modal-footer" id="modal-order-actions">
+        <!-- Status Action Buttons -->
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: AI DESCRIPTION GENERATOR (TRỢ LÝ AI) -->
+  <div class="modal-overlay" id="modal-ai-generator">
+    <div class="modal-box" style="max-width: 620px;">
+      <div class="modal-header" style="background: linear-gradient(135deg, #4f46e5, #ec4899); color:#fff;">
+        <h3>✨ Trợ Lý AI Sinh Mô Tả Sản Phẩm Chuẩn TMĐT</h3>
+        <button class="modal-close" style="color:#fff;" onclick="closeModal('modal-ai-generator')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label class="form-label">Tên sản phẩm cần viết bài:</label>
+          <input type="text" id="ai-product-name" class="form-control" readonly style="background:#f8fafc; font-weight:600;">
+        </div>
+        <div class="grid-2" style="margin-bottom:0;">
+          <div class="form-group">
+            <label class="form-label">Phong cách bài viết (Tone)</label>
+            <select id="ai-tone" class="form-control">
+              <option value="Luxury & Sang Trọng">Luxury & Sang Trọng</option>
+              <option value="Streetwear Trẻ Trung">Streetwear Trẻ Trung & Cá Tính</option>
+              <option value="Tối Giản Basic">Tối Giản Basic & Thanh Lịch</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Chất liệu chính</label>
+            <input type="text" id="ai-material" class="form-control" value="Da lộn cao cấp kết hợp vải lưới thoáng khí">
+          </div>
+        </div>
+        <button type="button" class="btn btn-ai" style="width:100%; justify-content:center; padding:12px; margin-top:8px;" onclick="generateAiCopy()">
+          ✨ Bắt Đầu Sinh Mô Tả Bằng AI
+        </button>
+
+        <div id="ai-result-area" style="display:none; margin-top:20px;">
+          <label class="form-label" style="color:var(--primary-accent);">Kết quả bài viết AI đã tạo:</label>
+          <textarea id="ai-result-text" class="form-control" style="min-height:180px; font-size:13px;"></textarea>
+          <div style="margin-top:12px; display:flex; gap:10px; justify-content:flex-end;">
+            <button type="button" class="btn btn-secondary" onclick="closeModal('modal-ai-generator')">Đóng</button>
+            <button type="button" class="btn btn-primary" onclick="applyAiCopy()">✅ Chèn Vào Bài Đăng</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: WITHDRAW MONEY (RÚT TIỀN VÍ) -->
+  <div class="modal-overlay" id="modal-withdraw">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>💵 Rút Tiền Về Tài Khoản Ngân Hàng</h3>
+        <button class="modal-close" onclick="closeModal('modal-withdraw')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="handleWithdraw(event)">
+          <div class="form-group">
+            <label class="form-label">Số tiền muốn rút (VND)</label>
+            <input type="number" id="withdraw-amount" class="form-control" min="50000" placeholder="5000000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Ngân hàng</label>
+            <input type="text" id="withdraw-bank" class="form-control" value="Vietcombank" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Số tài khoản</label>
+            <input type="text" id="withdraw-acc-num" class="form-control" value="1018293847" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tên chủ tài khoản</label>
+            <input type="text" id="withdraw-acc-name" class="form-control" value="NGUYEN DUC MANH" required>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:12px;">Xác Nhận Rút Tiền</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: CREATE PROMOTION -->
+  <div class="modal-overlay" id="modal-create-promo">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3>🎁 Tạo Mã Giảm Giá Mới</h3>
+        <button class="modal-close" onclick="closeModal('modal-create-promo')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form onsubmit="handleCreatePromo(event)">
+          <div class="form-group">
+            <label class="form-label">Mã Giảm Giá (Mã Code)</label>
+            <input type="text" id="promo-code" class="form-control" placeholder="SALE50K" required style="text-transform:uppercase;">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tiêu Đề Voucher</label>
+            <input type="text" id="promo-title" class="form-control" placeholder="Giảm ngay 50.000đ cho đơn từ 500k" required>
+          </div>
+          <div class="grid-2" style="margin-bottom:0;">
+            <div class="form-group">
+              <label class="form-label">Hình Thức Giảm</label>
+              <select id="promo-type" class="form-control">
+                <option value="FIXED">Giảm tiền mặt (VND)</option>
+                <option value="PERCENT">Giảm phần trăm (%)</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Giá Trị Giảm</label>
+              <input type="number" id="promo-value" class="form-control" placeholder="50000" required>
+            </div>
+          </div>
+          <div class="grid-2" style="margin-bottom:0;">
+            <div class="form-group">
+              <label class="form-label">Đơn Hàng Tối Thiểu</label>
+              <input type="number" id="promo-min-order" class="form-control" value="0">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Số Lượt Áp Dụng</label>
+              <input type="number" id="promo-limit" class="form-control" value="100">
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; padding:12px;">Kích Hoạt Voucher</button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOAST ALERTS CONTAINER -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- SCRIPT -->
+  <script src="js/seller.js"></script>
+</body>
+</html>

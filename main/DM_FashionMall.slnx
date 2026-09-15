@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/DM_FashionMall.API/DM_FashionMall.API.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/DM_FashionMall.Tests/DM_FashionMall.Tests.csproj" />
+  </Folder>
+</Solution>
