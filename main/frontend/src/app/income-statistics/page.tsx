@@ -1,388 +1,601 @@
-'use client';
+﻿'use client';
 
-import React, { useState, useEffect } from 'react';
-import { TrendingUp, DollarSign, Users, ShoppingCart, Search, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { IncomeSummary, MonthlyData, Transaction } from '@/types';
-import { api } from '@/lib/api';
+import React, { useState } from 'react';
+
+// Monthly Data for the Block Matrix Chart (JAN - DEC)
+interface MatrixMonthItem {
+  month: string;
+  existing: number;
+  newUsers: number;
+  valTotal: string;
+  newText?: string;
+  existText?: string;
+}
+
+const matrixChartData: MatrixMonthItem[] = [
+  { month: 'JAN', existing: 4, newUsers: 3, valTotal: '14k' },
+  { month: 'FEB', existing: 5, newUsers: 4, valTotal: '18k' },
+  { month: 'MAR', existing: 6, newUsers: 6, valTotal: '24k' },
+  { month: 'APR', existing: 5, newUsers: 7, valTotal: '26k' },
+  { month: 'MAY', existing: 7, newUsers: 10, valTotal: '34k' },
+  { month: 'JUN', existing: 8, newUsers: 14, valTotal: '56k', newText: '38k', existText: '18k' },
+  { month: 'JUL', existing: 6, newUsers: 8, valTotal: '30k' },
+  { month: 'AUG', existing: 5, newUsers: 6, valTotal: '22k' },
+  { month: 'SEP', existing: 4, newUsers: 5, valTotal: '19k' },
+  { month: 'OCT', existing: 6, newUsers: 7, valTotal: '27k' },
+  { month: 'NOV', existing: 5, newUsers: 8, valTotal: '28k' },
+  { month: 'DEC', existing: 7, newUsers: 9, valTotal: '32k' }
+];
+
+// Needle chart segments
+const needleHeights = [
+  { dark: 30, light: 20 },
+  { dark: 45, light: 25 },
+  { dark: 20, light: 15 },
+  { dark: 35, light: 30 },
+  { dark: 60, light: 20 },
+  { dark: 25, light: 30 },
+  { dark: 40, light: 20 },
+  { dark: 30, light: 35 },
+  { dark: 50, light: 25 },
+  { dark: 70, light: 30 },
+  { dark: 35, light: 20 },
+  { dark: 45, light: 25 },
+  { dark: 55, light: 20 },
+  { dark: 28, light: 30 },
+  { dark: 65, light: 25 },
+  { dark: 40, light: 30 },
+  { dark: 50, light: 20 },
+  { dark: 30, light: 25 }
+];
+
+interface Transaction {
+  id: string;
+  customer: string;
+  product: string;
+  status: 'Success' | 'Pending' | 'Refunded';
+  qty: number;
+  unitPrice: string;
+  total: string;
+}
+
+const initialTransactions: Transaction[] = [
+  { id: '#04910', customer: 'Ryan Korsgaard', product: 'Ergo Office Chair', status: 'Success', qty: 12, unitPrice: '$3,450', total: '$41,400' },
+  { id: '#04911', customer: 'Madelyn Lubin', product: 'Sunset Desk 02', status: 'Success', qty: 20, unitPrice: '$2,980', total: '$59,200' },
+  { id: '#04912', customer: 'Abram Bergson', product: 'Eco Bookshelf', status: 'Pending', qty: 22, unitPrice: '$1,750', total: '$75,900' },
+  { id: '#04913', customer: 'Phillip Mango', product: 'Green Leaf Desk', status: 'Refunded', qty: 24, unitPrice: '$1,950', total: '$19,500' },
+  { id: '#04914', customer: 'Esther Howard', product: 'Giày Sneaker Gucci Ace Leather', status: 'Success', qty: 2, unitPrice: '$1,250', total: '$2,500' },
+  { id: '#04915', customer: 'Darrell Steward', product: 'Túi Gucci Dionysus Supreme', status: 'Success', qty: 1, unitPrice: '$2,850', total: '$2,850' },
+  { id: '#04916', customer: 'Cameron Williamson', product: 'Adidas Samba OG Classic', status: 'Success', qty: 4, unitPrice: '$180', total: '$720' }
+];
 
 export default function IncomeStatisticsPage() {
-  const [stats, setStats] = useState<IncomeSummary | null>(null);
-  const [selectedMonth, setSelectedMonth] = useState<string>('JUN');
-  const [timeRange, setTimeRange] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
-  const [txSearch, setTxSearch] = useState('');
-  const [selectedTxIds, setSelectedTxIds] = useState<string[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [activeMonth, setActiveMonth] = useState<string>('JUN');
+  const [period, setPeriod] = useState<'weekly' | 'monthly' | 'yearly'>('monthly');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [showAiModal, setShowAiModal] = useState(false);
 
-  useEffect(() => {
-    async function loadStats() {
-      try {
-        setLoading(true);
-        const data = await api.getIncomeStats();
-        setStats(data);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    }
-    loadStats();
-  }, []);
+  // Period total calculation
+  const trendTotal = period === 'weekly' ? '$5,240' : period === 'yearly' ? '$248,500' : '$20,320';
 
-  const matrix = stats?.monthlyMatrix || [];
-  const currentActive = matrix.find(m => m.month === selectedMonth) || matrix[5];
-
-  const filteredTransactions = (stats?.recentTransactions || []).filter(tx =>
-    tx.id.toLowerCase().includes(txSearch.toLowerCase()) ||
-    tx.customer.toLowerCase().includes(txSearch.toLowerCase()) ||
-    tx.product.toLowerCase().includes(txSearch.toLowerCase())
-  );
+  // Filtered transactions
+  const filteredTransactions = transactions.filter(tx => {
+    if (!searchQuery) return true;
+    const q = searchQuery.toLowerCase();
+    return (
+      tx.id.toLowerCase().includes(q) ||
+      tx.customer.toLowerCase().includes(q) ||
+      tx.product.toLowerCase().includes(q) ||
+      tx.status.toLowerCase().includes(q)
+    );
+  });
 
   const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.checked) {
-      setSelectedTxIds(filteredTransactions.map(t => t.id));
+      setSelectedIds(filteredTransactions.map(tx => tx.id));
     } else {
-      setSelectedTxIds([]);
+      setSelectedIds([]);
     }
   };
 
   const handleToggleRow = (id: string) => {
-    setSelectedTxIds(prev =>
+    setSelectedIds(prev =>
       prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
     );
   };
 
+  const handleAddNewTx = () => {
+    const customer = window.prompt('Nhập tên khách hàng mới:', 'Eleanor Vance');
+    if (customer) {
+      const newTx: Transaction = {
+        id: `#049${Math.floor(100 + Math.random() * 900)}`,
+        customer: customer,
+        product: 'Gucci Monogram Canvas Shirt',
+        status: 'Success',
+        qty: 1,
+        unitPrice: '$1,050',
+        total: '$1,050'
+      };
+      setTransactions([newTx, ...transactions]);
+    }
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      
-      {/* ──── PAGE HEADER ──── */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-            Thống Kê Thu Nhập & Báo Cáo Tài Chính
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Biểu đồ phân tích doanh thu 12 tháng, chỉ số người dùng và lịch sử dòng tiền giao dịch
-          </p>
+    <main className="income-dashboard-wrap">
+      {/* ============================================================
+           ROW 1: 4 TOP METRIC CARDS
+           ============================================================ */}
+      <div className="metric-cards-grid">
+        {/* 1. Total Revenue */}
+        <div className="kpi-stat-box">
+          <div className="kpi-top-row">
+            <span className="kpi-title-mono">TOTAL REVENUE</span>
+            <div className="sparkline-bars">
+              <div className="spark-bar" style={{ height: '12px' }}></div>
+              <div className="spark-bar" style={{ height: '18px' }}></div>
+              <div className="spark-bar" style={{ height: '14px' }}></div>
+              <div className="spark-bar" style={{ height: '22px' }}></div>
+              <div className="spark-bar active" style={{ height: '28px' }}></div>
+              <div className="spark-bar" style={{ height: '16px' }}></div>
+              <div className="spark-bar" style={{ height: '20px' }}></div>
+            </div>
+          </div>
+          <div className="kpi-big-num">$20,320</div>
+          <div className="kpi-bottom-row">
+            <span className="kpi-info-icon">ⓘ</span>
+            <span className="kpi-growth-tag">
+              +0,94 <span style={{ fontWeight: 500, color: '#6B7280', marginLeft: '2px' }}>last year</span>
+            </span>
+          </div>
         </div>
 
-        {/* Time Pills */}
-        <div className="bg-slate-100 p-1 rounded-xl flex items-center gap-1 text-xs font-bold">
-          {(['weekly', 'monthly', 'yearly'] as const).map((mode) => (
-            <button
-              key={mode}
-              onClick={() => setTimeRange(mode)}
-              className={`px-3.5 py-1.5 rounded-lg capitalize transition-all ${
-                timeRange === mode
-                  ? 'bg-white text-slate-900 shadow-xs'
-                  : 'text-slate-500 hover:text-slate-900'
-              }`}
-            >
-              {mode}
-            </button>
-          ))}
+        {/* 2. Total Orders */}
+        <div className="kpi-stat-box">
+          <div className="kpi-top-row">
+            <span className="kpi-title-mono">TOTAL ORDERS</span>
+            <div className="sparkline-bars">
+              <div className="spark-bar" style={{ height: '14px' }}></div>
+              <div className="spark-bar" style={{ height: '10px' }}></div>
+              <div className="spark-bar" style={{ height: '16px' }}></div>
+              <div className="spark-bar active" style={{ height: '24px' }}></div>
+              <div className="spark-bar" style={{ height: '18px' }}></div>
+              <div className="spark-bar" style={{ height: '22px' }}></div>
+              <div className="spark-bar" style={{ height: '14px' }}></div>
+            </div>
+          </div>
+          <div className="kpi-big-num">
+            10,320 <span className="kpi-subtext">Orders</span>
+          </div>
+          <div className="kpi-bottom-row">
+            <span className="kpi-info-icon">ⓘ</span>
+            <span className="kpi-growth-tag">
+              +0,94 <span style={{ fontWeight: 500, color: '#6B7280', marginLeft: '2px' }}>last year</span>
+            </span>
+          </div>
+        </div>
+
+        {/* 3. New Customers */}
+        <div className="kpi-stat-box">
+          <div className="kpi-top-row">
+            <span className="kpi-title-mono">NEW CUSTOMERS</span>
+            <div className="sparkline-bars">
+              <div className="spark-bar" style={{ height: '16px' }}></div>
+              <div className="spark-bar" style={{ height: '20px' }}></div>
+              <div className="spark-bar" style={{ height: '12px' }}></div>
+              <div className="spark-bar" style={{ height: '18px' }}></div>
+              <div className="spark-bar active" style={{ height: '26px' }}></div>
+              <div className="spark-bar" style={{ height: '14px' }}></div>
+              <div className="spark-bar" style={{ height: '19px' }}></div>
+            </div>
+          </div>
+          <div className="kpi-big-num">
+            4,305 <span className="kpi-subtext">New Users</span>
+          </div>
+          <div className="kpi-bottom-row">
+            <span className="kpi-info-icon">ⓘ</span>
+            <span className="kpi-growth-tag">
+              +0,94 <span style={{ fontWeight: 500, color: '#6B7280', marginLeft: '2px' }}>last year</span>
+            </span>
+          </div>
+        </div>
+
+        {/* 4. Conversion Rate */}
+        <div className="kpi-stat-box">
+          <div className="kpi-top-row">
+            <span className="kpi-title-mono">CONVERSION RATE</span>
+            <div className="sparkline-bars">
+              <div className="spark-bar" style={{ height: '10px' }}></div>
+              <div className="spark-bar" style={{ height: '14px' }}></div>
+              <div className="spark-bar" style={{ height: '20px' }}></div>
+              <div className="spark-bar" style={{ height: '15px' }}></div>
+              <div className="spark-bar active" style={{ height: '25px' }}></div>
+              <div className="spark-bar" style={{ height: '18px' }}></div>
+              <div className="spark-bar" style={{ height: '12px' }}></div>
+            </div>
+          </div>
+          <div className="kpi-big-num">3.9%</div>
+          <div className="kpi-bottom-row">
+            <span className="kpi-info-icon">ⓘ</span>
+            <span className="kpi-growth-tag">
+              +0,94 <span style={{ fontWeight: 500, color: '#6B7280', marginLeft: '2px' }}>last year</span>
+            </span>
+          </div>
         </div>
       </div>
 
-      {/* ──── TOP STATS CARDS ──── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Tổng Doanh Thu Năm</span>
-          <div className="text-3xl font-black text-slate-900 mt-2">
-            {(stats?.totalRevenue || 145000000).toLocaleString('vi-VN')} đ
-          </div>
-          <div className="flex items-center gap-1 text-emerald-600 text-xs font-bold mt-1">
-            <ArrowUpRight className="w-3.5 h-3.5" />
-            <span>+18.5% so với cùng kỳ</span>
-          </div>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Doanh Số Tháng Đỉnh ({selectedMonth})</span>
-          <div className="text-3xl font-black text-sketch-purple mt-2">
-            56.000.000 đ
-          </div>
-          <span className="text-[11px] text-slate-400">Tháng cao điểm mua sắm hè</span>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Tổng Đơn Thành Công</span>
-          <div className="text-3xl font-black text-slate-900 mt-2">
-            {stats?.totalOrders || 284}
-          </div>
-          <span className="text-[11px] text-slate-400">Tỷ lệ hủy đơn dưới 1.2%</span>
-        </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Người Mua Mới</span>
-          <div className="text-3xl font-black text-indigo-600 mt-2">
-            38.400
-          </div>
-          <div className="flex items-center gap-1 text-emerald-600 text-xs font-bold mt-1">
-            <ArrowUpRight className="w-3.5 h-3.5" />
-            <span>+24% người dùng kích hoạt</span>
-          </div>
-        </div>
-      </div>
-
-      {/* ──── CHARTS ROW: 12-MONTH BLOCK MATRIX CHART & NEEDLE GAUGE ──── */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-        
-        {/* Block Matrix Chart (8 cols) */}
-        <div className="lg:col-span-8 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-            <div>
-              <h3 className="text-lg font-extrabold text-slate-900">
-                Ma Trận Tăng Trưởng Doanh Thu (Block Matrix)
-              </h3>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Nhấn vào từng cột tháng để xem phân bổ Người Dùng Mới vs Khách Hàng Thân Thiết
-              </p>
+      {/* ============================================================
+           ROW 2: SALES TREND & REVENUE BREAKDOWN
+           ============================================================ */}
+      <div className="analytics-two-col-grid">
+        {/* Left Card: SALES TREND */}
+        <div className="dash-card">
+          <div className="dash-card-header">
+            <div className="dash-card-title-group">
+              <span>SALES TREND</span>
+              <span>ⓘ</span>
             </div>
-            
-            {/* Legend */}
-            <div className="flex items-center gap-4 text-xs font-bold">
-              <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-xs bg-sketch-purple inline-block"></span>
-                <span className="text-slate-700">Người Dùng Mới</span>
+            <span className="dash-card-action-icon">⋯</span>
+          </div>
+
+          <div className="sales-trend-toolbar">
+            <div className="trend-stat-left">
+              <div className="trend-total-label">
+                Total Revenue : <strong id="trend-total-amount">{trendTotal}</strong>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="w-3 h-3 rounded-xs bg-purple-200 inline-block"></span>
-                <span className="text-slate-700">Khách Hàng Cũ</span>
+              <div className="trend-legend">
+                <div className="trend-legend-item">
+                  <span className="legend-square-new"></span>
+                  <span>NEW USER</span>
+                </div>
+                <div className="trend-legend-item">
+                  <span className="legend-square-existing"></span>
+                  <span>EXISTING USER</span>
+                </div>
               </div>
+            </div>
+
+            <div className="time-pill-selector">
+              <button
+                className={`time-pill-btn ${period === 'weekly' ? 'active' : ''}`}
+                onClick={() => setPeriod('weekly')}
+              >
+                Weekly
+              </button>
+              <button
+                className={`time-pill-btn ${period === 'monthly' ? 'active' : ''}`}
+                onClick={() => setPeriod('monthly')}
+              >
+                Monthly
+              </button>
+              <button
+                className={`time-pill-btn ${period === 'yearly' ? 'active' : ''}`}
+                onClick={() => setPeriod('yearly')}
+              >
+                Yearly
+              </button>
             </div>
           </div>
 
-          {/* 12-Month Matrix Block Grid */}
-          <div className="grid grid-cols-12 gap-2 sm:gap-3 pt-6 pb-2 items-end min-h-[260px] border-b border-slate-100">
-            {matrix.map((item) => {
-              const isSelected = item.month === selectedMonth;
-              return (
-                <div
-                  key={item.month}
-                  onClick={() => setSelectedMonth(item.month)}
-                  className="flex flex-col items-center gap-2 cursor-pointer group"
-                >
-                  {/* Total Value Tag */}
-                  <span className={`text-[10px] font-extrabold transition-all ${
-                    isSelected ? 'text-sketch-purple scale-110' : 'text-slate-400 group-hover:text-slate-700'
-                  }`}>
-                    {item.valTotal}
-                  </span>
+          {/* Block Matrix Bar Chart */}
+          <div className="matrix-chart-wrapper">
+            {/* Y-Axis */}
+            <div className="matrix-y-axis">
+              <span>60k</span>
+              <span>50k</span>
+              <span>40k</span>
+              <span>30k</span>
+              <span>20k</span>
+              <span>10k</span>
+              <span>0k</span>
+            </div>
 
-                  {/* Block Stack */}
-                  <div className={`w-full max-w-[28px] rounded-lg p-1 transition-all flex flex-col justify-end gap-1 ${
-                    isSelected ? 'bg-purple-50 ring-2 ring-sketch-purple' : 'hover:bg-slate-50'
-                  }`}>
-                    {/* New users block */}
-                    <div
-                      className={`w-full rounded-sm transition-all ${
-                        isSelected ? 'bg-sketch-purple' : 'bg-purple-500/80 group-hover:bg-purple-600'
-                      }`}
-                      style={{ height: `${Math.max(item.newUsers * 8, 12)}px` }}
-                    />
-                    {/* Existing users block */}
-                    <div
-                      className={`w-full rounded-sm transition-all ${
-                        isSelected ? 'bg-purple-300' : 'bg-purple-200 group-hover:bg-purple-300'
-                      }`}
-                      style={{ height: `${Math.max(item.existingUsers * 6, 8)}px` }}
-                    />
-                  </div>
+            {/* Grid Area with Dotted Guidelines and Columns */}
+            <div className="matrix-grid-area">
+              <div className="matrix-guidelines">
+                <div className="matrix-guide-line"></div>
+                <div className="matrix-guide-line"></div>
+                <div className="matrix-guide-line"></div>
+                <div className="matrix-guide-line"></div>
+                <div className="matrix-guide-line"></div>
+                <div className="matrix-guide-line"></div>
+                <div className="matrix-guide-line" style={{ borderTop: '1px solid #E5E7EB' }}></div>
+              </div>
 
-                  {/* Month Label */}
-                  <span className={`text-xs font-bold uppercase transition-all ${
-                    isSelected ? 'text-sketch-purple font-extrabold' : 'text-slate-500'
-                  }`}>
+              {/* Month Columns */}
+              <div className="matrix-columns-container" id="matrix-cols-container">
+                {matrixChartData.map(item => {
+                  const isActive = item.month === activeMonth;
+                  return (
+                    <div
+                      key={item.month}
+                      className="matrix-month-col"
+                      onClick={() => setActiveMonth(item.month)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      {isActive && (
+                        <>
+                          <div className="matrix-tooltip-pin">
+                            <div className="tt-title">{item.month} 2025</div>
+                            <div className="tt-row">
+                              <span className="legend-square-new"></span>
+                              <span>New User <strong>{item.newText || item.valTotal}</strong></span>
+                            </div>
+                            <div className="tt-row">
+                              <span className="legend-square-existing"></span>
+                              <span>Existing User <strong>{item.existText || '18k'}</strong></span>
+                            </div>
+                          </div>
+                          <div className="matrix-vertical-dash"></div>
+                        </>
+                      )}
+
+                      <div className="blocks-stack">
+                        {/* Existing user blocks (bottom) */}
+                        {Array.from({ length: item.existing }).map((_, idx) => (
+                          <div
+                            key={`exist-${idx}`}
+                            className={`matrix-block existing ${isActive ? 'highlight' : ''}`}
+                          ></div>
+                        ))}
+                        {/* New user blocks (top) */}
+                        {Array.from({ length: item.newUsers }).map((_, idx) => (
+                          <div key={`new-${idx}`} className="matrix-block new"></div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* X-Axis Labels */}
+              <div className="matrix-x-axis" id="matrix-x-axis">
+                {matrixChartData.map(item => (
+                  <span
+                    key={item.month}
+                    className={`matrix-x-label ${item.month === activeMonth ? 'active' : ''}`}
+                    onClick={() => setActiveMonth(item.month)}
+                    style={{ cursor: 'pointer' }}
+                  >
                     {item.month}
                   </span>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Active Month Drilldown Breakdown */}
-          {currentActive && (
-            <div className="bg-purple-50/60 p-4 rounded-xl border border-purple-100 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs">
-              <div>
-                <span className="text-slate-500 font-medium">Chi tiết phân bổ tháng: </span>
-                <strong className="text-slate-900 uppercase font-black text-sm">{selectedMonth}</strong>
+                ))}
               </div>
-              <div className="flex items-center gap-6 font-bold">
-                <div>
-                  <span className="text-slate-500">Khách hàng mới: </span>
-                  <span className="text-sketch-purple font-black">{currentActive.newText || `${currentActive.newUsers * 3}k`}</span>
-                </div>
-                <div>
-                  <span className="text-slate-500">Khách mua lại: </span>
-                  <span className="text-slate-800 font-black">{currentActive.existText || `${currentActive.existingUsers * 3}k`}</span>
-                </div>
-                <div>
-                  <span className="text-slate-500">Tổng doanh thu: </span>
-                  <span className="text-slate-900 font-black">{currentActive.valTotal} USD</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-        </div>
-
-        {/* Needle Gauge / Efficiency Indicator (4 cols) */}
-        <div className="lg:col-span-4 bg-white p-6 rounded-2xl border border-slate-200 shadow-sm space-y-6 text-center">
-          <div>
-            <h3 className="text-lg font-extrabold text-slate-900">
-              Hiệu Suất Vận Hành
-            </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Chỉ số KPI đạt được so với mục tiêu quý
-            </p>
-          </div>
-
-          {/* SVG Semi-Circle Needle Gauge */}
-          <div className="relative w-56 h-36 mx-auto flex items-center justify-center">
-            <svg className="w-full h-full" viewBox="0 0 200 120">
-              {/* Semi-circle track */}
-              <path
-                d="M 20 110 A 80 80 0 0 1 180 110"
-                fill="none"
-                stroke="#f1f5f9"
-                strokeWidth="16"
-                strokeLinecap="round"
-              />
-              {/* Active colored arc */}
-              <path
-                d="M 20 110 A 80 80 0 0 1 155 50"
-                fill="none"
-                stroke="url(#gauge-gradient)"
-                strokeWidth="16"
-                strokeLinecap="round"
-              />
-              <defs>
-                <linearGradient id="gauge-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                  <stop offset="0%" stopColor="#8065c9" />
-                  <stop offset="100%" stopColor="#ec4899" />
-                </linearGradient>
-              </defs>
-              {/* Needle pointer */}
-              <line
-                x1="100"
-                y1="110"
-                x2="145"
-                y2="55"
-                stroke="#1e1b4b"
-                strokeWidth="3.5"
-                strokeLinecap="round"
-              />
-              <circle cx="100" cy="110" r="7" fill="#1e1b4b" />
-            </svg>
-            <div className="absolute bottom-0 text-center">
-              <span className="text-2xl font-black text-slate-900">82.4%</span>
-              <div className="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Mục tiêu quý</div>
-            </div>
-          </div>
-
-          <div className="space-y-2 pt-4 border-t border-slate-100 text-xs text-left">
-            <div className="flex justify-between font-semibold text-slate-600">
-              <span>Tỷ lệ hoàn tất đơn:</span>
-              <strong className="text-slate-900">98.8%</strong>
-            </div>
-            <div className="flex justify-between font-semibold text-slate-600">
-              <span>Tốc độ xử lý kho:</span>
-              <strong className="text-slate-900">1.8 giờ / kiện</strong>
-            </div>
-            <div className="flex justify-between font-semibold text-slate-600">
-              <span>Độ chính xác tồn kho:</span>
-              <strong className="text-emerald-600">99.4%</strong>
             </div>
           </div>
         </div>
 
+        {/* Right Card: REVENUE BREAKDOWN */}
+        <div className="dash-card">
+          <div className="dash-card-header">
+            <div className="dash-card-title-group">
+              <span>REVENUE BREAKDOWN</span>
+              <span>ⓘ</span>
+            </div>
+            <span className="dash-card-action-icon">⋯</span>
+          </div>
+
+          <div className="breakdown-top-meta">
+            <span className="breakdown-cat-title">Revenue by Category</span>
+            <div className="breakdown-date-pill">
+              <span>📅 Jan 1 - Aug 30</span>
+              <span style={{ fontSize: '0.65rem' }}>▼</span>
+            </div>
+          </div>
+
+          <div className="breakdown-big-val">$20,320</div>
+
+          {/* AI Insight Button Banner */}
+          <button
+            className="btn-ai-insight"
+            onClick={() => setShowAiModal(true)}
+            type="button"
+          >
+            <span className="ai-icon-spark">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path>
+              </svg>
+              Get AI insight for better analysis
+            </span>
+            <span>›</span>
+          </button>
+
+          {/* Vertical Needle Chart */}
+          <div className="needle-chart-container" id="needle-chart-bars">
+            {needleHeights.map((h, i) => (
+              <div key={i} className="needle-col">
+                <div className="needle-dark-seg" style={{ height: `${h.dark}px` }}></div>
+                <div className="needle-light-seg" style={{ height: `${h.light}px` }}></div>
+              </div>
+            ))}
+          </div>
+
+          <div className="needle-axis-labels">
+            <span>1 JAN</span>
+            <span>30 JAN 2025</span>
+          </div>
+        </div>
       </div>
 
-      {/* ──── RECENT TRANSACTIONS TABLE ──── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        
-        <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div>
-            <h3 className="text-base font-extrabold text-slate-900">
-              Lịch Sử Giao Dịch Gần Đây (Recent Transactions)
-            </h3>
-            <p className="text-xs text-slate-500">
-              Dữ liệu đơn hàng đối soát từ các đối tác thương hiệu
-            </p>
+      {/* ============================================================
+           ROW 3: RECENT TRANSACTIONS TABLE
+           ============================================================ */}
+      <div className="dash-card" style={{ padding: '18px 20px' }}>
+        <div className="recent-tx-header">
+          <div className="dash-card-title-group">
+            <span>RECENT TRANSACTIONS</span>
+            <span>ⓘ</span>
           </div>
 
-          <div className="relative w-full sm:w-72">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-            <input
-              type="text"
-              placeholder="Tìm mã #TX, khách hàng, sản phẩm..."
-              value={txSearch}
-              onChange={(e) => setTxSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:border-sketch-purple outline-none"
-            />
+          <div className="tx-header-actions">
+            <div className="tx-search-box">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+              </svg>
+              <input
+                type="text"
+                id="tx-search-input"
+                placeholder="Search transactions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+            </div>
+            <button className="btn-add-tx" onClick={handleAddNewTx} type="button">
+              + Add Transaction
+            </button>
+            <button
+              className="btn-more-options"
+              onClick={() => alert('Transaction filter options...')}
+              type="button"
+            >
+              ⋯
+            </button>
           </div>
         </div>
 
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
+        <div className="tx-table-wrapper">
+          <table className="tx-table">
             <thead>
-              <tr className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
-                <th className="p-4 w-10 text-center">
+              <tr>
+                <th style={{ width: '28px' }}>
                   <input
                     type="checkbox"
+                    className="tx-checkbox"
+                    id="tx-check-all"
+                    checked={selectedIds.length === filteredTransactions.length && filteredTransactions.length > 0}
                     onChange={handleSelectAll}
-                    checked={selectedTxIds.length === filteredTransactions.length && filteredTransactions.length > 0}
-                    className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
                   />
                 </th>
-                <th className="p-4">Mã Giao Dịch</th>
-                <th className="p-4">Khách Hàng</th>
-                <th className="p-4">Sản Phẩm</th>
-                <th className="p-4 text-center">Trạng Thái</th>
-                <th className="p-4 text-center">Số Lượng</th>
-                <th className="p-4 text-right">Đơn Giá</th>
-                <th className="p-4 text-right">Tổng Tiền</th>
+                <th>ID ↕</th>
+                <th>CUSTOMER ↕</th>
+                <th>PRODUCT ↕</th>
+                <th>STATUS ↕</th>
+                <th>QTY ↕</th>
+                <th>UNIT PRICE ↕</th>
+                <th>TOTAL REVENUE ↕</th>
+                <th style={{ textAlign: 'right' }}>ACTIONS</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredTransactions.map((tx) => {
-                const isChecked = selectedTxIds.includes(tx.id);
-                return (
-                  <tr key={tx.id} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="p-4 text-center">
+            <tbody id="tx-table-body">
+              {filteredTransactions.length === 0 ? (
+                <tr>
+                  <td colSpan={9} style={{ textAlign: 'center', padding: '30px', color: '#9CA3AF' }}>
+                    No transactions found matching "{searchQuery}"
+                  </td>
+                </tr>
+              ) : (
+                filteredTransactions.map(tx => (
+                  <tr key={tx.id}>
+                    <td style={{ width: '28px' }}>
                       <input
                         type="checkbox"
-                        checked={isChecked}
+                        className="tx-checkbox tx-row-check"
+                        checked={selectedIds.includes(tx.id)}
                         onChange={() => handleToggleRow(tx.id)}
-                        className="rounded border-slate-300 text-purple-600 focus:ring-purple-500"
                       />
                     </td>
-                    <td className="p-4 font-bold text-sketch-purple">{tx.id}</td>
-                    <td className="p-4 font-semibold text-slate-800">{tx.customer}</td>
-                    <td className="p-4 text-slate-600 max-w-xs truncate">{tx.product}</td>
-                    <td className="p-4 text-center">
-                      <span className={`px-2.5 py-0.5 rounded-full font-bold text-[10px] ${
-                        tx.status === 'Success'
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : tx.status === 'Pending'
-                          ? 'bg-amber-100 text-amber-700'
-                          : 'bg-rose-100 text-rose-700'
-                      }`}>
-                        {tx.status}
-                      </span>
+                    <td>
+                      <span className="tx-id-badge">{tx.id}</span>
                     </td>
-                    <td className="p-4 text-center font-bold text-slate-800">{tx.qty}</td>
-                    <td className="p-4 text-right text-slate-500 font-semibold">{tx.unitPrice}</td>
-                    <td className="p-4 text-right font-black text-slate-900">{tx.total}</td>
+                    <td>
+                      <span className="tx-customer-name">{tx.customer}</span>
+                    </td>
+                    <td>
+                      <span className="tx-product-name">{tx.product}</span>
+                    </td>
+                    <td>
+                      <span className={`tx-status-badge ${tx.status}`}>{tx.status}</span>
+                    </td>
+                    <td>
+                      <span style={{ fontWeight: 650, color: '#111827' }}>{tx.qty}</span>
+                    </td>
+                    <td>
+                      <span className="tx-unit-price">{tx.unitPrice}</span>
+                    </td>
+                    <td>
+                      <span className="tx-total-rev">{tx.total}</span>
+                    </td>
+                    <td style={{ textAlign: 'right' }}>
+                      <button
+                        className="btn-tx-actions"
+                        onClick={() => alert(`Transaction ${tx.id}: ${tx.customer} - ${tx.total}`)}
+                        type="button"
+                      >
+                        •••
+                      </button>
+                    </td>
                   </tr>
-                );
-              })}
+                ))
+              )}
             </tbody>
           </table>
         </div>
-
       </div>
 
-    </div>
+      {/* AI Insight Modal Dialog */}
+      {showAiModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 9999
+          }}
+          onClick={() => setShowAiModal(false)}
+        >
+          <div
+            style={{
+              background: '#FFFFFF',
+              borderRadius: '16px',
+              padding: '28px',
+              maxWidth: '520px',
+              width: '90%',
+              boxShadow: '0 20px 40px rgba(0,0,0,0.15)'
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '16px' }}>
+              <span style={{ fontSize: '24px' }}>✨</span>
+              <h3 style={{ margin: 0, fontSize: '18px', fontWeight: 700, color: '#111827' }}>
+                AI Business Insights & Analysis
+              </h3>
+            </div>
+            <div style={{ fontSize: '14px', lineHeight: '1.7', color: '#4B5563' }}>
+              <p style={{ margin: '0 0 10px' }}>
+                • <strong>Doanh số tháng 6 đạt đỉnh $56,000</strong> nhờ chiến dịch thời trang hè (+38k khách mới).
+              </p>
+              <p style={{ margin: '0 0 10px' }}>
+                • <strong>Tỷ lệ chuyển đổi khách quen duy trì ổn định</strong> ở mức 18k người dùng.
+              </p>
+              <p style={{ margin: '0 0 10px' }}>
+                • <strong>Dự báo tháng 7:</strong> Doanh thu kỳ vọng tăng thêm <strong>+12%</strong> nếu bổ sung thêm 5 SKU phụ kiện luxury.
+              </p>
+            </div>
+            <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+              <button
+                style={{
+                  background: '#111827',
+                  color: '#FFFFFF',
+                  border: 'none',
+                  borderRadius: '8px',
+                  padding: '10px 20px',
+                  fontWeight: 600,
+                  fontSize: '13px',
+                  cursor: 'pointer'
+                }}
+                onClick={() => setShowAiModal(false)}
+              >
+                Đóng
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </main>
   );
 }

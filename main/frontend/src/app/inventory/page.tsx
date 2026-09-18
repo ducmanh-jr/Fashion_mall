@@ -1,291 +1,422 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
-import { Package, AlertTriangle, Plus, Download, RefreshCw, CheckCircle, Search, X } from 'lucide-react';
-import { InventorySummary, InventoryItem } from '@/types';
-import { api } from '@/lib/api';
+import React, { useState, useMemo } from 'react';
+
+interface InvItem {
+  id: number;
+  name: string;
+  category: string;
+  sku: string;
+  barcode: string;
+  variants: string;
+  available_stock: number;
+  reserved_stock: number;
+  threshold: number;
+  status: 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK';
+  status_text: string;
+  cost_price: number;
+  retail_price: number;
+  image_url: string;
+}
+
+const mockInventory: InvItem[] = [
+  {
+    id: 101,
+    name: "Giày Adidas Samba OG Classic White Black",
+    category: "Giày Sneaker & Thể Thao",
+    sku: "AD-00101",
+    barcode: "8938501239102",
+    variants: "Size 39, 40, 41, 42",
+    available_stock: 45,
+    reserved_stock: 6,
+    threshold: 15,
+    status: "IN_STOCK",
+    status_text: "Còn Hàng",
+    cost_price: 1618000,
+    retail_price: 2790000,
+    image_url: "/img/addidas samba.jpg"
+  },
+  {
+    id: 102,
+    name: "Áo Khoác Nỉ Adidas Sakura Special Edition",
+    category: "Thời Trang Streetwear & Áo Khoác",
+    sku: "AD-00102",
+    barcode: "8938501239103",
+    variants: "Size S, M, L",
+    available_stock: 30,
+    reserved_stock: 4,
+    threshold: 10,
+    status: "IN_STOCK",
+    status_text: "Còn Hàng",
+    cost_price: 1270000,
+    retail_price: 2190000,
+    image_url: "/img/Adidas sakura zip up hoodie.jpg"
+  },
+  {
+    id: 103,
+    name: "Giày Balenciaga Track 4.0 Tan/Beige",
+    category: "Giày Sneaker & Thể Thao",
+    sku: "BL-00103",
+    barcode: "8938501239104",
+    variants: "Size 40, 41, 42, 43",
+    available_stock: 12,
+    reserved_stock: 3,
+    threshold: 10,
+    status: "LOW_STOCK",
+    status_text: "Sắp Hết",
+    cost_price: 14210000,
+    retail_price: 24500000,
+    image_url: "/img/Balenciaga Track 4_0 570391 W2GN7 2009.jpg"
+  },
+  {
+    id: 104,
+    name: "Giày Balenciaga Track Thug Edition Black",
+    category: "Giày Sneaker & Thể Thao",
+    sku: "BL-00104",
+    barcode: "8938501239105",
+    variants: "Size 41, 42",
+    available_stock: 5,
+    reserved_stock: 2,
+    threshold: 10,
+    status: "LOW_STOCK",
+    status_text: "Sắp Hết",
+    cost_price: 13862000,
+    retail_price: 23900000,
+    image_url: "/img/#balanciagatrack#thug 🥷🏿.jpg"
+  },
+  {
+    id: 105,
+    name: "Quần Nỉ Balenciaga Paris Sweatpants White",
+    category: "Quần & Phụ Kiện Thời Trang",
+    sku: "BL-00105",
+    barcode: "8938501239106",
+    variants: "Size S, M, L",
+    available_stock: 15,
+    reserved_stock: 1,
+    threshold: 8,
+    status: "IN_STOCK",
+    status_text: "Còn Hàng",
+    cost_price: 9570000,
+    retail_price: 16500000,
+    image_url: "/img/#balenciaga WhatsApp_WeChat：+86 15669556357….jpg"
+  },
+  {
+    id: 106,
+    name: "Giày Sneaker Gucci Ace Web Leather",
+    category: "Giày Sneaker & Thể Thao",
+    sku: "GC-00106",
+    barcode: "8938501239107",
+    variants: "Size 39, 40, 41, 42",
+    available_stock: 20,
+    reserved_stock: 5,
+    threshold: 10,
+    status: "IN_STOCK",
+    status_text: "Còn Hàng",
+    cost_price: 10962000,
+    retail_price: 18900000,
+    image_url: "/img/gucci-sneaker.jpg"
+  },
+  {
+    id: 107,
+    name: "Áo Khoác Oversized Ripped Balenciaga",
+    category: "Thời Trang Streetwear & Áo Khoác",
+    sku: "BL-00107",
+    barcode: "8938501239108",
+    variants: "Size M, L, XL",
+    available_stock: 0,
+    reserved_stock: 0,
+    threshold: 5,
+    status: "OUT_OF_STOCK",
+    status_text: "Hết Hàng",
+    cost_price: 18500000,
+    retail_price: 32000000,
+    image_url: "/img/Oversized ripped balenciaga jacket.jpg"
+  }
+];
 
 export default function InventoryPage() {
-  const [summary, setSummary] = useState<InventorySummary | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [inventoryList, setInventoryList] = useState<InvItem[]>(mockInventory);
+  const [activeTab, setActiveTab] = useState<'ALL' | 'IN_STOCK' | 'LOW_STOCK' | 'OUT_OF_STOCK'>('ALL');
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedItemForRestock, setSelectedItemForRestock] = useState<InventoryItem | null>(null);
-  const [restockQty, setRestockQty] = useState(20);
+  const [restockTarget, setRestockTarget] = useState<InvItem | null>(null);
+  const [restockQty, setRestockQty] = useState(25);
   const [toastMsg, setToastMsg] = useState<string | null>(null);
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
-    setTimeout(() => setToastMsg(null), 3500);
+    setTimeout(() => setToastMsg(null), 3000);
   };
 
-  const loadData = async () => {
-    try {
-      setLoading(true);
-      const data = await api.getInventory();
-      setSummary(data);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
+  const filteredItems = useMemo(() => {
+    let list = [...inventoryList];
+    if (activeTab !== 'ALL') {
+      list = list.filter((item) => item.status === activeTab);
     }
-  };
-
-  useEffect(() => {
-    loadData();
-  }, []);
-
-  const handleRestock = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedItemForRestock) return;
-
-    try {
-      await api.restock(selectedItemForRestock.id, restockQty);
-      showToast(`Đã nhập thêm +${restockQty} chiếc cho "${selectedItemForRestock.name}"!`);
-      setSelectedItemForRestock(null);
-      loadData();
-    } catch {
-      showToast('Cập nhật kho thành công!');
+    if (searchTerm.trim()) {
+      const q = searchTerm.toLowerCase();
+      list = list.filter(
+        (i) =>
+          i.name.toLowerCase().includes(q) ||
+          i.sku.toLowerCase().includes(q) ||
+          i.barcode.toLowerCase().includes(q)
+      );
     }
-  };
+    return list;
+  }, [inventoryList, activeTab, searchTerm]);
 
-  const filteredItems = (summary?.items || []).filter(item =>
-    item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    item.sku.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const totalStock = inventoryList.reduce((sum, item) => sum + item.available_stock, 0);
+  const lowStockCount = inventoryList.filter((item) => item.status === 'LOW_STOCK').length;
+  const totalValue = inventoryList.reduce((sum, item) => sum + item.available_stock * item.cost_price, 0);
+
+  const handleRestockSubmit = () => {
+    if (!restockTarget) return;
+    setInventoryList((prev) =>
+      prev.map((item) => {
+        if (item.id === restockTarget.id) {
+          const newQty = item.available_stock + restockQty;
+          return {
+            ...item,
+            available_stock: newQty,
+            status: newQty > item.threshold ? 'IN_STOCK' : 'LOW_STOCK',
+            status_text: newQty > item.threshold ? 'Còn Hàng' : 'Sắp Hết'
+          };
+        }
+        return item;
+      })
+    );
+    showToast(`Đã nhập thêm +${restockQty} sản phẩm cho ${restockTarget.name}!`);
+    setRestockTarget(null);
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
-      
-      {/* Toast Alert */}
-      {toastMsg && (
-        <div className="fixed bottom-8 right-8 z-50 bg-slate-900 text-white px-5 py-3 rounded-xl shadow-2xl text-sm font-semibold flex items-center gap-2 border border-slate-700 animate-bounce">
-          <CheckCircle className="w-4 h-4 text-emerald-400" />
-          <span>{toastMsg}</span>
-        </div>
-      )}
-
-      {/* ──── PAGE HEADER ──── */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-b border-slate-200 pb-6">
-        <div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">
-            Quản Lý Tồn Kho & Hàng Hóa
-          </h1>
-          <p className="text-sm text-slate-500 mt-1">
-            Kiểm soát lượng tồn khả dụng, phân bổ theo size/biến thể và cảnh báo an toàn kho bãi
-          </p>
+    <main className="inventory-container">
+      {/* PAGE HEADER */}
+      <div className="inv-page-header">
+        <div className="inv-header-titles">
+          <h1>Quản Lý Tồn Kho & Hàng Hóa</h1>
+          <p>Kiểm soát lượng tồn khả dụng, phân bổ theo size/biến thể và cảnh báo an toàn kho bãi</p>
         </div>
 
-        <div className="flex items-center gap-3">
-          <button
-            onClick={() => {
-              if (summary?.items && summary.items.length > 0) {
-                setSelectedItemForRestock(summary.items[0]);
-              }
-            }}
-            className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Nhập Hàng Mới</span>
+        <div className="inv-header-actions">
+          <button className="btn-clean-secondary" onClick={() => setRestockTarget(inventoryList[0])}>
+            + Nhập Hàng Mới
           </button>
           <button
-            onClick={() => alert('Đã tải xuống file Excel báo cáo kiểm kê kho Aethelgard Mall!')}
-            className="px-4 py-2.5 bg-sketch-purple hover:bg-purple-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm flex items-center gap-1.5"
+            className="btn-clean-primary"
+            onClick={() => showToast('Đã tải xuống file Excel báo cáo kiểm kê kho!')}
           >
-            <Download className="w-4 h-4" />
-            <span>Xuất Báo Cáo Kho</span>
+            Xuất Báo Cáo Kho
           </button>
         </div>
       </div>
 
-      {/* ──── KPI STATS CARDS ──── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Tổng Mã SKU</span>
-          <div className="text-3xl font-black text-slate-900 mt-2">{summary?.totalSku || 20}</div>
-          <span className="text-[11px] text-slate-400">Đang hoạt động trên sàn</span>
+      {/* KPI STATS CARDS */}
+      <div className="inv-kpi-grid">
+        <div className="inv-kpi-card">
+          <span className="label">Tổng Mã SKU</span>
+          <span className="num">{inventoryList.length}</span>
+          <span className="sub" style={{ color: '#64748B' }}>
+            Đang hoạt động trên sàn
+          </span>
         </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Tổng Hàng Lưu Kho</span>
-          <div className="text-3xl font-black text-slate-900 mt-2">
-            {(summary?.totalStockItems || 420).toLocaleString('vi-VN')}
-          </div>
-          <span className="text-[11px] text-slate-400">Chiếc sản phẩm thực tế</span>
+        <div className="inv-kpi-card">
+          <span className="label">Tổng Hàng Lưu Kho</span>
+          <span className="num">{totalStock.toLocaleString('vi-VN')}</span>
+          <span className="sub" style={{ color: '#64748B' }}>
+            Chiếc sản phẩm thực tế
+          </span>
         </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-          <span className="text-xs font-bold uppercase tracking-wider text-slate-500">Ước Tính Giá Trị Kho</span>
-          <div className="text-3xl font-black text-emerald-600 mt-2">
-            {(summary?.totalStockValue || 450000000).toLocaleString('vi-VN')} đ
-          </div>
-          <span className="text-[11px] text-slate-400">Định giá theo giá sỉ niêm yết</span>
+        <div className="inv-kpi-card warning-card">
+          <span className="label">Cảnh Báo Tồn Thấp</span>
+          <span className="num" style={{ color: '#D97706' }}>
+            {lowStockCount}
+          </span>
+          <span className="sub" style={{ color: '#D97706' }}>
+            Cần lên đơn nhập thêm
+          </span>
         </div>
-
-        <div className="bg-white p-5 rounded-2xl border border-rose-100 bg-rose-50/20 shadow-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-xs font-bold uppercase tracking-wider text-rose-600">Cảnh Báo Sắp Hết</span>
-            <AlertTriangle className="w-4 h-4 text-rose-500" />
-          </div>
-          <div className="text-3xl font-black text-rose-600 mt-2">
-            {summary?.lowStockAlertCount || 3}
-          </div>
-          <span className="text-[11px] text-rose-400 font-semibold">Tồn kho dưới ngưỡng an toàn (≤ 10)</span>
+        <div className="inv-kpi-card asset-card">
+          <span className="label">Tổng Trị Giá Tồn Kho</span>
+          <span className="num" style={{ color: '#10B981', fontSize: '1.45rem' }}>
+            {totalValue.toLocaleString('vi-VN')} đ
+          </span>
+          <span className="sub">Định giá theo giá vốn COGS</span>
         </div>
       </div>
 
-      {/* ──── INVENTORY TABLE SECTION ──── */}
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden">
-        
-        {/* Table Controls */}
-        <div className="p-4 sm:p-5 border-b border-slate-100 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-          <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm mã SKU, tên hàng hóa..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 rounded-xl border border-slate-200 text-xs focus:border-sketch-purple outline-none"
-            />
-          </div>
-          <div className="text-xs font-semibold text-slate-500">
-            Hiển thị <span className="font-bold text-slate-900">{filteredItems.length}</span> SKU
-          </div>
+      {/* FILTER & TABS */}
+      <div className="inv-filter-bar">
+        <div className="inv-tabs">
+          <button
+            className={`inv-tab-btn ${activeTab === 'ALL' ? 'active' : ''}`}
+            onClick={() => setActiveTab('ALL')}
+          >
+            Tất Cả ({inventoryList.length})
+          </button>
+          <button
+            className={`inv-tab-btn ${activeTab === 'IN_STOCK' ? 'active' : ''}`}
+            onClick={() => setActiveTab('IN_STOCK')}
+          >
+            Còn Hàng ({inventoryList.filter((i) => i.status === 'IN_STOCK').length})
+          </button>
+          <button
+            className={`inv-tab-btn ${activeTab === 'LOW_STOCK' ? 'active' : ''}`}
+            onClick={() => setActiveTab('LOW_STOCK')}
+          >
+            Sắp Hết ({lowStockCount})
+          </button>
+          <button
+            className={`inv-tab-btn ${activeTab === 'OUT_OF_STOCK' ? 'active' : ''}`}
+            onClick={() => setActiveTab('OUT_OF_STOCK')}
+          >
+            Hết Hàng ({inventoryList.filter((i) => i.status === 'OUT_OF_STOCK').length})
+          </button>
         </div>
 
-        {/* Table Content */}
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse text-xs">
-            <thead>
-              <tr className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider border-b border-slate-200">
-                <th className="p-4">Sản Phẩm & SKU</th>
-                <th className="p-4">Phân Loại Danh Mục</th>
-                <th className="p-4">Đơn Giá Bán</th>
-                <th className="p-4 text-center">Tồn Kho Thực Tế</th>
-                <th className="p-4 text-center">Trạng Thái Kho</th>
-                <th className="p-4 text-right">Thao Tác</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredItems.map((item) => (
-                <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
-                  <td className="p-4 flex items-center gap-3">
+        <div className="inv-search-wrap">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input
+            type="text"
+            id="inv-search-input"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Tìm kiếm tên, SKU, Barcode..."
+          />
+        </div>
+      </div>
+
+      {/* INVENTORY TABLE */}
+      <div className="inv-table-wrap">
+        <table className="inv-table">
+          <thead>
+            <tr>
+              <th>Sản Phẩm</th>
+              <th>Mã SKU</th>
+              <th>Mã Vạch</th>
+              <th>Biến Thể</th>
+              <th>Khả Dụng</th>
+              <th>Đang Giữ</th>
+              <th>Ngưỡng</th>
+              <th>Tình Trạng</th>
+              <th>Thao Tác</th>
+            </tr>
+          </thead>
+          <tbody id="inv-table-body">
+            {filteredItems.map((item) => (
+              <tr key={item.id}>
+                <td>
+                  <div className="inv-prod-cell">
                     <img
-                      src={item.imageUrl}
+                      src={item.image_url}
                       alt={item.name}
-                      className="w-12 h-12 rounded-lg object-cover bg-slate-100 border border-slate-200"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = '/img/addidas samba.jpg';
+                      }}
                     />
                     <div>
-                      <div className="font-bold text-slate-900">{item.name}</div>
-                      <div className="text-[10px] text-purple-600 font-bold tracking-wider">SKU: {item.sku}</div>
+                      <div className="inv-prod-name">{item.name}</div>
+                      <div className="inv-prod-cat">{item.category}</div>
                     </div>
-                  </td>
-                  <td className="p-4 font-semibold text-slate-600">{item.categoryName}</td>
-                  <td className="p-4 font-bold text-slate-900">
-                    {item.price.toLocaleString('vi-VN')} đ
-                  </td>
-                  <td className="p-4 text-center font-extrabold text-slate-900">
-                    {item.stockQuantity} chiếc
-                  </td>
-                  <td className="p-4 text-center">
-                    {item.stockQuantity === 0 ? (
-                      <span className="px-2.5 py-1 bg-rose-100 text-rose-700 font-bold rounded-full text-[10px]">
-                        Hết hàng
-                      </span>
-                    ) : item.stockQuantity <= 10 ? (
-                      <span className="px-2.5 py-1 bg-amber-100 text-amber-700 font-bold rounded-full text-[10px]">
-                        Sắp hết ({item.stockQuantity})
-                      </span>
-                    ) : (
-                      <span className="px-2.5 py-1 bg-emerald-100 text-emerald-700 font-bold rounded-full text-[10px]">
-                        Khả dụng an toàn
-                      </span>
-                    )}
-                  </td>
-                  <td className="p-4 text-right">
-                    <button
-                      onClick={() => setSelectedItemForRestock(item)}
-                      className="px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-sketch-purple font-bold rounded-lg text-xs transition-colors"
-                    >
-                      + Nhập Thêm
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-
+                  </div>
+                </td>
+                <td>
+                  <span className="sku-badge">{item.sku}</span>
+                </td>
+                <td style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{item.barcode}</td>
+                <td>{item.variants}</td>
+                <td style={{ fontWeight: 800 }}>{item.available_stock}</td>
+                <td style={{ color: '#64748B' }}>{item.reserved_stock}</td>
+                <td style={{ color: '#64748B' }}>{item.threshold}</td>
+                <td>
+                  <span
+                    className={`status-pill ${
+                      item.status === 'IN_STOCK' ? 'in-stock' : item.status === 'LOW_STOCK' ? 'low-stock' : 'out-of-stock'
+                    }`}
+                  >
+                    {item.status_text}
+                  </span>
+                </td>
+                <td>
+                  <button
+                    className="btn-action-restock"
+                    onClick={() => setRestockTarget(item)}
+                  >
+                    + Nhập Thêm
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
-      {/* ──── RESTOCK MODAL ──── */}
-      {selectedItemForRestock && (
-        <div className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4 animate-scale-up">
-            <div className="flex justify-between items-center border-b border-slate-100 pb-3">
-              <h3 className="text-base font-bold text-slate-900">
-                Nhập Thêm Hàng Hóa (Restock)
-              </h3>
-              <button
-                onClick={() => setSelectedItemForRestock(null)}
-                className="text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-5 h-5" />
+      {/* QUICK RESTOCK MODAL */}
+      {restockTarget && (
+        <div
+          id="restock-modal"
+          className="restock-modal-backdrop active"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) setRestockTarget(null);
+          }}
+        >
+          <div className="restock-modal-card">
+            <h3 id="restock-modal-prod-title">Nhập Thêm Kho: {restockTarget.name}</h3>
+            <p id="restock-modal-curr-stock">Tồn kho hiện tại: {restockTarget.available_stock} chiếc</p>
+
+            <label
+              style={{
+                display: 'block',
+                fontSize: '0.82rem',
+                fontWeight: 750,
+                marginBottom: '8px',
+                color: 'var(--text-muted)'
+              }}
+            >
+              Số lượng sản phẩm nhập thêm:
+            </label>
+            <input
+              type="number"
+              id="restock-qty-input"
+              className="restock-input-field"
+              value={restockQty}
+              min="1"
+              onChange={(e) => setRestockQty(Number(e.target.value))}
+            />
+
+            <div className="restock-modal-actions">
+              <button className="btn-clean-secondary" onClick={() => setRestockTarget(null)}>
+                Hủy Bỏ
+              </button>
+              <button className="btn-clean-primary" onClick={handleRestockSubmit}>
+                Xác Nhận Nhập Kho
               </button>
             </div>
-
-            <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-xl border border-slate-100">
-              <img
-                src={selectedItemForRestock.imageUrl}
-                alt={selectedItemForRestock.name}
-                className="w-14 h-14 rounded-lg object-cover bg-white border border-slate-200"
-              />
-              <div className="min-w-0">
-                <div className="text-xs font-bold text-slate-900 truncate">
-                  {selectedItemForRestock.name}
-                </div>
-                <div className="text-[11px] text-slate-500">
-                  Tồn kho hiện tại: <span className="font-bold text-slate-800">{selectedItemForRestock.stockQuantity}</span> chiếc
-                </div>
-              </div>
-            </div>
-
-            <form onSubmit={handleRestock} className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold uppercase text-slate-600 mb-1">
-                  Số lượng nhập thêm (chiếc)
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  max={500}
-                  required
-                  value={restockQty}
-                  onChange={(e) => setRestockQty(Number(e.target.value))}
-                  className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm font-bold focus:border-sketch-purple outline-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                <button
-                  type="button"
-                  onClick={() => setSelectedItemForRestock(null)}
-                  className="py-2.5 border border-slate-200 text-slate-600 rounded-xl text-xs font-semibold hover:bg-slate-50"
-                >
-                  Hủy Bỏ
-                </button>
-                <button
-                  type="submit"
-                  className="py-2.5 bg-sketch-purple text-white rounded-xl text-xs font-bold hover:bg-purple-700 shadow-sm"
-                >
-                  Xác Nhận Lưu Kho
-                </button>
-              </div>
-            </form>
           </div>
         </div>
       )}
 
-    </div>
+      {/* Toast */}
+      {toastMsg && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 24,
+            right: 24,
+            background: '#0F172A',
+            color: '#fff',
+            padding: '10px 20px',
+            borderRadius: '9999px',
+            zIndex: 99999,
+            fontSize: '0.85rem',
+            fontWeight: 600
+          }}
+        >
+          {toastMsg}
+        </div>
+      )}
+    </main>
   );
 }

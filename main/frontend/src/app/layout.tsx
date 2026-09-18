@@ -1,5 +1,12 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import '@/styles/style.css';
+import '@/styles/inventory.css';
+import '@/styles/orders.css';
+import '@/styles/income-statistics.css';
+import '@/styles/shop-profile.css';
+import '@/styles/profile-shoppe.css';
+import '@/styles/login-sketch.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 

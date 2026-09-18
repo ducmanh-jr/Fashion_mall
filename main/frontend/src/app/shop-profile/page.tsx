@@ -1,226 +1,663 @@
-'use client';
+﻿'use client';
 
-import React, { useState, useEffect } from 'react';
-import { ShieldCheck, MapPin, Clock, Phone, Mail, Award, Sparkles, Tag, ExternalLink, Check } from 'lucide-react';
-import { StoreProfile } from '@/types';
-import { api } from '@/lib/api';
+import React, { useState } from 'react';
+import Link from 'next/link';
+
+interface Product {
+  id: string;
+  name: string;
+  category: string;
+  price: number;
+  originalPrice: string;
+  priceFormatted: string;
+  sales: number;
+  rating: string;
+  badge: string;
+  discount: string;
+  image: string;
+}
+
+const initialProducts: Product[] = [
+  {
+    id: '1',
+    name: 'Gucci Luxury Signature Casual Sneaker Authentic Italian Edition',
+    category: 'Giày Thể Thao Cao Cấp',
+    price: 5200000,
+    originalPrice: '5.800.000₫',
+    priceFormatted: '5.200.000₫',
+    sales: 620,
+    rating: '★ 5.0',
+    badge: 'Gucci Iconic',
+    discount: '-10%',
+    image: '/img/gucci-sneaker.jpg'
+  },
+  {
+    id: '2',
+    name: 'Gucci Runway Vintage Monogram Heritage Jacket Limited Edition',
+    category: 'Áo Khoác & Outerwear',
+    price: 8650000,
+    originalPrice: '10.200.000₫',
+    priceFormatted: '8.650.000₫',
+    sales: 340,
+    rating: '★ 5.0',
+    badge: 'Runway Collection',
+    discount: '-15%',
+    image: '/img/gucci-runway.jpg'
+  },
+  {
+    id: '3',
+    name: 'Essential Heavyweight Oversized Hoodie 450 GSM Cotton French Terry',
+    category: 'Áo Hoodie Streetwear',
+    price: 1450000,
+    originalPrice: '2.150.000₫',
+    priceFormatted: '1.450.000₫',
+    sales: 1240,
+    rating: '★ 4.8',
+    badge: 'New Drop',
+    discount: '-33%',
+    image: '/img/sample-velora.jpg'
+  },
+  {
+    id: '4',
+    name: 'Balenciaga Track 4.0 Triple Black Futuristic Sneaker',
+    category: 'Chunky Sneaker',
+    price: 4850000,
+    originalPrice: '5.700.000₫',
+    priceFormatted: '4.850.000₫',
+    sales: 640,
+    rating: '★ 5.0',
+    badge: 'Kering High-end',
+    discount: '-15%',
+    image: '/img/Balenciaga Track 4_0 570391 W2GN7 2009.jpg'
+  },
+  {
+    id: '5',
+    name: 'Oversized Ripped Balenciaga Vintage Distressed Denim Jacket',
+    category: 'Áo Khoác Denim',
+    price: 3650000,
+    originalPrice: '4.850.000₫',
+    priceFormatted: '3.650.000₫',
+    sales: 420,
+    rating: '★ 4.8',
+    badge: 'High Fashion',
+    discount: '-25%',
+    image: '/img/Oversized ripped balenciaga jacket.jpg'
+  },
+  {
+    id: '6',
+    name: 'Adidas Sakura Zip Up Hoodie Limited Japan Special Edition',
+    category: 'Áo Khoác Zipper',
+    price: 1890000,
+    originalPrice: '2.350.000₫',
+    priceFormatted: '1.890.000₫',
+    sales: 890,
+    rating: '★ 4.9',
+    badge: 'Special Drop',
+    discount: '-20%',
+    image: '/img/Adidas sakura zip up hoodie.jpg'
+  },
+  {
+    id: '7',
+    name: 'Adidas Samba OG Classic Leather White Black Gum Sole',
+    category: 'Sneaker & Footwear',
+    price: 2490000,
+    originalPrice: '3.050.000₫',
+    priceFormatted: '2.490.000₫',
+    sales: 1520,
+    rating: '★ 4.9',
+    badge: 'Top Trending',
+    discount: '-18%',
+    image: '/img/addidas samba.jpg'
+  },
+  {
+    id: '8',
+    name: "Nike Men's Summer Court Retro Sneaker 2024 Collection",
+    category: 'Sneaker Thể Thao',
+    price: 2890000,
+    originalPrice: '3.700.000₫',
+    priceFormatted: '2.890.000₫',
+    sales: 760,
+    rating: '★ 4.8',
+    badge: 'New Arrival',
+    discount: '-22%',
+    image: "/img/Nike men's summer sneaker (men shoe collection for 2024).jpg"
+  }
+];
 
 export default function ShopProfilePage() {
-  const [stores, setStores] = useState<StoreProfile[]>([]);
-  const [selectedStore, setSelectedStore] = useState<StoreProfile | null>(null);
-  const [copiedVoucher, setCopiedVoucher] = useState(false);
+  const [isFollowing, setIsFollowing] = useState(false);
+  const [followersCount, setFollowersCount] = useState(485200);
+  const [claimedVouchers, setClaimedVouchers] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<string>('storefront');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortBy, setSortBy] = useState<string>('popular');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    async function loadStores() {
-      try {
-        const data = await api.getStores();
-        setStores(data);
-        if (data.length > 0) setSelectedStore(data[0]);
-      } catch (e) {
-        console.error(e);
-      }
-    }
-    loadStores();
-  }, []);
-
-  const copyCode = (code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedVoucher(true);
-    setTimeout(() => setCopiedVoucher(false), 3000);
+  const showToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage(null);
+    }, 3400);
   };
 
+  // Follow toggle
+  const handleFollowToggle = () => {
+    if (isFollowing) {
+      setIsFollowing(false);
+      setFollowersCount(prev => prev - 1);
+      showToast('Đã hủy theo dõi gian hàng.');
+    } else {
+      setIsFollowing(true);
+      setFollowersCount(prev => prev + 1);
+      showToast('Đã theo dõi GUCCI Official Flagship Store! Nhận voucher giảm 10% ngay.');
+    }
+  };
+
+  // Chat shop
+  const handleChatShop = () => {
+    showToast('Đang kết nối phiên tư vấn bảo mật riêng với Quản lý Boutique Gucci...');
+  };
+
+  // Claim voucher
+  const handleClaimVoucher = (code: string) => {
+    if (!claimedVouchers.includes(code)) {
+      setClaimedVouchers([...claimedVouchers, code]);
+      showToast(`Đã lưu mã đặc quyền GUCCI [${code}] vào ví tài khoản của bạn!`);
+    }
+  };
+
+  // Book appointment
+  const handleBookAppointment = (boutiqueName: string) => {
+    showToast(`Đã mở yêu cầu đặt lịch hẹn VIP tại ${boutiqueName}. Chuyên viên sẽ gọi xác nhận trong 10 phút.`);
+  };
+
+  // Tab switch
+  const handleTabClick = (tab: string) => {
+    setActiveTab(tab);
+    if (tab === 'locations') {
+      const el = document.getElementById('boutiques-section');
+      if (el) el.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Filter & Sort products
+  let displayProducts = [...initialProducts];
+
+  // Tab filter
+  if (activeTab === 'new') {
+    displayProducts = displayProducts.filter(
+      p => p.badge.includes('New') || p.badge.includes('Runway')
+    );
+  } else if (activeTab === 'bestseller') {
+    displayProducts = displayProducts.filter(p => p.sales >= 600);
+  }
+
+  // Search filter
+  if (searchQuery.trim()) {
+    const q = searchQuery.toLowerCase();
+    displayProducts = displayProducts.filter(
+      p => p.name.toLowerCase().includes(q) || p.category.toLowerCase().includes(q)
+    );
+  }
+
+  // Sort
+  if (sortBy === 'price_asc') {
+    displayProducts.sort((a, b) => a.price - b.price);
+  } else if (sortBy === 'price_desc') {
+    displayProducts.sort((a, b) => b.price - a.price);
+  } else if (sortBy === 'bestseller') {
+    displayProducts.sort((a, b) => b.sales - a.sales);
+  }
+
   return (
-    <div className="bg-slate-50 min-h-screen pb-16">
-      
-      {/* ──── LUXURY COVER BANNER ──── */}
-      <section className="relative bg-slate-950 text-white overflow-hidden py-20 px-4 sm:px-6 lg:px-8 border-b border-slate-800">
-        
-        {/* Giant GUCCI Watermark */}
-        <div className="absolute inset-0 flex items-center justify-center select-none pointer-events-none opacity-20">
-          <span className="text-[14vw] font-serif font-black tracking-[0.2em] text-slate-100 uppercase">
-            GUCCI
-          </span>
-        </div>
+    <main className="shop-profile-container">
+      {/* BREADCRUMBS */}
+      <nav className="breadcrumb-nav" style={{ marginTop: '20px', marginBottom: 0 }}>
+        <Link href="/">Aethelgard Mall</Link>
+        <span className="breadcrumb-separator">/</span>
+        <span style={{ color: 'var(--text-muted)' }}>Gian Hàng Thương Hiệu Xa Xỉ (Luxury Flagship)</span>
+        <span className="breadcrumb-separator">/</span>
+        <span className="breadcrumb-current">GUCCI Official Flagship Store</span>
+      </nav>
 
-        <div className="relative max-w-5xl mx-auto text-center space-y-4 z-10">
-          <div className="inline-flex items-center gap-2 px-4 py-1 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold uppercase tracking-widest">
-            <ShieldCheck className="w-4 h-4" />
-            <span>Kering Group Certified Luxury Boutique</span>
-          </div>
-
-          <h1 className="text-3xl sm:text-5xl font-serif font-extrabold tracking-wide uppercase">
-            GUCCI OFFICIAL FLAGSHIP STORE
-          </h1>
-
-          <p className="text-slate-300 text-sm sm:text-base max-w-2xl mx-auto font-light leading-relaxed">
+      {/* 1. LUXURY COVER BANNER */}
+      <section className="shop-cover-banner">
+        <div className="shop-cover-watermark">GUCCI</div>
+        <div className="shop-cover-headline">
+          <div className="brand-badge-pill">⚖ KERING GROUP CERTIFIED LUXURY BOUTIQUE</div>
+          <h2>GUCCI OFFICIAL FLAGSHIP STORE</h2>
+          <p>
             Haute Couture, phụ kiện & đồ da thủ công tinh hoa từ Florence, Ý (1921) • Gian hàng Flagship chính hãng phân phối trực tiếp tại sàn Aethelgard Luxury Mall
           </p>
+        </div>
+      </section>
 
-          <div className="flex flex-wrap justify-center gap-6 pt-4 text-xs text-slate-400 border-t border-slate-800/80 max-w-xl mx-auto">
-            <div>Đánh giá: <strong className="text-white">4.9 / 5.0 ⭐ (2.4k lượt)</strong></div>
-            <div>Tỷ lệ phản hồi: <strong className="text-white">99.8% (Dưới 5 phút)</strong></div>
-            <div>Thời gian tham gia: <strong className="text-white">Từ 2024</strong></div>
+      {/* 2. SHOP IDENTITY CARD (FLOATING HEADER OVERLAY) */}
+      <section className="shop-identity-card">
+        {/* Main Shop Details & Actions */}
+        <div className="shop-main-identity">
+          <div className="shop-avatar-box">
+            <span>GG</span>
+            <span className="shop-mall-badge">FLAGSHIP</span>
+          </div>
+
+          <div className="shop-details-col">
+            <div className="shop-name-row">
+              <h1 className="shop-title-text">GUCCI Official Store</h1>
+              <span className="verified-icon" title="Gian hàng chính hãng ủy quyền chính thức">✓</span>
+            </div>
+            <p className="shop-slogan-text">
+              @gucci_vietnam • Authentic Italian High-End Fashion, Leather Goods & Footwear
+            </p>
+            <div className="shop-status-text">
+              <span className="shop-status-dot"></span>
+              <span>Đang hoạt động (Trực tuyến 2 phút trước)</span>
+            </div>
+
+            <div className="shop-actions-group">
+              <button
+                id="btn-follow-shop"
+                className={`btn-follow-shop ${isFollowing ? 'following' : ''}`}
+                onClick={handleFollowToggle}
+                type="button"
+              >
+                <span>{isFollowing ? '✓ Đang Theo Dõi' : '+ Theo Dõi Shop'}</span>
+              </button>
+              <button
+                id="btn-chat-shop"
+                className="btn-chat-shop"
+                onClick={handleChatShop}
+                type="button"
+              >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />
+                </svg>
+                <span>Chat Chuyên Viên VIP</span>
+              </button>
+              <a href="#boutiques-section" className="btn-view-boutique-jump">
+                <span>📍 2 Cửa Hàng Boutique</span>
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Shop Performance Stats Grid */}
+        <div className="shop-stats-grid">
+          <div className="stat-metric-item">
+            <span className="stat-label-row">Đánh Giá Gian Hàng</span>
+            <span className="stat-value-highlight accent">
+              5.0 ★ <span style={{ fontSize: '0.82rem', color: '#64748B', fontWeight: 500 }}>(68.4k)</span>
+            </span>
+          </div>
+          <div className="stat-metric-item">
+            <span className="stat-label-row">Sản Phẩm Trưng Bày</span>
+            <span className="stat-value-highlight">240+</span>
+          </div>
+          <div className="stat-metric-item">
+            <span className="stat-label-row">Khách Hàng Theo Dõi</span>
+            <span id="followers-count-val" className="stat-value-highlight">
+              {(followersCount / 1000).toFixed(1)}k
+            </span>
+          </div>
+          <div className="stat-metric-item">
+            <span className="stat-label-row">Tỉ Lệ Phản Hồi Chat</span>
+            <span className="stat-value-highlight">
+              100% <span style={{ fontSize: '0.8rem', color: '#10B981', fontWeight: 600 }}>(Ngay lập tức)</span>
+            </span>
+          </div>
+          <div className="stat-metric-item">
+            <span className="stat-label-row">Giao Hàng Đúng Hạn</span>
+            <span className="stat-value-highlight">99.9%</span>
+          </div>
+          <div className="stat-metric-item">
+            <span className="stat-label-row">Nguồn Gốc Thương Hiệu</span>
+            <span className="stat-value-highlight">Ý (Từ năm 1921)</span>
           </div>
         </div>
       </section>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-10">
-        
-        {/* ──── VOUCHERS & PRIVILEGES ──── */}
-        <div className="bg-gradient-to-r from-purple-900 via-indigo-900 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl flex flex-col md:flex-row items-center justify-between gap-6 border border-purple-800/50">
-          <div className="space-y-2 text-center md:text-left">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-300 bg-amber-400/20 px-3 py-1 rounded-full">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>VOUCHER ĐẶC QUYỀN VIP MALL</span>
-            </div>
-            <h3 className="text-2xl font-extrabold tracking-tight">
-              Giảm Ngay 1.000.000 đ Cho Đơn Hàng Từ 25 Triệu
-            </h3>
-            <p className="text-xs text-purple-200">
-              Áp dụng cho toàn bộ túi xách Dionysus, sneaker Gucci Ace và kính mát Kering chính hãng.
+      {/* 3. STORE LOCATIONS & BOUTIQUES (VỊ TRÍ CỬA HÀNG) */}
+      <section className="store-locations-section" id="boutiques-section">
+        <div className="locations-section-header">
+          <div>
+            <h3>📍 Hệ Thống Vị Trí Cửa Hàng & Boutique Chính Thức Tại Việt Nam</h3>
+            <p>
+              Trải nghiệm mua sắm trực tiếp tại không gian Flagship xa xỉ chuẩn quốc tế hoặc đặt lịch hẹn thử đồ VIP riêng tư.
             </p>
           </div>
+        </div>
 
-          <div className="flex items-center gap-3 bg-white/10 backdrop-blur p-2 rounded-2xl border border-white/20">
-            <span className="font-mono text-lg font-black tracking-widest px-3">GUCCI-VIP-2026</span>
+        <div className="boutiques-grid">
+          {/* BOUTIQUE 1: HÀ NỘI */}
+          <div className="boutique-card">
+            <div>
+              <div className="boutique-top-row">
+                <span className="boutique-city-tag">Hà Nội Flagship</span>
+                <span style={{ fontSize: '0.8rem', color: '#10B981', fontWeight: 700 }}>● Đang mở cửa</span>
+              </div>
+              <h4 className="boutique-name">Gucci Tràng Tiền Plaza Boutique</h4>
+              <ul className="boutique-info-list">
+                <li>
+                  <span className="info-icon">📍</span>
+                  <span><strong>Địa chỉ:</strong> Tầng 1 & 2, TTTM Tràng Tiền Plaza, 24 Hai Bà Trưng, P. Tràng Tiền, Q. Hoàn Kiếm, Hà Nội</span>
+                </li>
+                <li>
+                  <span className="info-icon">🕒</span>
+                  <span><strong>Giờ mở cửa:</strong> 09:30 - 21:30 (Thứ Hai đến Chủ Nhật)</span>
+                </li>
+                <li>
+                  <span className="info-icon">📞</span>
+                  <span><strong>Hotline hỗ trợ:</strong> (024) 3936 8899</span>
+                </li>
+              </ul>
+
+              <div className="boutique-services-tags">
+                <span className="service-pill">✓ Phòng Thử Đồ VIP Riêng Tư</span>
+                <span className="service-pill">✓ Khắc Tên Monogram Miễn Phí</span>
+                <span className="service-pill">✓ Cố Vấn Phong Cách 1:1</span>
+              </div>
+            </div>
+
+            <div className="boutique-actions-row">
+              <a href="https://maps.google.com/?q=Trang+Tien+Plaza+Hanoi" target="_blank" rel="noreferrer" className="btn-map-directions">
+                <span>🗺 Chỉ Đường Bản Đồ</span>
+              </a>
+              <button
+                className="btn-book-appointment"
+                onClick={() => handleBookAppointment('Gucci Tràng Tiền Plaza (Hà Nội)')}
+                type="button"
+              >
+                <span>📅 Đặt Lịch Hẹn VIP</span>
+              </button>
+            </div>
+          </div>
+
+          {/* BOUTIQUE 2: TP. HỒ CHÍ MINH */}
+          <div className="boutique-card">
+            <div>
+              <div className="boutique-top-row">
+                <span className="boutique-city-tag">TP. Hồ Chí Minh Flagship</span>
+                <span style={{ fontSize: '0.8rem', color: '#10B981', fontWeight: 700 }}>● Đang mở cửa</span>
+              </div>
+              <h4 className="boutique-name">Gucci Đồng Khởi Boutique (Sheraton Saigon)</h4>
+              <ul className="boutique-info-list">
+                <li>
+                  <span className="info-icon">📍</span>
+                  <span><strong>Địa chỉ:</strong> Khách sạn Sheraton Saigon, 88 Đồng Khởi, P. Bến Nghé, Quận 1, TP. Hồ Chí Minh</span>
+                </li>
+                <li>
+                  <span className="info-icon">🕒</span>
+                  <span><strong>Giờ mở cửa:</strong> 09:30 - 22:00 (Thứ Hai đến Chủ Nhật)</span>
+                </li>
+                <li>
+                  <span className="info-icon">📞</span>
+                  <span><strong>Hotline hỗ trợ:</strong> (028) 3827 6688</span>
+                </li>
+              </ul>
+
+              <div className="boutique-services-tags">
+                <span className="service-pill">✓ Bộ Sưu Tập Runway Giới Hạn</span>
+                <span className="service-pill">✓ Spa & Bảo Dưỡng Đồ Da</span>
+                <span className="service-pill">✓ Giao Xe Riêng Hỏa Tốc 2H</span>
+              </div>
+            </div>
+
+            <div className="boutique-actions-row">
+              <a href="https://maps.google.com/?q=Sheraton+Saigon+Hotel+Dong+Khoi" target="_blank" rel="noreferrer" className="btn-map-directions">
+                <span>🗺 Chỉ Đường Bản Đồ</span>
+              </a>
+              <button
+                className="btn-book-appointment"
+                onClick={() => handleBookAppointment('Gucci Đồng Khởi (TP.HCM)')}
+                type="button"
+              >
+                <span>📅 Đặt Lịch Hẹn VIP</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. EXCLUSIVE SHOP VOUCHERS BAR */}
+      <section className="shop-vouchers-section">
+        <div className="section-label-bar">
+          <h3>🎁 Đặc Quyền Voucher Giảm Giá Từ Gucci Mall</h3>
+          <span style={{ fontSize: '0.85rem', color: '#64748B' }}>
+            Lưu mã ngay để nhận ưu đãi thanh toán trực tuyến
+          </span>
+        </div>
+
+        <div className="vouchers-carousel-list">
+          {/* Voucher 1 */}
+          <div className="voucher-ticket-card">
+            <div className="voucher-info-col">
+              <h4>GIẢM 500.000₫</h4>
+              <p className="voucher-condition-text">Cho đơn hàng từ 5.000.000₫</p>
+              <span className="voucher-expiry-tag">HSD: 30/11/2026</span>
+            </div>
             <button
-              onClick={() => copyCode('GUCCI-VIP-2026')}
-              className="px-5 py-2.5 bg-white text-slate-950 rounded-xl text-xs font-bold hover:bg-slate-100 transition-all shadow-md flex items-center gap-1.5"
+              className={`btn-claim-voucher ${claimedVouchers.includes('GUCCI500K') ? 'claimed' : ''}`}
+              onClick={() => handleClaimVoucher('GUCCI500K')}
+              type="button"
             >
-              {copiedVoucher ? <Check className="w-4 h-4 text-emerald-600" /> : <Tag className="w-4 h-4" />}
-              <span>{copiedVoucher ? 'Đã Sao Chép' : 'Sao Chép Mã'}</span>
+              {claimedVouchers.includes('GUCCI500K') ? '✓ Đã Lưu' : 'Lưu Mã'}
+            </button>
+          </div>
+
+          {/* Voucher 2 */}
+          <div className="voucher-ticket-card">
+            <div className="voucher-info-col">
+              <h4>GIẢM 10% TỐI ĐA 2 TRIỆU</h4>
+              <p className="voucher-condition-text">Đặc quyền Follower & Khách hàng VIP</p>
+              <span className="voucher-expiry-tag">HSD: 30/11/2026</span>
+            </div>
+            <button
+              className={`btn-claim-voucher ${claimedVouchers.includes('VIPGUCCI') ? 'claimed' : ''}`}
+              onClick={() => handleClaimVoucher('VIPGUCCI')}
+              type="button"
+            >
+              {claimedVouchers.includes('VIPGUCCI') ? '✓ Đã Lưu' : 'Lưu Mã'}
+            </button>
+          </div>
+
+          {/* Voucher 3 */}
+          <div className="voucher-ticket-card">
+            <div className="voucher-info-col">
+              <h4>WHITE GLOVE FREESHIP</h4>
+              <p className="voucher-condition-text">Miễn phí giao hàng xe riêng bọc găng tay trắng</p>
+              <span className="voucher-expiry-tag">HSD: 30/11/2026</span>
+            </div>
+            <button
+              className={`btn-claim-voucher ${claimedVouchers.includes('LUXESHIP') ? 'claimed' : ''}`}
+              onClick={() => handleClaimVoucher('LUXESHIP')}
+              type="button"
+            >
+              {claimedVouchers.includes('LUXESHIP') ? '✓ Đã Lưu' : 'Lưu Mã'}
             </button>
           </div>
         </div>
+      </section>
 
-        {/* ──── ASIAN BOUTIQUE LOCATOR & STORE DETAILS ──── */}
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-extrabold text-slate-900">
-              Mạng Lưới Flagship Boutique Tại Việt Nam
-            </h2>
-            <p className="text-xs text-slate-500 mt-1">
-              Khách hàng có thể đặt hàng trực tuyến trên sàn Aethelgard Mall và đến nhận hàng trực tiếp tại các Boutique Flagship cao cấp
-            </p>
-          </div>
+      {/* 5. SHOP NAVIGATION TABS */}
+      <nav className="shop-tabs-nav-bar">
+        <button
+          className={`shop-tab-item ${activeTab === 'storefront' ? 'active' : ''}`}
+          onClick={() => handleTabClick('storefront')}
+          type="button"
+        >
+          Dạo Gian Hàng (Storefront)
+        </button>
+        <button
+          className={`shop-tab-item ${activeTab === 'all' ? 'active' : ''}`}
+          onClick={() => handleTabClick('all')}
+          type="button"
+        >
+          Tất Cả Sản Phẩm (240+)
+        </button>
+        <button
+          className={`shop-tab-item ${activeTab === 'new' ? 'active' : ''}`}
+          onClick={() => handleTabClick('new')}
+          type="button"
+        >
+          Bộ Sưu Tập Runway Mới
+        </button>
+        <button
+          className={`shop-tab-item ${activeTab === 'bestseller' ? 'active' : ''}`}
+          onClick={() => handleTabClick('bestseller')}
+          type="button"
+        >
+          Kiệt Tác Bán Chạy
+        </button>
+        <button
+          className={`shop-tab-item ${activeTab === 'locations' ? 'active' : ''}`}
+          onClick={() => handleTabClick('locations')}
+          type="button"
+        >
+          📍 Vị Trí Cửa Hàng & Boutique
+        </button>
+        <button
+          className={`shop-tab-item ${activeTab === 'about' ? 'active' : ''}`}
+          onClick={() => handleTabClick('about')}
+          type="button"
+        >
+          Chứng Nhận Kering Group
+        </button>
+      </nav>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            {/* Store Selection Cards (5 cols) */}
-            <div className="lg:col-span-5 space-y-4">
-              {stores.map(store => {
-                const isSelected = selectedStore?.storeCode === store.storeCode;
-                return (
-                  <div
-                    key={store.storeCode}
-                    onClick={() => setSelectedStore(store)}
-                    className={`p-5 rounded-2xl border cursor-pointer transition-all ${
-                      isSelected
-                        ? 'bg-white border-sketch-purple shadow-md ring-2 ring-purple-100'
-                        : 'bg-white border-slate-200 hover:border-slate-300'
-                    }`}
-                  >
-                    <div className="flex justify-between items-start mb-2">
-                      <h4 className="font-extrabold text-slate-900 text-base">
-                        {store.storeName}
-                      </h4>
-                      <span className="text-[10px] font-bold text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded-full">
-                        {store.storeType}
-                      </span>
-                    </div>
+      {/* 6. SHOP SEARCH & FILTER TOOLBAR */}
+      <div className="shop-toolbar-row">
+        <div className="shop-search-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#64748B" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <circle cx="11" cy="11" r="8" />
+            <path d="m21 21-4.3-4.3" />
+          </svg>
+          <input
+            type="text"
+            id="shop-search-input"
+            placeholder="Tìm kiếm trong danh mục Gucci..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
 
-                    <p className="text-xs text-slate-600 flex items-start gap-1.5 leading-relaxed">
-                      <MapPin className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
-                      <span>{store.address}</span>
-                    </p>
+        <div className="shop-filter-pills-row">
+          <span style={{ fontSize: '0.88rem', fontWeight: 700, color: 'var(--text-muted)', marginRight: '6px' }}>
+            Sắp xếp:
+          </span>
+          <button
+            className={`filter-pill-btn ${sortBy === 'popular' ? 'active' : ''}`}
+            onClick={() => setSortBy('popular')}
+            type="button"
+          >
+            Phổ biến
+          </button>
+          <button
+            className={`filter-pill-btn ${sortBy === 'newest' ? 'active' : ''}`}
+            onClick={() => setSortBy('newest')}
+            type="button"
+          >
+            Mới nhất
+          </button>
+          <button
+            className={`filter-pill-btn ${sortBy === 'bestseller' ? 'active' : ''}`}
+            onClick={() => setSortBy('bestseller')}
+            type="button"
+          >
+            Bán chạy
+          </button>
+          <button
+            className={`filter-pill-btn ${sortBy === 'price_asc' ? 'active' : ''}`}
+            onClick={() => setSortBy('price_asc')}
+            type="button"
+          >
+            Giá: Thấp → Cao
+          </button>
+          <button
+            className={`filter-pill-btn ${sortBy === 'price_desc' ? 'active' : ''}`}
+            onClick={() => setSortBy('price_desc')}
+            type="button"
+          >
+            Giá: Cao → Thấp
+          </button>
+        </div>
+      </div>
 
-                    <div className="flex items-center gap-4 text-[11px] text-slate-400 mt-3 pt-3 border-t border-slate-100">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3 h-3 text-slate-400" />
-                        <span>{store.operatingHours}</span>
-                      </span>
-                    </div>
-                  </div>
-                );
-              })}
+      {/* 7. SHOP PRODUCT CATALOG GRID */}
+      <section className="shop-product-grid" id="shop-product-grid">
+        {displayProducts.map((p) => (
+          <Link
+            key={p.id}
+            href={`/product-detail/${p.id}`}
+            className="shop-product-card"
+            data-price={p.price}
+            data-sales={p.sales}
+          >
+            <div className="product-card-thumb">
+              <span className="card-tag-badge">{p.badge}</span>
+              <span className="card-discount-tag">{p.discount}</span>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={p.image} alt={p.name} loading="lazy" />
             </div>
-
-            {/* Detailed Selected Store View (7 cols) */}
-            {selectedStore && (
-              <div className="lg:col-span-7 bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
-                <div className="h-64 rounded-2xl overflow-hidden bg-slate-100 relative">
-                  <img
-                    src={selectedStore.imageUrl || '/img/gucci-runway.jpg'}
-                    alt={selectedStore.storeName}
-                    className="w-full h-full object-cover"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent flex items-end p-6">
-                    <div className="text-white">
-                      <span className="text-xs font-bold text-purple-300 uppercase tracking-widest">
-                        {selectedStore.city}, {selectedStore.country}
-                      </span>
-                      <h3 className="text-2xl font-serif font-black">{selectedStore.storeName}</h3>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div className="p-4 bg-slate-50 rounded-xl space-y-1">
-                    <span className="font-bold text-slate-400 uppercase">Liên Hệ Boutique</span>
-                    <div className="flex items-center gap-1.5 font-bold text-slate-900 pt-1">
-                      <Phone className="w-3.5 h-3.5 text-purple-600" />
-                      <span>{selectedStore.phone}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-slate-600">
-                      <Mail className="w-3.5 h-3.5 text-slate-400" />
-                      <span>{selectedStore.email}</span>
-                    </div>
-                  </div>
-
-                  <div className="p-4 bg-slate-50 rounded-xl space-y-1">
-                    <span className="font-bold text-slate-400 uppercase">Giờ Mở Cửa Hoạt Động</span>
-                    <div className="font-bold text-slate-800 leading-relaxed pt-1">
-                      {selectedStore.operatingHours}
-                    </div>
-                  </div>
-                </div>
-
-                {/* Exclusive Services */}
-                <div>
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">
-                    Dịch Vụ Đặc Quyền Tại Điểm Bán (In-Store Privileges)
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                    {(selectedStore.services || []).map((service, idx) => (
-                      <div key={idx} className="flex items-center gap-2 p-2.5 bg-purple-50/50 rounded-xl border border-purple-100 text-slate-800 font-semibold">
-                        <Award className="w-4 h-4 text-sketch-purple shrink-0" />
-                        <span>{service}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* External link to official Gucci locator */}
-                <div className="pt-4 border-t border-slate-100 flex justify-between items-center">
-                  <span className="text-xs text-slate-400">Tọa độ: {selectedStore.latitude}° N, {selectedStore.longitude}° E</span>
-                  <a
-                    href={selectedStore.storeUrl || '#'}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-1 text-xs font-bold text-sketch-purple hover:underline"
-                  >
-                    <span>Xem định vị bản đồ chính thức</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
+            <div className="product-card-body">
+              <span className="product-category-subtext">{p.category}</span>
+              <h3 className="product-card-name">{p.name}</h3>
+              <div className="product-card-meta">
+                <span className="stars-gold" style={{ fontSize: '0.85rem' }}>{p.rating}</span>
+                <span style={{ color: '#94A3B8' }}>•</span>
+                <span className="sales-count-text">Đã bán {p.sales >= 1000 ? `${(p.sales / 1000).toFixed(1)}k` : p.sales}</span>
               </div>
-            )}
+              <div className="product-card-price-row">
+                <span className="price-main-val">{p.priceFormatted}</span>
+                <span style={{ textDecoration: 'line-through', color: '#94A3B8', fontSize: '0.88rem' }}>
+                  {p.originalPrice}
+                </span>
+              </div>
+            </div>
+          </Link>
+        ))}
+      </section>
 
+      {/* 8. GUCCI LUXURY GUARANTEES BANNER */}
+      <section className="shop-guarantee-banner">
+        <div className="guarantee-box">
+          <div className="guarantee-icon-wrapper">🛡</div>
+          <div>
+            <h4>100% Chính Hãng Kering Group</h4>
+            <p>Cam kết bồi thường 300% nếu phát hiện không chuẩn nguyên bản.</p>
           </div>
         </div>
 
-      </div>
+        <div className="guarantee-box">
+          <div className="guarantee-icon-wrapper">🔄</div>
+          <div>
+            <h4>Bảo Dưỡng Toàn Cầu</h4>
+            <p>Hưởng chính sách chăm sóc đồ da và bảo dưỡng tại mọi Boutique Gucci.</p>
+          </div>
+        </div>
 
-    </div>
+        <div className="guarantee-box">
+          <div className="guarantee-icon-wrapper">🚗</div>
+          <div>
+            <h4>White Glove VIP Delivery</h4>
+            <p>Giao hàng bằng xe riêng chuyên dụng, nhân viên đeo găng tay trắng bàn giao.</p>
+          </div>
+        </div>
+
+        <div className="guarantee-box">
+          <div className="guarantee-icon-wrapper">🎁</div>
+          <div>
+            <h4>Đóng Hộp Quà Tặng Luxury</h4>
+            <p>Hộp quà cao cấp nguyên seal kèm túi giấy, ruy băng và thư cảm ơn.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Toast Notification Container */}
+      {toastMessage && (
+        <div id="toast-container" className="toast-container">
+          <div className="toast">{toastMessage}</div>
+        </div>
+      )}
+    </main>
   );
 }
