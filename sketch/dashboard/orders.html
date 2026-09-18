@@ -1,0 +1,337 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quản Lý Đơn Hàng & Vận Chuyển | Aethelgard Mall Seller Portal</title>
+  <meta name="description" content="Quản lý và theo dõi hành trình đơn hàng chuẩn Seller Portal Aethelgard Mall.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="orders.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- TOP NAVBAR -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+          <span class="logo-text">Aethelgard <span class="accent-text">Shopping Mall</span></span>
+        </a>
+      </div>
+
+      <!-- MAIN NAVIGATION LINKS -->
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="inventory.html" class="nav-link">Inventory</a>
+        <a href="orders.html" class="nav-link active">Orders</a>
+        <a href="income-statistics.html" class="nav-link">Income Statistics</a>
+        <a href="shop-profile.html" class="nav-link">Shop Profile</a>
+      </nav>
+
+      <!-- USER CONTROLS -->
+      <div class="nav-actions">
+        <div class="user-avatar" title="Account">A</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ORDERS MAIN CONTENT -->
+  <main class="orders-container">
+    <!-- PAGE HEADER -->
+    <div class="orders-page-header">
+      <div class="orders-header-titles">
+        <h1>Quản Lý Đơn Hàng & Vận Chuyển</h1>
+        <p>Theo dõi luồng xử lý đơn đặt hàng, hành trình giao nhận bưu kiện và xuất phiếu kho</p>
+      </div>
+
+      <div class="orders-header-actions">
+        <button class="btn-order-action" onclick="openOrderTrackingModal('AG-2024-7890')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          Tra Cứu Nhanh
+        </button>
+        <button class="btn-order-action" style="background: #111827; color: #FFFFFF; border-color: #111827;" onclick="window.print()">
+          Xuất Báo Cáo Đơn
+        </button>
+      </div>
+    </div>
+
+    <!-- KPI STATS CARDS -->
+    <div class="orders-kpi-grid">
+      <div class="order-kpi-card active" onclick="document.querySelector('[data-status=ALL]').click()">
+        <span class="kpi-num">128</span>
+        <span class="kpi-label">Tổng Đơn Hàng</span>
+      </div>
+      <div class="order-kpi-card" onclick="document.querySelector('[data-status=PENDING]').click()">
+        <span class="kpi-num" style="color: #D97706;">14</span>
+        <span class="kpi-label">Chờ Xác Nhận</span>
+      </div>
+      <div class="order-kpi-card" onclick="document.querySelector('[data-status=CONFIRMED]').click()">
+        <span class="kpi-num" style="color: #0284C7;">26</span>
+        <span class="kpi-label">Đã Xác Nhận</span>
+      </div>
+      <div class="order-kpi-card" onclick="document.querySelector('[data-status=SHIPPED]').click()">
+        <span class="kpi-num" style="color: #EA580C;">38</span>
+        <span class="kpi-label">Đang Vận Chuyển</span>
+      </div>
+      <div class="order-kpi-card" onclick="document.querySelector('[data-status=DELIVERED]').click()">
+        <span class="kpi-num" style="color: #16A34A;">50</span>
+        <span class="kpi-label">Giao Thành Công</span>
+      </div>
+    </div>
+
+    <!-- FILTER TABS & SEARCH -->
+    <div class="orders-filter-bar">
+      <div class="orders-tab-group">
+        <button class="order-tab-btn active" data-status="ALL">Tất Cả (128)</button>
+        <button class="order-tab-btn" data-status="PENDING">Chờ Duyệt (14)</button>
+        <button class="order-tab-btn" data-status="CONFIRMED">Đã Xác Nhận (26)</button>
+        <button class="order-tab-btn" data-status="SHIPPED">Đang Giao (38)</button>
+        <button class="order-tab-btn" data-status="DELIVERED">Đã Giao (50)</button>
+      </div>
+
+      <div class="orders-search-box">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#64748B" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" id="orders-search-input" placeholder="Tìm mã đơn, tên khách, tracking...">
+      </div>
+    </div>
+
+    <!-- ORDERS TABLE -->
+    <div class="orders-table-wrapper">
+      <table class="orders-table">
+        <thead>
+          <tr>
+            <th>Mã Đơn</th>
+            <th>Thời Gian</th>
+            <th>Khách Hàng</th>
+            <th>Sản Phẩm</th>
+            <th>Đơn Vị / Tracking</th>
+            <th>Tổng Tiền</th>
+            <th>Trạng Thái</th>
+            <th style="width: 32px; text-align: right;"></th>
+          </tr>
+        </thead>
+        <tbody id="orders-table-body">
+          <!-- Rendered dynamically by orders.js (Clickable rows) -->
+        </tbody>
+      </table>
+    </div>
+  </main>
+
+  <!-- ============================================================
+       DUAL-PANEL SLIDING DRAWER SYSTEM FOR ORDERS TRACKING
+       Smooth staggered slide-in from right (like Home product drawer)
+       ============================================================ -->
+  <div id="track-order-modal" class="track-drawer-backdrop" onclick="if(event.target === this) closeOrderTrackingModal()">
+    <div class="track-drawer-wrapper">
+
+      <!-- SECONDARY PANEL (LEFT): VẬN CHUYỂN, ĐỊA CHỈ & THÔNG TIN BỔ TRỢ -->
+      <div class="track-panel track-panel-secondary">
+        <div class="track-panel-header">
+          <h3>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg>
+            Vận Đơn & Giao Nhận
+          </h3>
+          <span class="badge-transit" id="track-carrier-badge-sub">In transit</span>
+        </div>
+
+        <div class="track-panel-body">
+          <!-- Tracking Carrier Details -->
+          <div class="track-card">
+            <div class="track-card-title">Tracking Information</div>
+            <div class="carrier-info-grid" style="margin-top: 8px;">
+              <div class="carrier-col">
+                <div class="carrier-name-row">
+                  <span id="track-carrier-name">FedEx Logistics</span>
+                </div>
+                <div class="tracking-code-val" id="track-carrier-code">Tracking #: 789012345678</div>
+                <div style="margin-top: 6px; font-size: 0.78rem; color: #6B7280;">
+                  Dự kiến giao: <strong id="track-carrier-est-delivery" style="color: #111827;">January 20, 2024</strong>
+                </div>
+              </div>
+
+              <div class="carrier-col" style="border-top: 1px dashed #E5E7EB; padding-top: 8px; margin-top: 4px;">
+                <div style="font-weight: 650; color: #6B7280; font-size: 0.74rem;">Cập Nhật Gần Nhất</div>
+                <p id="track-carrier-last-update" style="font-size: 0.78rem; color: #111827; margin-top: 2px;">
+                  Package departed from facility in NEW YORK, NY
+                </p>
+                <div style="margin-top: 4px; font-size: 0.74rem; font-weight: 650; color: #6B7280;">Vị Trí Hiện Tại: <span id="track-carrier-location" style="color: #111827; font-weight: 700;">NEW YORK, NY Hub</span></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Shipping Address -->
+          <div class="half-card">
+            <div class="half-card-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              Địa Chỉ Giao Hàng
+            </div>
+            <div class="half-card-content">
+              <strong id="track-addr-name">Esther Howard</strong><br>
+              <span id="track-addr-detail">123 Main Street, New York, NY 10001, United States</span><br>
+              <span id="track-addr-phone" style="display: block; margin-top: 4px; font-weight: 600;">+1 (555) 123-4567</span>
+            </div>
+          </div>
+
+          <!-- Payment Method -->
+          <div class="half-card">
+            <div class="half-card-title">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+              Phương Thức Thanh Toán
+            </div>
+            <div class="half-card-content">
+              <strong id="track-pay-method">Credit Card</strong><br>
+              <span style="font-size: 0.75rem; color: #6B7280;">Cổng Aethelgard Gateway bảo mật</span><br>
+              <span id="track-pay-total" style="display: block; margin-top: 6px; font-weight: 750; color: #16A34A;">Tổng: 31.892.000 đ</span>
+            </div>
+          </div>
+
+          <!-- Quick Lookup -->
+          <div class="track-card">
+            <div class="track-card-title">Find Another Order</div>
+            <div class="track-card-subtitle">Tra cứu mã đơn khác trong hệ thống</div>
+            <form onsubmit="trackSearchLookup(event)">
+              <div class="track-inputs-row" style="grid-template-columns: 1fr;">
+                <div class="track-input-group">
+                  <input type="text" id="find-order-id-input" value="AG-2024-7890" placeholder="e.g. AG-2024-7890">
+                </div>
+              </div>
+              <button type="submit" class="btn-track-submit">
+                Tra Cứu Bưu Kiện
+              </button>
+            </form>
+          </div>
+
+          <!-- Support Card -->
+          <div class="track-card" style="text-align: center; padding: 14px;">
+            <div style="font-size: 0.82rem; font-weight: 750; margin-bottom: 2px;">Cần Hỗ Trợ Kho Vận?</div>
+            <p style="font-size: 0.74rem; color: #6B7280; margin-bottom: 10px;">Hotline trung tâm điều phối Aethelgard: 1900-8899</p>
+            <button class="btn-order-action" style="width: 100%; justify-content: center;" onclick="alert('Đang kết nối điều phối viên kho bãi...')">Liên Hệ Hotline</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- PRIMARY PANEL (RIGHT): CHI TIẾT ĐƠN HÀNG, TIẾN ĐỘ, SẢN PHẨM & TỔNG KẾT -->
+      <div class="track-panel track-panel-primary">
+        <div class="track-panel-header">
+          <div class="track-order-summary-header" style="flex: 1; margin-right: 12px;">
+            <div class="order-headline-left">
+              <div class="order-title-code">
+                <span id="track-order-code-title">Order AG-2024-7890</span>
+                <span id="track-order-badge" class="badge-order-status SHIPPED">Shipped</span>
+              </div>
+              <div class="order-date-text" id="track-order-placed-date">Placed on January 15, 2024</div>
+            </div>
+
+            <div class="order-header-buttons">
+              <button class="btn-order-action" onclick="printInvoiceMock()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Invoice
+              </button>
+              <button class="btn-order-action" onclick="printInvoiceMock()">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+                Print
+              </button>
+            </div>
+          </div>
+
+          <button class="track-panel-close" onclick="closeOrderTrackingModal()">&times;</button>
+        </div>
+
+        <div class="track-panel-body">
+          <!-- Delivery Progress Stepper (4 steps) -->
+          <div class="track-card">
+            <div class="stepper-header">
+              <h3>Delivery Progress</h3>
+              <span id="track-progress-est-sub">Estimated delivery: Jan 20, 2024</span>
+            </div>
+
+            <div class="delivery-progress-bar-wrap">
+              <div class="delivery-progress-line-fill" id="delivery-line-fill" style="width: 66%;"></div>
+
+              <!-- Step 1 -->
+              <div class="step-node completed">
+                <div class="step-icon-circle">✓</div>
+                <span class="step-name">Ordered</span>
+                <span class="step-date" id="step-date-ordered">Jan 15</span>
+              </div>
+
+              <!-- Step 2 -->
+              <div class="step-node completed">
+                <div class="step-icon-circle">✓</div>
+                <span class="step-name">Confirmed</span>
+                <span class="step-date" id="step-date-confirmed">Jan 15</span>
+              </div>
+
+              <!-- Step 3 -->
+              <div class="step-node current">
+                <div class="step-icon-circle">✓</div>
+                <span class="step-name">Shipped</span>
+                <span class="step-date" id="step-date-shipped">Jan 17</span>
+              </div>
+
+              <!-- Step 4 -->
+              <div class="step-node">
+                <div class="step-icon-circle">4</div>
+                <span class="step-name">Delivered</span>
+                <span class="step-date" id="step-date-delivered">Jan 20</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Order Timeline -->
+          <div class="track-card">
+            <div class="track-card-title">Order Timeline</div>
+            <div class="timeline-list" id="track-timeline-list">
+              <!-- Rendered dynamically -->
+            </div>
+          </div>
+
+          <!-- Order Items -->
+          <div class="track-card">
+            <div class="track-card-title">Order Items</div>
+            <div class="track-items-list" id="track-items-container">
+              <!-- Rendered dynamically -->
+            </div>
+            <div class="track-items-footer">
+              <span id="track-items-total-qty">2 items</span>
+              <span>Tạm tính: <strong id="track-items-subtotal">30.400.000 đ</strong></span>
+            </div>
+          </div>
+
+          <!-- Order Summary Breakdown -->
+          <div class="track-card">
+            <div class="track-card-title" style="margin-bottom: 8px;">Order Summary</div>
+            <div class="order-summary-breakdown">
+              <div class="summary-calc-row">
+                <span>Subtotal</span>
+                <strong id="track-sum-subtotal">30.400.000 đ</strong>
+              </div>
+              <div class="summary-calc-row">
+                <span>Shipping Charge</span>
+                <strong id="track-sum-shipping">60.000 đ</strong>
+              </div>
+              <div class="summary-calc-row">
+                <span>Taxes (VAT 8%)</span>
+                <strong id="track-sum-tax">2.432.000 đ</strong>
+              </div>
+              <div class="summary-calc-row" style="color: #16A34A;">
+                <span>Discount (Voucher Mall)</span>
+                <strong id="track-sum-discount">-1.000.000 đ</strong>
+              </div>
+              <div class="summary-calc-row total-row">
+                <span>Total Payment</span>
+                <strong id="track-sum-total" style="color: #111827;">31.892.000 đ</strong>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="orders.js"></script>
+</body>
+</html>

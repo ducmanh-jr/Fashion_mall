@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aethelgard — Reset Your Password</title>
+    <meta name="description" content="Aethelgard AI Shopping Mall - Reset your password.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { jakarta: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'] },
+                    colors: {
+                        brand: { 50:'#f5f3ff', 100:'#ede9fe', 200:'#ddd6fe', 300:'#c4b5fd', 400:'#a78bfa', 500:'#8b5cf6', 600:'#7c3aed', 700:'#6d28d9' },
+                        sketch: { purple: '#8065c9', light: '#f3f0ff', text: '#3c3a50' }
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="font-jakarta bg-white text-slate-900 min-h-screen overflow-x-hidden antialiased">
+
+    <!-- ═══════════════ MAIN 50:50 AETHELGARD SPLIT LAYOUT ═══════════════ -->
+    <div class="min-h-screen grid grid-cols-1 lg:grid-cols-2">
+
+        <!-- ────────────────── LEFT COLUMN: AUTH & RECOVERY CONTAINERS ────────────────── -->
+        <div class="flex flex-col justify-between p-6 sm:p-12 lg:p-16 max-w-xl mx-auto w-full z-20 bg-white">
+            
+            <!-- Header Brand Logo & Top Bar (Task 1 Standard) -->
+            <div class="mb-4 flex items-center justify-between">
+                <a href="#" class="inline-flex items-center gap-3.5 group">
+                    <div class="w-10 h-10 rounded-xl bg-slate-950 flex items-center justify-center text-white font-serif font-700 text-xl shadow-md border border-slate-800 tracking-tighter group-hover:scale-105 transition-all">
+                        <span class="bg-gradient-to-tr from-slate-200 via-white to-slate-400 bg-clip-text text-transparent italic">Æ</span>
+                    </div>
+                    <div class="flex flex-col">
+                        <span class="text-xl font-800 tracking-[0.18em] text-slate-900 uppercase font-serif">Aethelgard</span>
+                        <span class="text-[10px] tracking-[0.2em] text-slate-400 font-600 uppercase -mt-0.5">Shopping Mall • AI Powered</span>
+                    </div>
+                </a>
+
+
+            </div>
+
+            <!-- ══════════════════════════════════════════════════════════════ -->
+            <!-- 1. MAIN TASK 1 AUTH CARD (LOG IN & SIGN UP) — DEFAULT ACTIVE VIEW -->
+            <!-- ══════════════════════════════════════════════════════════════ -->
+            <div id="authCardMain" class="my-auto py-2 transition-all duration-300">
+                <h1 id="task1Title" class="text-3xl sm:text-4xl font-800 tracking-tight text-slate-900 mb-2">
+                    Log in to your account
+                </h1>
+                <p id="task1Sub" class="text-slate-500 text-sm sm:text-base leading-relaxed mb-6">
+                    Welcome back! Log in to access your personal space, exclusive deals, and AI smart shopping.
+                </p>
+
+                <!-- Social OAuth Button -->
+                <button type="button" class="w-full py-3 px-4 bg-white border border-slate-200 hover:border-slate-300 rounded-full font-600 text-sm text-slate-700 flex items-center justify-center gap-3 shadow-sm transition-all hover:bg-slate-50 mb-6" onclick="showToast('Đăng nhập nhanh qua Google')">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 001 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+                    <span>Continue with Google</span>
+                </button>
+
+                <!-- Divider -->
+                <div class="flex items-center gap-4 mb-6">
+                    <div class="flex-1 h-px bg-slate-200"></div>
+                    <span class="text-xs text-slate-400 font-500">or</span>
+                    <div class="flex-1 h-px bg-slate-200"></div>
+                </div>
+
+                <!-- Segmented Control Tab (Task 1: Sign Up / Log In) -->
+                <div class="relative bg-slate-100 rounded-xl p-1 flex mb-6">
+                    <div id="task1TabSlider" class="tab-slider slide-right"></div>
+                    <button id="task1RegBtn" class="tab-button" onclick="switchTask1Tab('register')">Sign Up</button>
+                    <button id="task1LogBtn" class="tab-button active" onclick="switchTask1Tab('login')">Log In</button>
+                </div>
+
+                <!-- Task 1: Log In Form Panel (Active by default) -->
+                <form id="formLogin" class="form-panel active space-y-4" onsubmit="onLoginSubmit(event)">
+                    <div>
+                        <label class="input-label">Email Address</label>
+                        <input type="email" id="loginEmail" class="input-field !pl-4" placeholder="admin@gmail.com" value="" required>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="input-label mb-0">Password</label>
+                            <a href="#" onclick="event.preventDefault(); openForgotFlow();" class="text-xs font-600 text-sketch-purple hover:underline transition-colors flex items-center gap-1">
+                                <span>Forgot your password ?</span>
+                                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/></svg>
+                            </a>
+                        </div>
+                        <div class="input-wrapper">
+                            <input type="password" id="loginPassword" class="input-field !pl-4 pr-12" placeholder="••••••••" value="" required>
+                            <button type="button" class="toggle-eye" onclick="togglePass('loginPassword', this)" aria-label="Toggle password">
+                                <svg class="eye-open w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <svg class="eye-closed w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 px-4 bg-sketch-purple hover:opacity-90 text-white rounded-lg font-700 text-sm transition-all shadow-md mt-4">
+                        Log In
+                    </button>
+                </form>
+
+                <!-- Task 1: Sign Up Form Panel -->
+                <form id="formRegister" class="form-panel space-y-4" onsubmit="onRegisterSubmit(event)">
+                    <div>
+                        <label class="input-label">Full Name</label>
+                        <input type="text" id="regName" class="input-field !pl-4" placeholder="Nguyễn Đức Mạnh" required>
+                    </div>
+
+                    <div>
+                        <label class="input-label">Email Address</label>
+                        <input type="email" id="regEmail" class="input-field !pl-4" placeholder="ducmanh@gmail.com" required>
+                    </div>
+
+                    <div>
+                        <label class="input-label">Password</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="regPassword" class="input-field !pl-4 pr-12" placeholder="Create a secure password" required oninput="handlePasswordInput(this.value, 'strengthBoxReg', 'strengthBarReg', 'strengthLabelReg', 'strengthHintReg')">
+                            <button type="button" class="toggle-eye" onclick="togglePass('regPassword', this)" aria-label="Toggle password">
+                                <svg class="eye-open w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                <svg class="eye-closed w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                            </button>
+                        </div>
+
+                        <!-- Strength Meter -->
+                        <div id="strengthBoxReg" class="mt-3 opacity-0 transition-all duration-300 hidden">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs text-slate-400">Độ mạnh mật khẩu</span>
+                                <span id="strengthLabelReg" class="text-xs font-600 text-slate-400">—</span>
+                            </div>
+                            <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden mb-1.5">
+                                <div id="strengthBarReg" class="h-full rounded-full transition-all duration-400 ease-out" style="width: 0%; background: #cbd5e1;"></div>
+                            </div>
+                            <p id="strengthHintReg" class="text-[11px] text-slate-400">Mật khẩu đạt tiêu chuẩn an toàn khi đáp ứng đủ tiêu chuẩn</p>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="w-full py-3.5 px-4 bg-sketch-purple hover:opacity-90 text-white rounded-lg font-700 text-sm transition-all shadow-md mt-4">
+                        Continue
+                    </button>
+                </form>
+
+                <p class="text-xs text-slate-400 mt-5 leading-relaxed text-center">
+                    By continuing, you agree to Aethelgard's <a href="#" onclick="event.preventDefault(); showToast('Terms of Service')" class="text-slate-700 underline font-500">Terms of Service</a> and <a href="#" onclick="event.preventDefault(); showToast('Privacy Policy')" class="text-slate-700 underline font-500">Privacy Policy</a>.
+                </p>
+            </div>
+
+
+            <!-- ══════════════════════════════════════════════════════════════ -->
+            <!-- 2. TASK 6 SKETCH WIREFRAME CONTAINER (EXACT 3 SKETCH SCREENS) -->
+            <!-- ══════════════════════════════════════════════════════════════ -->
+            <div id="recoveryCardMain" class="my-auto py-2 hidden opacity-0 transition-all duration-300 text-center max-w-sm mx-auto w-full">
+                
+                <!-- ════ SCREEN 1 SKETCH: Forgot your password ? ════ -->
+                <div id="sketchScreen1" class="sketch-screen">
+                    <div class="text-left mb-2">
+                        <button type="button" onclick="closeForgotFlow()" class="sketch-back-btn" title="Back to Login">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+                            <span>Back</span>
+                        </button>
+                    </div>
+
+                    <!-- SVG Illustration 1: Person thinking with ? marks -->
+                    <div class="sketch-illustration-box">
+                        <div class="sketch-semicircle-bg"></div>
+                        <svg class="sketch-svg" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Dashed ground line -->
+                            <line x1="20" y1="140" x2="180" y2="140" stroke="#8065c9" stroke-width="2.5" stroke-dasharray="14 8 4 6" stroke-linecap="round"/>
+                            <!-- Person body -->
+                            <path d="M70 140 C70 115, 80 105, 100 105 C120 105, 130 115, 130 140" stroke="#8065c9" stroke-width="3.5" fill="#e8e2fc" stroke-linecap="round"/>
+                            <!-- Person neck & head -->
+                            <circle cx="100" cy="80" r="22" stroke="#8065c9" stroke-width="3.5" fill="#ffffff"/>
+                            <!-- Hair cap -->
+                            <path d="M78 78 C78 60, 122 60, 122 78 C120 62, 80 62, 78 78 Z" fill="#8065c9"/>
+                            <!-- Eyes & Mouth -->
+                            <circle cx="93" cy="78" r="2.5" fill="#8065c9"/>
+                            <circle cx="107" cy="78" r="2.5" fill="#8065c9"/>
+                            <path d="M96 90 Q100 88 104 90" stroke="#8065c9" stroke-width="2" stroke-linecap="round"/>
+                            <!-- Question Marks -->
+                            <text x="60" y="55" font-family="sans-serif" font-weight="bold" font-size="22" fill="#8065c9">?</text>
+                            <text x="135" y="50" font-family="sans-serif" font-weight="bold" font-size="24" fill="#8065c9">?</text>
+                            <text x="145" y="80" font-family="sans-serif" font-weight="bold" font-size="18" fill="#8065c9">?</text>
+                            <text x="50" y="85" font-family="sans-serif" font-weight="bold" font-size="18" fill="#8065c9">?</text>
+                        </svg>
+                    </div>
+
+                    <h2 class="text-2xl font-800 text-slate-800 mb-1.5">Forgot your password ?</h2>
+                    <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto mb-6">
+                        Enter your e-mail address and we'll send you a link to reset your password
+                    </p>
+
+                    <form onsubmit="onForgotStep1Submit(event)" class="space-y-4">
+                        <div>
+                            <input type="email" id="forgotEmailInput" class="sketch-input" placeholder="Email Address (e.g. name@gmail.com)" value="" required>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3 pt-2">
+                            <button type="button" onclick="closeForgotFlow()" class="sketch-btn-cancel">
+                                Cancel
+                            </button>
+                            <button type="submit" id="btnSendOTP" class="sketch-btn-purple">
+                                Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+
+                <!-- ════ SCREEN 2 SKETCH: Check in your mail ! ════ -->
+                <div id="sketchScreen2" class="sketch-screen hidden">
+                    <div class="text-left mb-2">
+                        <button type="button" onclick="goToStep(1)" class="sketch-back-btn" title="Back to Step 1">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+                            <span>Back</span>
+                        </button>
+                    </div>
+
+                    <!-- SVG Illustration 2: Open Envelope with RESET Paper -->
+                    <div class="sketch-illustration-box">
+                        <div class="sketch-semicircle-bg"></div>
+                        <svg class="sketch-svg" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Dashed ground line -->
+                            <line x1="20" y1="140" x2="180" y2="140" stroke="#8065c9" stroke-width="2.5" stroke-dasharray="14 8 4 6" stroke-linecap="round"/>
+                            <!-- Paper sheet inside -->
+                            <rect x="75" y="45" width="50" height="55" rx="3" fill="#ffffff" stroke="#8065c9" stroke-width="3"/>
+                            <text x="82" y="64" font-family="sans-serif" font-weight="bold" font-size="10" fill="#8065c9" letter-spacing="1">RESET</text>
+                            <line x1="84" y1="74" x2="116" y2="74" stroke="#8065c9" stroke-width="2.5" stroke-linecap="round"/>
+                            <line x1="86" y1="82" x2="114" y2="82" stroke="#8065c9" stroke-width="2.5" stroke-linecap="round"/>
+                            <!-- Envelope main body -->
+                            <path d="M60 80 L100 105 L140 80 L140 135 L60 135 Z" fill="#e8e2fc" stroke="#8065c9" stroke-width="3.5" stroke-linejoin="round"/>
+                            <!-- Envelope flap folds -->
+                            <path d="M60 80 L100 110 L140 80" stroke="#8065c9" stroke-width="3" fill="none" stroke-linejoin="round"/>
+                        </svg>
+                    </div>
+
+                    <h2 class="text-2xl font-800 text-slate-800 mb-1.5">Check in your mail !</h2>
+                    <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto mb-4">
+                        We just emailed you with the instructions to reset your password.
+                    </p>
+
+                    <!-- Interactive OTP Verification Box (Strict Max 1 Character per box) -->
+                    <form onsubmit="onForgotStep2Submit(event)" class="space-y-4 mb-6">
+                        <div class="flex items-center justify-center gap-2" id="otpBoxGrid">
+                            <input type="text" maxlength="1" pattern="[0-9]*" class="otp-box" id="otp1" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" pattern="[0-9]*" class="otp-box" id="otp2" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" pattern="[0-9]*" class="otp-box" id="otp3" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" pattern="[0-9]*" class="otp-box" id="otp4" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" pattern="[0-9]*" class="otp-box" id="otp5" autocomplete="off" inputmode="numeric">
+                            <input type="text" maxlength="1" pattern="[0-9]*" class="otp-box" id="otp6" autocomplete="off" inputmode="numeric">
+                        </div>
+
+                        <div class="flex items-center justify-between text-xs px-2">
+                            <button type="button" onclick="goToStep(1)" class="text-slate-400 hover:text-slate-700">← Back</button>
+                            <button type="button" id="btnResendOTP" onclick="onResendOTPClick()" class="text-sketch-purple font-600">Resend OTP (60s)</button>
+                        </div>
+
+                        <button type="submit" id="btnVerifyOTP" class="sketch-btn-purple w-full">
+                            Verify OTP & Continue
+                        </button>
+                    </form>
+
+                    <!-- Sketch Footer Note -->
+                    <div class="border-t border-slate-100 pt-4 mt-4">
+                        <p class="text-[11px] text-slate-400">For any questions or problems please email us at</p>
+                        <a href="mailto:helpdesk@aethelgard.com" class="text-xs font-700 text-sketch-purple hover:underline mt-0.5 inline-block">helpdesk@aethelgard.com</a>
+                    </div>
+                </div>
+
+
+                <!-- ════ SCREEN 3 SKETCH: Reset your password ════ -->
+                <div id="sketchScreen3" class="sketch-screen hidden">
+                    <div class="text-left mb-2">
+                        <button type="button" onclick="goToStep(2)" class="sketch-back-btn" title="Back to OTP Step">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18"/></svg>
+                            <span>Back</span>
+                        </button>
+                    </div>
+
+                    <!-- SVG Illustration 3: Curved Arrow with Lock Badge -->
+                    <div class="sketch-illustration-box">
+                        <div class="sketch-semicircle-bg"></div>
+                        <svg class="sketch-svg" viewBox="0 0 200 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Dashed ground line -->
+                            <line x1="20" y1="140" x2="180" y2="140" stroke="#8065c9" stroke-width="2.5" stroke-dasharray="14 8 4 6" stroke-linecap="round"/>
+                            <!-- Big Curved Loop Arrow -->
+                            <path d="M60 115 C50 60, 150 50, 140 120 M60 115 L80 100 M60 115 L80 130" stroke="#8065c9" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                            <!-- Lock Badge Circle -->
+                            <circle cx="130" cy="55" r="18" fill="#ffffff" stroke="#8065c9" stroke-width="3"/>
+                            <!-- Lock body -->
+                            <rect x="122" y="55" width="16" height="13" rx="2" fill="#8065c9"/>
+                            <!-- Lock shackle -->
+                            <path d="M125 55 V50 A5 5 0 0 1 135 50 V55" stroke="#8065c9" stroke-width="2.5" fill="none"/>
+                        </svg>
+                    </div>
+
+                    <h2 class="text-2xl font-800 text-slate-800 mb-1.5">Reset your password</h2>
+                    <p class="text-xs text-slate-500 leading-relaxed max-w-xs mx-auto mb-6">
+                        What would you like your new password to be ?
+                    </p>
+
+                    <form onsubmit="onForgotStep3Submit(event)" class="space-y-4">
+                        <div>
+                            <div class="input-wrapper">
+                                <input type="password" id="forgotNewPassInput" class="sketch-input pr-12" placeholder="Password" value="" required oninput="handlePasswordInput(this.value, 'strengthBoxForgot', 'strengthBarForgot', 'strengthLabelForgot', 'strengthHintForgot')">
+                                <button type="button" class="toggle-eye" onclick="togglePass('forgotNewPassInput', this)" aria-label="Toggle password">
+                                    <svg class="eye-open w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    <svg class="eye-closed w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                                </button>
+                            </div>
+
+                            <!-- Minimalist Password Strength Bar -->
+                            <div id="strengthBoxForgot" class="mt-2.5 transition-all duration-300 text-left">
+                                <div class="flex items-center justify-between mb-1 text-xs">
+                                    <span class="text-slate-400">Độ mạnh mật khẩu:</span>
+                                    <span id="strengthLabelForgot" class="font-600 text-slate-500">—</span>
+                                </div>
+                                <div class="h-1.5 bg-slate-100 rounded-full overflow-hidden mb-2">
+                                    <div id="strengthBarForgot" class="h-full rounded-full transition-all duration-300" style="width: 0%; background: #cbd5e1;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="input-wrapper">
+                                <input type="password" id="forgotConfirmPassInput" class="sketch-input pr-12" placeholder="Confirm Password" value="" required>
+                                <button type="button" class="toggle-eye" onclick="togglePass('forgotConfirmPassInput', this)" aria-label="Toggle password">
+                                    <svg class="eye-open w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z"/><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    <svg class="eye-closed w-5 h-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5"><path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <button type="submit" id="btnSubmitNewPass" class="sketch-btn-purple w-full">
+                            Save
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+
+            <!-- Footer Trusted By / Categories -->
+            <div class="pt-4 border-t border-slate-100 text-center">
+                <p class="text-[11px] font-600 tracking-wider text-slate-400 uppercase mb-2">Explore Top E-Commerce Categories</p>
+                <div class="flex items-center justify-center gap-3 flex-wrap opacity-75 grayscale hover:grayscale-0 transition-all">
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 font-700 text-[10px] text-slate-700 tracking-wider uppercase">FASHION</span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 font-700 text-[10px] text-slate-700 tracking-wider uppercase">ELECTRONICS</span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 font-700 text-[10px] text-slate-700 tracking-wider uppercase">BEAUTY</span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 font-700 text-[10px] text-slate-700 tracking-wider uppercase">HOME LIVING</span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-100 font-700 text-[10px] text-slate-700 tracking-wider uppercase">AI ASSISTANT</span>
+                </div>
+            </div>
+        </div>
+
+
+        <!-- ────────────────── RIGHT COLUMN: DUAL-COLUMN 15S AUTO-SLIDER ────────────────── -->
+        <div class="hidden lg:block relative w-full h-full min-h-screen overflow-hidden bg-slate-950" id="visualPanel">
+            <!-- Dual-Column Slides Container (Rendered dynamically by JS) -->
+            <div class="dual-slider-wrapper relative w-full h-full min-h-screen" id="dualSliderWrapper">
+                <!-- 2-column image pairs inserted by JS -->
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toastEl" class="toast-notification">
+        <div class="flex items-center gap-3">
+            <div id="toastIcon" class="hidden" style="display: none;"></div>
+            <p id="toastText" class="text-sm text-slate-700 font-500"></p>
+        </div>
+    </div>
+
+    <script src="brand-config.js"></script>
+    <script src="form-validator.js"></script>
+    <script src="password-meter.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

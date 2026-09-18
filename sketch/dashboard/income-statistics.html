@@ -1,0 +1,297 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Thống Kê Thu Nhập & Báo Cáo Tài Chính | Aethelgard Mall Seller Portal</title>
+  <meta name="description" content="Dashboard thống kê doanh thu, phân tích tăng trưởng và sao kê giao dịch chuẩn mực.">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="income-statistics.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+</head>
+<body>
+  <!-- TOP NAVBAR -->
+  <header class="navbar">
+    <div class="nav-container">
+      <div class="logo">
+        <a href="index.html" style="text-decoration: none; color: inherit; display: flex; align-items: center; gap: 8px;">
+          <span class="logo-text">Aethelgard <span class="accent-text">Shopping Mall</span></span>
+        </a>
+      </div>
+
+      <!-- MAIN NAVIGATION LINKS -->
+      <nav class="nav-links">
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="inventory.html" class="nav-link">Inventory</a>
+        <a href="orders.html" class="nav-link">Orders</a>
+        <a href="income-statistics.html" class="nav-link active">Income Statistics</a>
+        <a href="shop-profile.html" class="nav-link">Shop Profile</a>
+      </nav>
+
+      <!-- USER CONTROLS -->
+      <div class="nav-actions">
+        <div class="user-avatar" title="Account">A</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN INCOME DASHBOARD WRAPPER (Exact match to media_1789715810035.png) -->
+  <main class="income-dashboard-wrap">
+    
+    <!-- ============================================================
+         ROW 1: 4 TOP METRIC CARDS
+         ============================================================ -->
+    <div class="metric-cards-grid">
+      <!-- 1. Total Revenue -->
+      <div class="kpi-stat-box">
+        <div class="kpi-top-row">
+          <span class="kpi-title-mono">TOTAL REVENUE</span>
+          <div class="sparkline-bars">
+            <div class="spark-bar" style="height: 12px;"></div>
+            <div class="spark-bar" style="height: 18px;"></div>
+            <div class="spark-bar" style="height: 14px;"></div>
+            <div class="spark-bar" style="height: 22px;"></div>
+            <div class="spark-bar active" style="height: 28px;"></div>
+            <div class="spark-bar" style="height: 16px;"></div>
+            <div class="spark-bar" style="height: 20px;"></div>
+          </div>
+        </div>
+        <div class="kpi-big-num">$20,320</div>
+        <div class="kpi-bottom-row">
+          <span class="kpi-info-icon">ⓘ</span>
+          <span class="kpi-growth-tag">+0,94 <span style="font-weight: 500; color: #6B7280; margin-left: 2px;">last year</span></span>
+        </div>
+      </div>
+
+      <!-- 2. Total Orders -->
+      <div class="kpi-stat-box">
+        <div class="kpi-top-row">
+          <span class="kpi-title-mono">TOTAL ORDERS</span>
+          <div class="sparkline-bars">
+            <div class="spark-bar" style="height: 14px;"></div>
+            <div class="spark-bar" style="height: 10px;"></div>
+            <div class="spark-bar" style="height: 16px;"></div>
+            <div class="spark-bar active" style="height: 24px;"></div>
+            <div class="spark-bar" style="height: 18px;"></div>
+            <div class="spark-bar" style="height: 22px;"></div>
+            <div class="spark-bar" style="height: 14px;"></div>
+          </div>
+        </div>
+        <div class="kpi-big-num">10,320 <span class="kpi-subtext">Orders</span></div>
+        <div class="kpi-bottom-row">
+          <span class="kpi-info-icon">ⓘ</span>
+          <span class="kpi-growth-tag">+0,94 <span style="font-weight: 500; color: #6B7280; margin-left: 2px;">last year</span></span>
+        </div>
+      </div>
+
+      <!-- 3. New Customers -->
+      <div class="kpi-stat-box">
+        <div class="kpi-top-row">
+          <span class="kpi-title-mono">NEW CUSTOMERS</span>
+          <div class="sparkline-bars">
+            <div class="spark-bar" style="height: 16px;"></div>
+            <div class="spark-bar" style="height: 20px;"></div>
+            <div class="spark-bar" style="height: 12px;"></div>
+            <div class="spark-bar" style="height: 18px;"></div>
+            <div class="spark-bar active" style="height: 26px;"></div>
+            <div class="spark-bar" style="height: 14px;"></div>
+            <div class="spark-bar" style="height: 19px;"></div>
+          </div>
+        </div>
+        <div class="kpi-big-num">4,305 <span class="kpi-subtext">New Users</span></div>
+        <div class="kpi-bottom-row">
+          <span class="kpi-info-icon">ⓘ</span>
+          <span class="kpi-growth-tag">+0,94 <span style="font-weight: 500; color: #6B7280; margin-left: 2px;">last year</span></span>
+        </div>
+      </div>
+
+      <!-- 4. Conversion Rate -->
+      <div class="kpi-stat-box">
+        <div class="kpi-top-row">
+          <span class="kpi-title-mono">CONVERSION RATE</span>
+          <div class="sparkline-bars">
+            <div class="spark-bar" style="height: 10px;"></div>
+            <div class="spark-bar" style="height: 14px;"></div>
+            <div class="spark-bar" style="height: 20px;"></div>
+            <div class="spark-bar" style="height: 15px;"></div>
+            <div class="spark-bar active" style="height: 25px;"></div>
+            <div class="spark-bar" style="height: 18px;"></div>
+            <div class="spark-bar" style="height: 12px;"></div>
+          </div>
+        </div>
+        <div class="kpi-big-num">3.9%</div>
+        <div class="kpi-bottom-row">
+          <span class="kpi-info-icon">ⓘ</span>
+          <span class="kpi-growth-tag">+0,94 <span style="font-weight: 500; color: #6B7280; margin-left: 2px;">last year</span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         ROW 2: SALES TREND & REVENUE BREAKDOWN
+         ============================================================ -->
+    <div class="analytics-two-col-grid">
+      <!-- Left Card: SALES TREND -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title-group">
+            <span>SALES TREND</span>
+            <span>ⓘ</span>
+          </div>
+          <span class="dash-card-action-icon">⋯</span>
+        </div>
+
+        <div class="sales-trend-toolbar">
+          <div class="trend-stat-left">
+            <div class="trend-total-label">
+              Total Revenue : <strong id="trend-total-amount">$20,320</strong>
+            </div>
+            <div class="trend-legend">
+              <div class="trend-legend-item">
+                <span class="legend-square-new"></span>
+                <span>NEW USER</span>
+              </div>
+              <div class="trend-legend-item">
+                <span class="legend-square-existing"></span>
+                <span>EXISTING USER</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="time-pill-selector">
+            <button class="time-pill-btn" data-period="weekly">Weekly</button>
+            <button class="time-pill-btn active" data-period="monthly">Monthly</button>
+            <button class="time-pill-btn" data-period="yearly">Yearly</button>
+          </div>
+        </div>
+
+        <!-- Block Matrix Bar Chart -->
+        <div class="matrix-chart-wrapper">
+          <!-- Y-Axis -->
+          <div class="matrix-y-axis">
+            <span>60k</span>
+            <span>50k</span>
+            <span>40k</span>
+            <span>30k</span>
+            <span>20k</span>
+            <span>10k</span>
+            <span>0k</span>
+          </div>
+
+          <!-- Grid Area with Dotted Guidelines and Columns -->
+          <div class="matrix-grid-area">
+            <div class="matrix-guidelines">
+              <div class="matrix-guide-line"></div>
+              <div class="matrix-guide-line"></div>
+              <div class="matrix-guide-line"></div>
+              <div class="matrix-guide-line"></div>
+              <div class="matrix-guide-line"></div>
+              <div class="matrix-guide-line"></div>
+              <div class="matrix-guide-line" style="border-top: 1px solid #E5E7EB;"></div>
+            </div>
+
+            <!-- Month Columns rendered dynamically -->
+            <div class="matrix-columns-container" id="matrix-cols-container"></div>
+
+            <!-- X-Axis Labels -->
+            <div class="matrix-x-axis" id="matrix-x-axis"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Card: REVENUE BREAKDOWN -->
+      <div class="dash-card">
+        <div class="dash-card-header">
+          <div class="dash-card-title-group">
+            <span>REVENUE BREAKDOWN</span>
+            <span>ⓘ</span>
+          </div>
+          <span class="dash-card-action-icon">⋯</span>
+        </div>
+
+        <div class="breakdown-top-meta">
+          <span class="breakdown-cat-title">Revenue by Category</span>
+          <div class="breakdown-date-pill">
+            <span>📅 Jan 1 - Aug 30</span>
+            <span style="font-size: 0.65rem;">▼</span>
+          </div>
+        </div>
+
+        <div class="breakdown-big-val">$20,320</div>
+
+        <!-- AI Insight Button Banner -->
+        <button class="btn-ai-insight" onclick="showAiInsight()">
+          <span class="ai-icon-spark">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+            Get AI insight for better analysis
+          </span>
+          <span>›</span>
+        </button>
+
+        <!-- Vertical Needle Chart -->
+        <div class="needle-chart-container" id="needle-chart-bars">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <div class="needle-axis-labels">
+          <span>1 JAN</span>
+          <span>30 JAN 2025</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         ROW 3: RECENT TRANSACTIONS TABLE
+         ============================================================ -->
+    <div class="dash-card" style="padding: 18px 20px;">
+      <div class="recent-tx-header">
+        <div class="dash-card-title-group">
+          <span>RECENT TRANSACTIONS</span>
+          <span>ⓘ</span>
+        </div>
+
+        <div class="tx-header-actions">
+          <div class="tx-search-box">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="tx-search-input" placeholder="Search transactions...">
+          </div>
+          <button class="btn-add-tx" onclick="addNewTransactionPrompt()">
+            + Add Transaction
+          </button>
+          <button class="btn-more-options" onclick="alert('Transaction filter options...')">
+            ⋯
+          </button>
+        </div>
+      </div>
+
+      <div class="tx-table-wrapper">
+        <table class="tx-table">
+          <thead>
+            <tr>
+              <th style="width: 28px;">
+                <input type="checkbox" class="tx-checkbox" id="tx-check-all">
+              </th>
+              <th>ID ↕</th>
+              <th>CUSTOMER ↕</th>
+              <th>PRODUCT ↕</th>
+              <th>STATUS ↕</th>
+              <th>QTY ↕</th>
+              <th>UNIT PRICE ↕</th>
+              <th>TOTAL REVENUE ↕</th>
+              <th style="text-align: right;">ACTIONS</th>
+            </tr>
+          </thead>
+          <tbody id="tx-table-body">
+            <!-- Rendered dynamically by income-statistics.js -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="income-statistics.js"></script>
+</body>
+</html>
