@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { fallbackProducts } from '@/lib/mock-data';
 import { Product } from '@/types';
 
@@ -18,8 +18,36 @@ export default function HomePage() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isOrdersOpen, setIsOrdersOpen] = useState(false);
-  const [activeDrawerProduct, setActiveDrawerProduct] = useState<Product | null>(null);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [drawerProduct, setDrawerProduct] = useState<Product>(fallbackProducts[0]);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const openSellerDrawer = (p: Product) => {
+    setDrawerProduct(p);
+    setIsDrawerOpen(true);
+  };
+
+  const closeSellerDrawer = () => {
+    setIsDrawerOpen(false);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsDrawerOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  useEffect(() => {
+    if (isDrawerOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [isDrawerOpen]);
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
@@ -99,6 +127,49 @@ export default function HomePage() {
     setMaxPrice('');
     setSortOrder('newest');
     setSearchTerm('');
+  };
+
+  // Financial & brand calculations for drawerProduct
+  const brandName = useMemo(() => {
+    if (!drawerProduct) return 'GUCCI';
+    const name = drawerProduct.name.toLowerCase();
+    if (name.includes('adidas')) return 'ADIDAS';
+    if (name.includes('balenciaga')) return 'BALENCIAGA';
+    if (name.includes('dior')) return 'DIOR';
+    return 'GUCCI';
+  }, [drawerProduct]);
+
+  const skuCode = useMemo(() => {
+    if (!drawerProduct) return 'GC-00101';
+    let prefix = 'GC';
+    const name = drawerProduct.name.toLowerCase();
+    if (name.includes('adidas')) prefix = 'AD';
+    else if (name.includes('balenciaga')) prefix = 'BL';
+    else if (name.includes('dior')) prefix = 'CD';
+    return `${prefix}-${drawerProduct.id.toString().padStart(5, '0')}`;
+  }, [drawerProduct]);
+
+  const retailPrice = drawerProduct?.basePrice || 0;
+  const originalPrice = Math.round((retailPrice * 1.18) / 10000) * 10000;
+  const cogsPrice = Math.round((retailPrice * 0.58) / 10000) * 10000;
+  const platformFee = Math.round(retailPrice * 0.035);
+  const vatFee = Math.round(retailPrice * 0.08);
+  const netProfit = retailPrice - cogsPrice - platformFee - vatFee;
+  const marginPct = retailPrice > 0 ? ((netProfit / retailPrice) * 100).toFixed(1) : '38.5';
+
+  const isFootwear = drawerProduct?.name.toLowerCase().includes('giày') || drawerProduct?.categoryName?.toLowerCase().includes('sneaker');
+
+  const copySkuToClipboard = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(skuCode);
+      showToast(`Đã sao chép mã ${skuCode} vào clipboard!`);
+    } else {
+      showToast(`Mã SKU: ${skuCode}`);
+    }
+  };
+
+  const quickRestock = () => {
+    showToast(`Đã ghi nhận tạo phiếu nhập thêm +20 sản phẩm cho "${drawerProduct.name}"!`);
   };
 
   return (
@@ -322,7 +393,7 @@ export default function HomePage() {
                 <div
                   key={p.id}
                   className="product-card"
-                  onClick={() => setActiveDrawerProduct(p)}
+                  onClick={() => openSellerDrawer(p)}
                   style={{ cursor: 'pointer' }}
                 >
                   <div className="product-card-top">
@@ -405,7 +476,7 @@ export default function HomePage() {
               <div
                 key={p.id}
                 className="product-card"
-                onClick={() => setActiveDrawerProduct(p)}
+                onClick={() => openSellerDrawer(p)}
                 style={{ cursor: 'pointer' }}
               >
                 <div className="product-card-top">
@@ -628,201 +699,345 @@ export default function HomePage() {
       </div>
 
       {/* SELLER DUAL-PANEL SLIDING DRAWER */}
-      {activeDrawerProduct && (
-        <div id="seller-product-drawer" className="seller-dual-drawer-backdrop active" aria-hidden="false">
-          <div className="seller-drawer-wrapper">
-            {/* SECONDARY PANEL (LEFT): QUẢN LÝ KHO, BIẾN THỂ & VẬN HÀNH */}
-            <div className="seller-panel seller-panel-secondary" id="seller-panel-secondary">
-              <div className="seller-panel-header">
-                <div className="seller-header-badge-group">
-                  <span className="badge-portal">KHO VẬN & VẬN HÀNH</span>
-                  <span className="badge-active-status" id="sec-panel-status">
-                    Đang phân phối
-                  </span>
-                </div>
-              </div>
-
-              <div className="seller-panel-body">
-                {/* Tồn kho & Cảnh báo */}
-                <div className="seller-section-box">
-                  <div className="seller-section-title">
-                    Kiểm Soát Tồn Kho
-                    <span className="extra-info" id="sec-inv-location">
-                      Kho Tổng: Hà Nội Hub
-                    </span>
-                  </div>
-                  <div className="inventory-stats-grid">
-                    <div className="inv-stat-card avail">
-                      <div className="inv-val" id="sec-stock-available">
-                        {activeDrawerProduct.stockQuantity}
-                      </div>
-                      <div className="inv-sub">Khả dụng</div>
-                    </div>
-                    <div className="inv-stat-card">
-                      <div className="inv-val" id="sec-stock-reserved">
-                        3
-                      </div>
-                      <div className="inv-sub">Đang giữ giỏ</div>
-                    </div>
-                    <div className="inv-stat-card">
-                      <div className="inv-val" id="sec-stock-threshold">
-                        10
-                      </div>
-                      <div className="inv-sub">Ngưỡng báo động</div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Bảng ma trận biến thể */}
-                <div className="seller-section-box">
-                  <div className="seller-section-title">
-                    Ma Trận Phân Loại & Biến Thể
-                    <span className="extra-info">3 kích cỡ</span>
-                  </div>
-                  <div className="variants-table-wrap">
-                    <table className="variants-table">
-                      <thead>
-                        <tr>
-                          <th>Phân Loại</th>
-                          <th>Mã SKU</th>
-                          <th>Tồn Kho</th>
-                          <th>Giá Bán</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr>
-                          <td>Size 39 / S</td>
-                          <td>{activeDrawerProduct.sku}-39</td>
-                          <td>15</td>
-                          <td>{formatVND(activeDrawerProduct.basePrice)}</td>
-                        </tr>
-                        <tr>
-                          <td>Size 40 / M</td>
-                          <td>{activeDrawerProduct.sku}-40</td>
-                          <td>20</td>
-                          <td>{formatVND(activeDrawerProduct.basePrice)}</td>
-                        </tr>
-                        <tr>
-                          <td>Size 41 / L</td>
-                          <td>{activeDrawerProduct.sku}-41</td>
-                          <td>10</td>
-                          <td>{formatVND(activeDrawerProduct.basePrice)}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </div>
-
-              <div className="seller-drawer-actions">
-                <button
-                  className="btn-seller-secondary"
-                  onClick={() => showToast(`Đã ghi nhận yêu cầu nhập thêm kho cho ${activeDrawerProduct.name}`)}
-                >
-                  + Nhập Thêm Kho Hàng
-                </button>
+      <div
+        id="seller-product-drawer"
+        className={`seller-dual-drawer-backdrop ${isDrawerOpen ? 'active' : ''}`}
+        aria-hidden={!isDrawerOpen}
+        onClick={(e) => {
+          if (e.target === e.currentTarget || (e.target as HTMLElement).classList.contains('seller-drawer-wrapper')) {
+            closeSellerDrawer();
+          }
+        }}
+      >
+        <div className="seller-drawer-wrapper">
+          {/* SECONDARY PANEL (LEFT): QUẢN LÝ KHO, BIẾN THỂ & VẬN HÀNH */}
+          <div className="seller-panel seller-panel-secondary" id="seller-panel-secondary">
+            <div className="seller-panel-header">
+              <div className="seller-header-badge-group">
+                <span className="badge-portal">KHO VẬN & VẬN HÀNH</span>
+                <span className="badge-active-status" id="sec-panel-status">
+                  Đang phân phối
+                </span>
               </div>
             </div>
 
-            {/* PRIMARY PANEL (RIGHT): THÔNG TIN SẢN PHẨM & TÀI CHÍNH LỢI NHUẬN */}
-            <div className="seller-panel seller-panel-primary" id="seller-panel-primary">
-              <div className="seller-panel-header">
-                <div className="seller-header-badge-group">
-                  <span className="badge-portal">DỮ LIỆU NGƯỜI BÁN</span>
-                  <span className="badge-active-status" id="pri-panel-status">
-                    Đang Bán (Active)
+            <div className="seller-panel-body">
+              {/* Tồn kho & Cảnh báo */}
+              <div className="seller-section-box">
+                <div className="seller-section-title">
+                  Kiểm Soát Tồn Kho
+                  <span className="extra-info" id="sec-inv-location">
+                    Kho Tổng: Hà Nội Hub
                   </span>
                 </div>
-                <button
-                  className="btn-drawer-close"
-                  id="btn-close-seller-drawer"
-                  title="Đóng bảng chi tiết"
-                  onClick={() => setActiveDrawerProduct(null)}
-                >
-                  &times;
-                </button>
+                <div className="inventory-stats-grid">
+                  <div className="inv-stat-card avail">
+                    <div className="inv-val" id="sec-stock-available">
+                      {drawerProduct.stockQuantity}
+                    </div>
+                    <div className="inv-sub">Khả dụng</div>
+                  </div>
+                  <div className="inv-stat-card">
+                    <div className="inv-val" id="sec-stock-reserved">
+                      {Math.min(3, Math.floor(drawerProduct.stockQuantity * 0.1))}
+                    </div>
+                    <div className="inv-sub">Đang giữ giỏ</div>
+                  </div>
+                  <div className="inv-stat-card">
+                    <div className="inv-val" id="sec-stock-threshold">
+                      10
+                    </div>
+                    <div className="inv-sub">Ngưỡng báo động</div>
+                  </div>
+                </div>
+                <div className="inv-progress-wrap">
+                  <div className="inv-progress-bar">
+                    <div className="inv-progress-fill" id="sec-inv-progress" style={{ width: '78%' }}></div>
+                  </div>
+                  <div className="inv-progress-label">
+                    <span>Trạng thái sức chứa kho</span>
+                    <span id="sec-inv-percent-text">78% An toàn</span>
+                  </div>
+                </div>
               </div>
 
-              <div className="seller-panel-body">
-                {/* Hero overview */}
-                <div className="seller-product-hero">
-                  <div className="seller-hero-img-box">
-                    <img id="pri-product-img" src={activeDrawerProduct.imageUrl} alt={activeDrawerProduct.name} />
+              {/* Bảng ma trận biến thể */}
+              <div className="seller-section-box">
+                <div className="seller-section-title">
+                  Ma Trận Phân Loại & Biến Thể
+                  <span className="extra-info" id="sec-variants-count">
+                    4 phiên bản
+                  </span>
+                </div>
+                <div className="variants-table-wrap">
+                  <table className="variants-table">
+                    <thead>
+                      <tr>
+                        <th>Phân Loại</th>
+                        <th>Mã SKU</th>
+                        <th>Tồn Kho</th>
+                        <th>Giá Bán</th>
+                      </tr>
+                    </thead>
+                    <tbody id="sec-variants-tbody">
+                      {isFootwear ? (
+                        <>
+                          <tr>
+                            <td><strong>Size 39 (Standard)</strong></td>
+                            <td><code>{skuCode}-39</code></td>
+                            <td><span style={{ fontWeight: 700, color: '#16A34A' }}>{Math.round(drawerProduct.stockQuantity * 0.25)} chiếc</span></td>
+                            <td><strong>{formatVND(retailPrice)}</strong></td>
+                          </tr>
+                          <tr>
+                            <td><strong>Size 40 (Standard)</strong></td>
+                            <td><code>{skuCode}-40</code></td>
+                            <td><span style={{ fontWeight: 700, color: '#16A34A' }}>{Math.round(drawerProduct.stockQuantity * 0.35)} chiếc</span></td>
+                            <td><strong>{formatVND(retailPrice)}</strong></td>
+                          </tr>
+                          <tr>
+                            <td><strong>Size 41 (Standard)</strong></td>
+                            <td><code>{skuCode}-41</code></td>
+                            <td><span style={{ fontWeight: 700, color: '#16A34A' }}>{Math.round(drawerProduct.stockQuantity * 0.25)} chiếc</span></td>
+                            <td><strong>{formatVND(retailPrice)}</strong></td>
+                          </tr>
+                          <tr>
+                            <td><strong>Size 42 (Standard)</strong></td>
+                            <td><code>{skuCode}-42</code></td>
+                            <td><span style={{ fontWeight: 700, color: '#DC2626' }}>{Math.max(1, drawerProduct.stockQuantity - Math.round(drawerProduct.stockQuantity * 0.85))} chiếc</span></td>
+                            <td><strong>{formatVND(retailPrice)}</strong></td>
+                          </tr>
+                        </>
+                      ) : (
+                        <>
+                          <tr>
+                            <td><strong>Size S (Regular Fit)</strong></td>
+                            <td><code>{skuCode}-S</code></td>
+                            <td><span style={{ fontWeight: 700, color: '#16A34A' }}>{Math.round(drawerProduct.stockQuantity * 0.25)} chiếc</span></td>
+                            <td><strong>{formatVND(retailPrice)}</strong></td>
+                          </tr>
+                          <tr>
+                            <td><strong>Size M (Regular Fit)</strong></td>
+                            <td><code>{skuCode}-M</code></td>
+                            <td><span style={{ fontWeight: 700, color: '#16A34A' }}>{Math.round(drawerProduct.stockQuantity * 0.4)} chiếc</span></td>
+                            <td><strong>{formatVND(retailPrice)}</strong></td>
+                          </tr>
+                          <tr>
+                            <td><strong>Size L (Regular Fit)</strong></td>
+                            <td><code>{skuCode}-L</code></td>
+                            <td><span style={{ fontWeight: 700, color: '#16A34A' }}>{Math.round(drawerProduct.stockQuantity * 0.25)} chiếc</span></td>
+                            <td><strong>{formatVND(retailPrice)}</strong></td>
+                          </tr>
+                          <tr>
+                            <td><strong>Size XL (Regular Fit)</strong></td>
+                            <td><code>{skuCode}-XL</code></td>
+                            <td><span style={{ fontWeight: 700, color: '#DC2626' }}>{Math.max(1, drawerProduct.stockQuantity - Math.round(drawerProduct.stockQuantity * 0.9))} chiếc</span></td>
+                            <td><strong>{formatVND(retailPrice)}</strong></td>
+                          </tr>
+                        </>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Quy cách đóng gói & Vận chuyển */}
+              <div className="seller-section-box">
+                <div className="seller-section-title">
+                  Quy Cách Đóng Gói & Vận Chuyển
+                </div>
+                <div className="shipping-spec-list">
+                  <div className="shipping-spec-item">
+                    <span>Khối lượng đóng gói:</span>
+                    <strong id="sec-spec-weight">{isFootwear ? '950 gram' : '520 gram'}</strong>
                   </div>
-                  <div className="seller-hero-meta">
-                    <div className="seller-hero-identifiers">
-                      <span className="brand-badge-pill" id="pri-brand-name">
-                        AETHELGARD
-                      </span>
-                      <span className="sku-tag" id="pri-sku-code">
-                        SKU: {activeDrawerProduct.sku}
-                      </span>
-                    </div>
-                    <h3 id="pri-product-title">{activeDrawerProduct.name}</h3>
-                    <p className="seller-category-crumb" id="pri-category-crumb">
-                      {activeDrawerProduct.categoryName}
-                    </p>
+                  <div className="shipping-spec-item">
+                    <span>Kích thước đóng hộp (D x R x C):</span>
+                    <strong id="sec-spec-dimensions">{isFootwear ? '34 x 22 x 13 cm' : '30 x 20 x 5 cm'}</strong>
+                  </div>
+                  <div className="shipping-spec-item">
+                    <span>Kênh giao hàng tích hợp:</span>
+                    <strong>Hỏa Tốc 2H, Chuẩn Aethelgard</strong>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                {/* Giá cả & Lợi nhuận */}
-                <div className="seller-section-box">
-                  <div className="seller-section-title">
-                    Giá Cả & Phân Tích Lợi Nhuận
-                    <span className="extra-info">Tỷ suất biên ròng</span>
-                  </div>
+            <div className="seller-drawer-actions">
+              <button className="btn-seller-secondary" onClick={quickRestock} type="button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                  <path d="M12 5v14M5 12h14" />
+                </svg>
+                Nhập Thêm Kho Hàng
+              </button>
+              <button className="btn-seller-secondary" onClick={copySkuToClipboard} type="button">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                Sao Chép Mã Quản Lý (SKU)
+              </button>
+            </div>
+          </div>
 
-                  <div className="seller-pricing-grid">
-                    <div className="seller-price-stat">
-                      <span className="stat-label">Giá bán lẻ (Retail)</span>
-                      <span className="stat-val" id="pri-retail-price">
-                        {formatVND(activeDrawerProduct.basePrice)}
-                      </span>
-                    </div>
-                    <div className="seller-price-stat">
-                      <span className="stat-label">Giá niêm yết gốc</span>
-                      <span className="stat-val subtext-strike" id="pri-original-price">
-                        {formatVND(activeDrawerProduct.originalPrice || activeDrawerProduct.basePrice * 1.15)}
-                      </span>
-                    </div>
-                    <div className="seller-price-stat">
-                      <span className="stat-label">Giá vốn nhập (COGS)</span>
-                      <span className="stat-val" id="pri-cost-price" style={{ color: '#475569' }}>
-                        {formatVND(Math.round(activeDrawerProduct.basePrice * 0.6))}
-                      </span>
-                    </div>
-                    <div className="seller-price-stat highlight-profit">
-                      <span className="stat-label">Biên Lợi Nhuận Ròng</span>
-                      <span className="stat-val profit-rate" id="pri-profit-margin">
-                        +38.5%
-                      </span>
-                    </div>
-                  </div>
+          {/* PRIMARY PANEL (RIGHT): THÔNG TIN SẢN PHẨM & TÀI CHÍNH LỢI NHUẬN */}
+          <div className="seller-panel seller-panel-primary" id="seller-panel-primary">
+            <div className="seller-panel-header">
+              <div className="seller-header-badge-group">
+                <span className="badge-portal">DỮ LIỆU NGƯỜI BÁN</span>
+                <span className="badge-active-status" id="pri-panel-status">
+                  Đang Bán (Active)
+                </span>
+              </div>
+              <button
+                className="btn-drawer-close"
+                id="btn-close-seller-drawer"
+                title="Đóng bảng chi tiết"
+                onClick={closeSellerDrawer}
+                type="button"
+              >
+                &times;
+              </button>
+            </div>
+
+            <div className="seller-panel-body">
+              {/* Hero overview */}
+              <div className="seller-product-hero">
+                <div className="seller-hero-img-box">
+                  <img id="pri-product-img" src={drawerProduct.imageUrl} alt={drawerProduct.name} />
                 </div>
-
-                {/* Mô tả */}
-                <div className="seller-section-box">
-                  <div className="seller-section-title">Mô Tả Sản Phẩm</div>
-                  <p id="pri-product-desc" style={{ fontSize: '0.85rem', lineHeight: '1.5', color: '#475569' }}>
-                    {activeDrawerProduct.description}
+                <div className="seller-hero-meta">
+                  <div className="seller-hero-identifiers">
+                    <span className="brand-badge-pill" id="pri-brand-name">
+                      {brandName}
+                    </span>
+                    <span className="sku-tag" id="pri-sku-code">
+                      SKU: {skuCode}
+                    </span>
+                  </div>
+                  <h3 id="pri-product-title">{drawerProduct.name}</h3>
+                  <p className="seller-category-crumb" id="pri-category-crumb">
+                    Aethelgard Mall / {drawerProduct.categoryName}
                   </p>
                 </div>
               </div>
 
-              <div className="seller-drawer-actions">
-                <a
-                  id="pri-btn-view-customer"
-                  href={`/product-detail/${activeDrawerProduct.id}`}
-                  className="btn-seller-primary"
-                  style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
-                >
-                  Xem Trang Sản Phẩm Khách Hàng &rarr;
-                </a>
+              {/* Giá Cả & Phân Tích Lợi Nhuận */}
+              <div className="seller-section-box">
+                <div className="seller-section-title">
+                  Giá Cả & Phân Tích Lợi Nhuận
+                  <span className="extra-info">Tỷ suất biên ròng</span>
+                </div>
+
+                <div className="seller-pricing-grid">
+                  <div className="seller-price-stat">
+                    <span className="stat-label">Giá bán lẻ (Retail)</span>
+                    <span className="stat-val" id="pri-retail-price">
+                      {formatVND(retailPrice)}
+                    </span>
+                  </div>
+                  <div className="seller-price-stat">
+                    <span className="stat-label">Giá niêm yết gốc</span>
+                    <span className="stat-val subtext-strike" id="pri-original-price">
+                      {formatVND(originalPrice)}
+                    </span>
+                  </div>
+                  <div className="seller-price-stat">
+                    <span className="stat-label">Giá vốn nhập (COGS)</span>
+                    <span className="stat-val" id="pri-cost-price" style={{ color: '#475569' }}>
+                      {formatVND(cogsPrice)}
+                    </span>
+                  </div>
+                  <div className="seller-price-stat highlight-profit">
+                    <span className="stat-label">Biên Lợi Nhuận Ròng</span>
+                    <span className="stat-val profit-rate" id="pri-profit-margin">
+                      +{marginPct}%
+                    </span>
+                  </div>
+                </div>
+
+                {/* Bảng hạch toán chi tiết */}
+                <div className="seller-ledger-list">
+                  <div className="ledger-row">
+                    <span>Doanh thu gộp dự kiến:</span>
+                    <strong id="pri-ledger-gross">{formatVND(retailPrice)}</strong>
+                  </div>
+                  <div className="ledger-row">
+                    <span>- Giá vốn hàng bán (COGS):</span>
+                    <span id="pri-ledger-cogs">-{formatVND(cogsPrice)}</span>
+                  </div>
+                  <div className="ledger-row">
+                    <span>- Phí sàn Aethelgard Mall (3.5%):</span>
+                    <span id="pri-ledger-fee">-{formatVND(platformFee)}</span>
+                  </div>
+                  <div className="ledger-row">
+                    <span>- Thuế GTGT VAT khấu trừ (8%):</span>
+                    <span id="pri-ledger-vat">-{formatVND(vatFee)}</span>
+                  </div>
+                  <div className="ledger-row total-net">
+                    <span>LỢI NHUẬN RÒNG THỰC NHẬN:</span>
+                    <span className="net-profit-val" id="pri-ledger-net">
+                      +{formatVND(netProfit)}
+                    </span>
+                  </div>
+                </div>
               </div>
+
+              {/* Hiệu suất kinh doanh 30 ngày */}
+              <div className="seller-section-box">
+                <div className="seller-section-title">
+                  Hiệu Suất Kinh Doanh (30 Ngày)
+                </div>
+                <div className="seller-metrics-row">
+                  <div className="metric-pill-card">
+                    <span className="m-val" id="pri-stat-views">12.4K</span>
+                    <span className="m-label">Lượt xem</span>
+                  </div>
+                  <div className="metric-pill-card">
+                    <span className="m-val" id="pri-stat-carts">845</span>
+                    <span className="m-label">Thêm vào giỏ</span>
+                  </div>
+                  <div className="metric-pill-card">
+                    <span className="m-val" id="pri-stat-cvr">4.2%</span>
+                    <span className="m-label">Tỷ lệ CVR</span>
+                  </div>
+                  <div className="metric-pill-card">
+                    <span className="m-val" id="pri-stat-rating">5.0 ★</span>
+                    <span className="m-label">Đánh giá</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Mô tả & Hướng dẫn sản phẩm */}
+              <div className="seller-section-box">
+                <div className="seller-section-title">
+                  Mô Tả & Hướng Dẫn Sản Phẩm
+                </div>
+                <p id="pri-product-desc" style={{ fontSize: '0.85rem', lineHeight: '1.5', color: '#475569' }}>
+                  {drawerProduct.description}
+                </p>
+              </div>
+            </div>
+
+            <div className="seller-drawer-actions">
+              <a
+                id="pri-btn-view-customer"
+                href={`/product-detail/${drawerProduct.id}`}
+                className="btn-seller-primary"
+                style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}
+              >
+                Xem Trang Sản Phẩm Khách Hàng &rarr;
+              </a>
+              <button
+                className="btn-seller-secondary"
+                onClick={() => showToast('Mở trình biên tập niêm yết sản phẩm đối tác!')}
+                type="button"
+              >
+                Chỉnh Sửa Niêm Yết Sản Phẩm
+              </button>
             </div>
           </div>
         </div>
-      )}
+      </div>
 
       {/* TOAST NOTIFICATION */}
       {toastMessage && (

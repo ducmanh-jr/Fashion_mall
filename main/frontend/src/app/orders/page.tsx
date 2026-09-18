@@ -244,7 +244,7 @@ const formatVND = (num: number) =>
 export default function OrdersPage() {
   const [currentFilter, setCurrentFilter] = useState<'ALL' | 'PENDING' | 'CONFIRMED' | 'SHIPPED' | 'DELIVERED'>('ALL');
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeOrder, setActiveOrder] = useState<Order | null>(null);
+  const [activeOrder, setActiveOrder] = useState<Order>(mockOrders[0]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [lookupId, setLookupId] = useState('AG-2024-7890');
 
@@ -497,13 +497,15 @@ export default function OrdersPage() {
       {/* DUAL-PANEL SLIDING DRAWER SYSTEM FOR ORDERS TRACKING */}
       <div
         id="track-order-modal"
-        className={`track-drawer-backdrop ${isModalOpen ? 'open' : ''}`}
+        className={`track-drawer-backdrop ${isModalOpen ? 'active' : ''}`}
+        aria-hidden={!isModalOpen}
         onClick={(e) => {
-          if (e.target === e.currentTarget) closeModal();
+          if (e.target === e.currentTarget || (e.target as HTMLElement).classList.contains('track-drawer-wrapper')) {
+            closeModal();
+          }
         }}
       >
-        {activeOrder && (
-          <div className="track-drawer-wrapper">
+        <div className="track-drawer-wrapper">
             {/* SECONDARY PANEL (LEFT) */}
             <div className="track-panel track-panel-secondary">
               <div className="track-panel-header">
@@ -803,7 +805,6 @@ export default function OrdersPage() {
             </div>
 
           </div>
-        )}
       </div>
     </main>
   );
