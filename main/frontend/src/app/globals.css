@@ -360,3 +360,40 @@
     transform: translateY(-4px);
   }
 }
+
+/* ============================================================
+   RESPONSIVE TABLE & ASPECT RATIO PROTECTION
+   Đảm bảo hình ảnh và bảng luôn co giãn tự động theo tỷ lệ khung hình
+   ============================================================ */
+.orders-table td img,
+.inv-table td img,
+.tx-table td img,
+.order-thumb-img,
+.inv-prod-thumb {
+  width: 48px !important;
+  height: 48px !important;
+  min-width: 48px !important;
+  max-width: 48px !important;
+  max-height: 48px !important;
+  aspect-ratio: 1 / 1 !important;
+  object-fit: cover !important;
+  border-radius: 6px !important;
+  flex-shrink: 0 !important;
+  display: block;
+}
+
+.orders-table-wrapper,
+.inv-table-wrap,
+.tx-table-wrapper {
+  overflow-x: auto !important;
+  -webkit-overflow-scrolling: touch;
+  width: 100%;
+}
+
+.orders-container,
+.inventory-container,
+.income-dashboard-wrap,
+.shop-profile-container {
+  width: 100%;
+  box-sizing: border-box;
+}

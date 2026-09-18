@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState } from 'react';
 
@@ -458,14 +458,14 @@ export default function OrdersPage() {
                       <div style={{ fontSize: '0.74rem', color: '#6B7280' }}>{o.customer_phone}</div>
                     </td>
                     <td>
-                      <div className="order-product-cell">
+                      <div className="order-item-cell">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={firstItem.image_url} alt={firstItem.name} />
-                        <div>
-                          <div className="order-product-title">{firstItem.name}</div>
-                          <div className="order-product-meta">
+                        <img className="order-thumb-img" src={firstItem.image_url} alt={firstItem.name} />
+                        <div className="order-item-meta">
+                          <strong>{firstItem.name}</strong>
+                          <span>
                             {firstItem.specs} {moreItemsText && <strong style={{ color: 'var(--accent-purple)' }}>{moreItemsText}</strong>}
-                          </div>
+                          </span>
                         </div>
                       </div>
                     </td>

@@ -310,20 +310,21 @@ export default function InventoryPage() {
                 <td>
                   <div className="inv-prod-cell">
                     <img
+                      className="inv-prod-thumb"
                       src={item.image_url}
                       alt={item.name}
                       onError={(e) => {
                         (e.target as HTMLImageElement).src = '/img/addidas samba.jpg';
                       }}
                     />
-                    <div>
-                      <div className="inv-prod-name">{item.name}</div>
-                      <div className="inv-prod-cat">{item.category}</div>
+                    <div className="inv-prod-info">
+                      <strong>{item.name}</strong>
+                      <span>{item.category}</span>
                     </div>
                   </div>
                 </td>
                 <td>
-                  <span className="sku-badge">{item.sku}</span>
+                  <span className="inv-sku-badge">{item.sku}</span>
                 </td>
                 <td style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}>{item.barcode}</td>
                 <td>{item.variants}</td>
