@@ -9,6 +9,7 @@ import '@/styles/profile-shoppe.css';
 import '@/styles/login-sketch.css';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import AuthGuard from '@/components/AuthGuard';
 
 export const metadata: Metadata = {
   title: 'Aethelgard Shopping Mall — AI Powered Luxury Fashion',
@@ -31,9 +32,11 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col bg-white text-slate-900 antialiased selection:bg-purple-500 selection:text-white">
-        <Navbar />
-        <div className="flex-1">{children}</div>
-        <Footer />
+        <AuthGuard>
+          <Navbar />
+          <div className="flex-1">{children}</div>
+          <Footer />
+        </AuthGuard>
       </body>
     </html>
   );

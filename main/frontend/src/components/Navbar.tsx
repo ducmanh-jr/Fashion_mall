@@ -1,20 +1,44 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { ShoppingBag, Search, User, Menu, X, Database } from 'lucide-react';
-import { api } from '@/lib/api';
+import { LogOut } from 'lucide-react';
+
+interface CurrentUser {
+  fullName?: string;
+  email?: string;
+  role?: string;
+  avatarUrl?: string;
+}
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [seedLoading, setSeedLoading] = useState(false);
-  const [seedMessage, setSeedMessage] = useState<string | null>(null);
+  const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const stored = localStorage.getItem('aethelgard_user');
+      if (stored) {
+        try {
+          setCurrentUser(JSON.parse(stored));
+        } catch {}
+      }
+    }
+  }, [pathname]);
 
   if (pathname === '/login') {
     return null;
   }
+
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('aethelgard_token');
+      localStorage.removeItem('aethelgard_user');
+      sessionStorage.removeItem('redirect_after_login');
+      window.location.href = '/login';
+    }
+  };
 
   const navLinks = [
     { name: 'Home', href: '/' },
@@ -24,29 +48,16 @@ export default function Navbar() {
     { name: 'Shop Profile', href: '/shop-profile' },
   ];
 
-  const handleSeedDatabase = async () => {
-    try {
-      setSeedLoading(true);
-      const res = await api.runSeeder();
-      setSeedMessage(res.message || 'Đã nạp dữ liệu thành công!');
-      setTimeout(() => setSeedMessage(null), 4000);
-      // Reload page sau khi seed
-      window.location.reload();
-    } catch {
-      setSeedMessage('Đã khởi tạo dữ liệu CSDL!');
-      setTimeout(() => setSeedMessage(null), 4000);
-    } finally {
-      setSeedLoading(false);
-    }
-  };
+  const displayName = currentUser?.fullName || currentUser?.email?.split('@')[0]?.toUpperCase() || 'Seller';
+  const initial = displayName.charAt(0).toUpperCase();
 
   return (
     <header className="navbar">
       <div className="nav-container">
         <div className="logo">
-          <a href="/" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <Link href="/" style={{ textDecoration: 'none', color: 'inherit', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span className="logo-text">Aethelgard <span className="accent-text">Shopping Mall</span></span>
-          </a>
+          </Link>
         </div>
 
         {/* MAIN NAVIGATION LINKS */}
@@ -54,30 +65,69 @@ export default function Navbar() {
           {navLinks.map((item) => {
             const isActive = pathname === item.href;
             return (
-              <a
+              <Link
                 key={item.name}
                 href={item.href}
                 className={`nav-link ${isActive ? 'active' : ''}`}
               >
                 {item.name}
-              </a>
+              </Link>
             );
           })}
         </nav>
 
-        <div className="nav-actions">
-          <button
-            onClick={handleSeedDatabase}
-            disabled={seedLoading}
-            title="Kích hoạt nạp dữ liệu bản phác thảo vào CSDL"
-            style={{ padding: '6px 12px', fontSize: '0.8rem', borderRadius: '8px', display: 'inline-flex', alignItems: 'center', gap: '4px', cursor: 'pointer', border: '1px solid #E2E8F0', background: '#F8FAFC' }}
-          >
-            <Database style={{ width: 14, height: 14 }} />
-            <span>{seedLoading ? 'Đang nạp...' : 'Sync Data'}</span>
-          </button>
-          <a href="/login" className="user-avatar" title="Account" style={{ textDecoration: 'none', color: '#fff' }}>
-            A
-          </a>
+        <div className="nav-actions" style={{ display: 'flex', alignItems: 'center', gap: '10px', minWidth: '180px', justifyContent: 'flex-end' }}>
+          {currentUser ? (
+            <>
+              <div
+                title={`Tài khoản: ${displayName}`}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  padding: '4px 12px 4px 6px',
+                  background: '#F8FAFC',
+                  border: '1px solid #E2E8F0',
+                  borderRadius: '9999px',
+                  fontSize: '0.82rem',
+                  fontWeight: 700,
+                  color: '#0F172A'
+                }}
+              >
+                <div className="user-avatar" style={{ width: '28px', height: '28px', fontSize: '0.8rem', lineHeight: '28px' }}>
+                  {initial}
+                </div>
+                <span style={{ maxWidth: '140px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                  {displayName}
+                </span>
+              </div>
+
+              <button
+                onClick={handleLogout}
+                title="Đăng xuất và quay lại màn hình Đăng nhập"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '4px',
+                  padding: '6px 12px',
+                  borderRadius: '8px',
+                  border: '1px solid #E2E8F0',
+                  background: '#FFFFFF',
+                  color: '#EF4444',
+                  fontSize: '0.78rem',
+                  fontWeight: 700,
+                  cursor: 'pointer'
+                }}
+              >
+                <LogOut style={{ width: 14, height: 14 }} />
+                <span>Đăng xuất</span>
+              </button>
+            </>
+          ) : (
+            <Link href="/login" className="user-avatar" title="Đăng nhập" style={{ textDecoration: 'none', color: '#fff' }}>
+              A
+            </Link>
+          )}
         </div>
       </div>
     </header>

@@ -58,6 +58,18 @@ export default function LoginPage() {
     setTimeout(() => setToastMsg(null), 3500);
   };
 
+  // Redirect to home or saved route if already authenticated
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const token = localStorage.getItem('aethelgard_token');
+      if (token) {
+        const dest = sessionStorage.getItem('redirect_after_login') || '/';
+        sessionStorage.removeItem('redirect_after_login');
+        window.location.href = dest;
+      }
+    }
+  }, []);
+
   // 15-second dual slider auto-play
   useEffect(() => {
     const timer = setInterval(() => {
@@ -112,12 +124,54 @@ export default function LoginPage() {
     setForgotStrength({ score: s.score, label: s.label, color: s.color, width: s.width });
   };
 
-  const handleLoginSubmit = (e: React.FormEvent) => {
+  const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    showToast(`Đăng nhập thành công! Chào mừng ${loginEmail} trở lại Aethelgard.`);
-    setTimeout(() => {
-      window.location.href = '/';
-    }, 1000);
+    try {
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+      const res = await fetch(`${apiUrl}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: loginEmail.trim(), password: loginPassword })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        localStorage.setItem('aethelgard_token', data.token);
+        localStorage.setItem('aethelgard_user', JSON.stringify(data));
+        showToast(`Đăng nhập thành công! Chào mừng ${data.fullName || loginEmail} đến với Aethelgard.`);
+        const dest = sessionStorage.getItem('redirect_after_login') || '/';
+        sessionStorage.removeItem('redirect_after_login');
+        setTimeout(() => {
+          window.location.href = dest;
+        }, 800);
+        return;
+      }
+
+      const errData = await res.json().catch(() => ({}));
+      showToast(errData.message || 'Email hoặc mật khẩu không chính xác. Mật khẩu chuẩn là Password123@ hoặc 00000000');
+    } catch {
+      // Fallback offline session
+      if (loginPassword === '00000000' || loginPassword === 'Password123@') {
+        const brandName = loginEmail.split('@')[0].toUpperCase();
+        const fallbackUser = {
+          userId: 1,
+          fullName: loginEmail === 'ducmanh@gmail.com' ? 'Nguyễn Đức Mạnh' : `${brandName} Official Flagship`,
+          email: loginEmail,
+          role: 'Seller',
+          token: 'demo-jwt-token-' + Date.now()
+        };
+        localStorage.setItem('aethelgard_token', fallbackUser.token);
+        localStorage.setItem('aethelgard_user', JSON.stringify(fallbackUser));
+        showToast(`Đăng nhập thành công! Chào mừng ${fallbackUser.fullName}.`);
+        const dest = sessionStorage.getItem('redirect_after_login') || '/';
+        sessionStorage.removeItem('redirect_after_login');
+        setTimeout(() => {
+          window.location.href = dest;
+        }, 800);
+      } else {
+        showToast('Mật khẩu chuẩn cho các tài khoản là Password123@ hoặc 00000000');
+      }
+    }
   };
 
   const handleRegisterSubmit = (e: React.FormEvent) => {
@@ -209,7 +263,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen grid grid-cols-1 lg:grid-cols-2 bg-white antialiased font-jakarta">
+    <div className="login-split-page antialiased font-jakarta">
       
       {/* Toast Notification */}
       {toastMsg && (
@@ -219,7 +273,7 @@ export default function LoginPage() {
       )}
 
       {/* ────────────────── LEFT COLUMN: AUTH & RECOVERY CONTAINERS ────────────────── */}
-      <div className="flex flex-col justify-between p-6 sm:p-12 lg:p-16 max-w-xl mx-auto w-full z-20 bg-white">
+      <div className="login-left-col">
         
         {/* Header Brand Logo & Top Bar */}
         <div className="mb-4 flex items-center justify-between">
@@ -346,6 +400,65 @@ export default function LoginPage() {
                 >
                   Log In
                 </button>
+
+                {/* Quick Demo Accounts for Seller Portal */}
+                <div className="mt-6 pt-4 border-t border-slate-200">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
+                      Tài khoản Cổng Người Bán (Demo 1 chạm):
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLoginEmail('ducmanh@gmail.com');
+                        setLoginPassword('Password123@');
+                        showToast('Đã chọn: Nguyễn Đức Mạnh (Chủ Sàn / Seller)');
+                      }}
+                      className="p-2 text-left bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-300 rounded-lg transition-all group cursor-pointer"
+                    >
+                      <div className="text-xs font-bold text-slate-800 group-hover:text-purple-700">Nguyễn Đức Mạnh</div>
+                      <div className="text-[10px] text-slate-400">ducmanh@gmail.com</div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLoginEmail('dior@gmail.com');
+                        setLoginPassword('Password123@');
+                        showToast('Đã chọn: Dior Official Flagship');
+                      }}
+                      className="p-2 text-left bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-300 rounded-lg transition-all group cursor-pointer"
+                    >
+                      <div className="text-xs font-bold text-slate-800 group-hover:text-purple-700">Dior Boutique</div>
+                      <div className="text-[10px] text-slate-400">dior@gmail.com</div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLoginEmail('adidas@gmail.com');
+                        setLoginPassword('Password123@');
+                        showToast('Đã chọn: Adidas Flagship Store');
+                      }}
+                      className="p-2 text-left bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-300 rounded-lg transition-all group cursor-pointer"
+                    >
+                      <div className="text-xs font-bold text-slate-800 group-hover:text-purple-700">Adidas Official</div>
+                      <div className="text-[10px] text-slate-400">adidas@gmail.com</div>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setLoginEmail('gucci@gmail.com');
+                        setLoginPassword('Password123@');
+                        showToast('Đã chọn: Gucci Luxury Store');
+                      }}
+                      className="p-2 text-left bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-300 rounded-lg transition-all group cursor-pointer"
+                    >
+                      <div className="text-xs font-bold text-slate-800 group-hover:text-purple-700">Gucci Luxury</div>
+                      <div className="text-[10px] text-slate-400">gucci@gmail.com</div>
+                    </button>
+                  </div>
+                </div>
               </form>
             )}
 
@@ -728,7 +841,7 @@ export default function LoginPage() {
       </div>
 
       {/* ────────────────── RIGHT COLUMN: DUAL-COLUMN 15S AUTO-SLIDER ────────────────── */}
-      <div className="hidden lg:block relative w-full h-full min-h-screen overflow-hidden bg-slate-950">
+      <div className="login-right-panel">
         <div className="dual-slider-wrapper relative w-full h-full min-h-screen">
           {DUAL_IMAGE_PAIRS.map((pair, idx) => (
             <div
