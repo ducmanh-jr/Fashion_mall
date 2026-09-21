@@ -1,0 +1,7 @@
+{
+  "/page": "app/page.js",
+  "/shop-profile/page": "app/shop-profile/page.js",
+  "/inventory/page": "app/inventory/page.js",
+  "/product-detail/[id]/page": "app/product-detail/[id]/page.js",
+  "/orders/page": "app/orders/page.js"
+}

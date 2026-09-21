@@ -1,8 +1,47 @@
+# Dependencies
 node_modules/
-dist/
-branches/
-*.log
-fashion_mall.db
-.next/
-main/frontend/.next/
+.pnp
+.pnp.js
 
+# Build outputs
+.next/
+out/
+build/
+dist/
+target/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Java / Maven
+*.class
+*.jar
+*.war
+*.ear
+target/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/

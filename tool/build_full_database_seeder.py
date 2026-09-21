@@ -1,0 +1,372 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Script tạo file DatabaseSeeder.cs hoàn chỉnh và chuẩn mực 100%
+- Khớp 100% thuộc tính của các thực thể trong Ecommerce.Common.Entities
+- Không gán cứng Id, tương thích 100% SQL Server IDENTITY
+- Đầy đủ 23 Users (Nguyễn Đức Mạnh + Admin + Customer + 20 Brand Sellers)
+- Đầy đủ 23 Stores (3 Gucci + 20 Brand Flagship Stores)
+- 4 Danh mục chuẩn
+- 180 Sản phẩm chuẩn xác (20 sản phẩm nổi bật của Nguyễn Đức Mạnh + 160 sản phẩm của 20 thương hiệu)
+- Toàn bộ ảnh dẫn tới đường dẫn cục bộ sạch (/img/... và /img/brands/...)
+- Đầy đủ ProductVariants (Size, Color, Sku, Price, StockQuantity)
+- Đầy đủ Đơn hàng & Bản ghi giao dịch khớp schema
+"""
+
+import os
+from test_brands_data import BRANDS_DATA
+
+SEEDER_PATH = r"C:\Users\Admin\ducmanh\DM_Fashion_mall_other_ducmanh\main\backend\src\Ecommerce.DAL\Seed\DatabaseSeeder.cs"
+
+def escape_str(s):
+    return s.replace('"', '\\"')
+
+def generate():
+    lines = []
+    lines.append('using System.Security.Cryptography;')
+    lines.append('using System.Text;')
+    lines.append('using System.Text.Json;')
+    lines.append('using Ecommerce.Common.Entities;')
+    lines.append('using Ecommerce.Common.Enums;')
+    lines.append('using Ecommerce.DAL.Context;')
+    lines.append('using Microsoft.EntityFrameworkCore;')
+    lines.append('')
+    lines.append('namespace Ecommerce.DAL.Seed;')
+    lines.append('')
+    lines.append('public static class DatabaseSeeder')
+    lines.append('{')
+    lines.append('    private static string HashPassword(string password)')
+    lines.append('    {')
+    lines.append('        using var sha256 = SHA256.Create();')
+    lines.append('        var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));')
+    lines.append('        return Convert.ToBase64String(bytes);')
+    lines.append('    }')
+    lines.append('')
+    lines.append('    public static async Task SeedAsync(ApplicationDbContext context)')
+    lines.append('    {')
+    lines.append('        await context.Database.EnsureCreatedAsync();')
+    lines.append('')
+    lines.append('        // ==========================================')
+    lines.append('        // 1. SEED USERS (23 Users)')
+    lines.append('        // ==========================================')
+    lines.append('        if (!await context.Users.AnyAsync())')
+    lines.append('        {')
+    lines.append('            var defaultPwdHash = HashPassword("Password123@");')
+    lines.append('            var users = new List<User>')
+    lines.append('            {')
+    lines.append('                new User { FullName = "Nguyễn Đức Mạnh", Email = "ducmanh@gmail.com", PasswordHash = defaultPwdHash, Role = UserRole.Seller, PhoneNumber = "+84 988 123 456", AvatarUrl = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400", IsEmailVerified = true },')
+    lines.append('                new User { FullName = "Aethelgard Admin", Email = "admin@gmail.com", PasswordHash = defaultPwdHash, Role = UserRole.Admin, PhoneNumber = "+84 901 000 001", AvatarUrl = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400", IsEmailVerified = true },')
+    lines.append('                new User { FullName = "Esther Howard", Email = "esther.howard@example.com", PasswordHash = defaultPwdHash, Role = UserRole.Customer, PhoneNumber = "+84 902 345 678", AvatarUrl = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400", IsEmailVerified = true },')
+
+    for brand_key, brand_name, origin, cat_id, cat_name, items in BRANDS_DATA:
+        lines.append(f'                new User {{ FullName = "{brand_name} Official", Email = "{brand_key}@gmail.com", PasswordHash = defaultPwdHash, Role = UserRole.Seller, PhoneNumber = "+84 912 {len(brand_key):03d} 888", AvatarUrl = "/img/brands/{brand_key}/{items[0][1]}.jpg", IsEmailVerified = true }},')
+
+    lines.append('            };')
+    lines.append('            await context.Users.AddRangeAsync(users);')
+    lines.append('            await context.SaveChangesAsync();')
+    lines.append('        }')
+    lines.append('')
+    lines.append('        // ==========================================')
+    lines.append('        // 2. SEED CATEGORIES (4 Categories)')
+    lines.append('        // ==========================================')
+    lines.append('        if (!await context.Categories.AnyAsync())')
+    lines.append('        {')
+    lines.append('            var categories = new List<Category>')
+    lines.append('            {')
+    lines.append('                new Category { Name = "Giày Sneaker & Thể Thao", Slug = "giay-sneaker-the-thao", Description = "Bộ sưu tập giày sneaker hàng hiệu chính hãng từ Nike, Adidas, Gucci, Balenciaga" },')
+    lines.append('                new Category { Name = "Thời Trang Streetwear & Áo Khoác", Slug = "thoi-trang-streetwear-ao-khoac", Description = "Áo khoác, hoodie, jacket phong cách hiện đại và sàn diễn quốc tế" },')
+    lines.append('                new Category { Name = "Quần & Phụ Kiện Thời Trang", Slug = "quan-phu-kien-thoi-trang", Description = "Túi xách cao cấp, kính mắt, thắt lưng da nguyên tấm và nước hoa" },')
+    lines.append('                new Category { Name = "Gia Dụng & Đời Sống", Slug = "gia-dung-doi-song", Description = "Vật phẩm nội thất & phong cách sống tinh tế phong cách tối giản" }')
+    lines.append('            };')
+    lines.append('            await context.Categories.AddRangeAsync(categories);')
+    lines.append('            await context.SaveChangesAsync();')
+    lines.append('        }')
+    lines.append('')
+    lines.append('        // ==========================================')
+    lines.append('        // 3. SEED STORES (23 Stores)')
+    lines.append('        // ==========================================')
+    lines.append('        if (!await context.Stores.AnyAsync())')
+    lines.append('        {')
+    lines.append('            var stores = new List<Store>')
+    lines.append('            {')
+    lines.append('                new Store { StoreCode = "VN_HN_01", BrandId = "gucci", StoreName = "Gucci Tràng Tiền Plaza", StoreType = "Flagship Boutique", City = "Hà Nội", Country = "Việt Nam", Address = "Tầng 1, Tràng Tiền Plaza, 24 Hai Bà Trưng, Hoàn Kiếm", Phone = "024 3936 9999", Email = "trangtien@gucci.com", OperatingHours = "09:30 - 21:30", Latitude = 21.0256, Longitude = 105.8524, ServicesJson = JsonSerializer.Serialize(new[] { "Chăm sóc khách VIP", "Đặt may đo riêng", "Bảo hành trọn đời" }), CategoriesJson = JsonSerializer.Serialize(new[] { "Túi xách", "Giày dép", "Trang sức" }), ImageUrl = "/img/gucci-runway.jpg", StoreUrl = "https://www.gucci.com" },')
+    lines.append('                new Store { StoreCode = "VN_SG_01", BrandId = "gucci", StoreName = "Gucci Sheraton Saigon", StoreType = "Luxury Boutique", City = "TP. Hồ Chí Minh", Country = "Việt Nam", Address = "Khách sạn Sheraton, 88 Đồng Khởi, Quận 1", Phone = "028 3827 7777", Email = "sheraton@gucci.com", OperatingHours = "10:00 - 22:00", Latitude = 10.7745, Longitude = 106.7032, ServicesJson = JsonSerializer.Serialize(new[] { "Phòng thử đồ VIP", "Giao hàng hỏa tốc", "Đánh bóng da miễn phí" }), CategoriesJson = JsonSerializer.Serialize(new[] { "Thời trang nữ", "Giày nam", "Phụ kiện" }), ImageUrl = "/img/gucci-sneaker.jpg", StoreUrl = "https://www.gucci.com" },')
+    lines.append('                new Store { StoreCode = "VN_SG_02", BrandId = "gucci", StoreName = "Gucci Union Square", StoreType = "Concept Store", City = "TP. Hồ Chí Minh", Country = "Việt Nam", Address = "Union Square, 171 Đồng Khởi, Bến Nghé, Quận 1", Phone = "028 3825 8888", Email = "unionsquare@gucci.com", OperatingHours = "09:30 - 22:00", Latitude = 10.7762, Longitude = 106.7021, ServicesJson = JsonSerializer.Serialize(new[] { "Khắc tên miễn phí", "Tư vấn phối đồ cá nhân" }), CategoriesJson = JsonSerializer.Serialize(new[] { "Bộ sưu tập giới hạn", "Nước hoa" }), ImageUrl = "/img/gucci-collection.jpg", StoreUrl = "https://www.gucci.com" },')
+
+    for brand_key, brand_name, origin, cat_id, cat_name, items in BRANDS_DATA:
+        lines.append(f'                new Store {{ StoreCode = "VN_{brand_key.upper()[:3]}_01", BrandId = "{brand_key}", StoreName = "{brand_name} Heritage Flagship Boutique", StoreType = "Global Flagship Boutique", City = "Hà Nội", Country = "Việt Nam", Address = "Tòa nhà Lotte Center, 54 Liễu Giai, Ba Đình, Hà Nội", Phone = "+84 24 3888 {len(brand_key):04d}", Email = "contact@{brand_key}.vn", OperatingHours = "09:30 - 21:30", Latitude = 21.0315, Longitude = 105.8130, ServicesJson = JsonSerializer.Serialize(new[] {{ "Bảo hành chính hãng quốc tế", "Kiểm định NFC Chip", "Phòng VIP Private Lounge" }}), CategoriesJson = JsonSerializer.Serialize(new[] {{ "{cat_name}", "Haute Couture", "Ready-to-Wear" }}), ImageUrl = "/img/brands/{brand_key}/{items[0][1]}.jpg", StoreUrl = "https://www.{brand_key}.com" }},')
+
+    lines.append('            };')
+    lines.append('            await context.Stores.AddRangeAsync(stores);')
+    lines.append('            await context.SaveChangesAsync();')
+    lines.append('        }')
+    lines.append('')
+    lines.append('        // ==========================================')
+    lines.append('        // 4. SEED PRODUCTS & VARIANTS')
+    lines.append('        // ==========================================')
+    lines.append('        if (!await context.Products.AnyAsync())')
+    lines.append('        {')
+    lines.append('            var dbCategories = await context.Categories.ToListAsync();')
+    lines.append('            var catSneaker = dbCategories.FirstOrDefault(c => c.Slug == "giay-sneaker-the-thao") ?? dbCategories[0];')
+    lines.append('            var catStreetwear = dbCategories.FirstOrDefault(c => c.Slug == "thoi-trang-streetwear-ao-khoac") ?? dbCategories[1];')
+    lines.append('            var catAccessories = dbCategories.FirstOrDefault(c => c.Slug == "quan-phu-kien-thoi-trang") ?? dbCategories[2];')
+    lines.append('            var catLiving = dbCategories.FirstOrDefault(c => c.Slug == "gia-dung-doi-song") ?? dbCategories[3];')
+    lines.append('')
+    lines.append('            var dbUsers = await context.Users.ToListAsync();')
+    lines.append('            var userManh = dbUsers.First(u => u.Email == "ducmanh@gmail.com");')
+    lines.append('')
+    lines.append('            var allProducts = new List<Product>();')
+    lines.append('')
+    lines.append('            // --- A. 20 SẢN PHẨM CỦA SELLER NGUYỄN ĐỨC MẠNH ---')
+
+    manh_products = [
+        ("Giày Adidas Samba OG Classic White Black", "giay-adidas-samba-og-classic", "ADI-SAMBA-01", "Adidas Originals Terrace", "Giày thể thao Adidas Samba OG phiên bản Classic phối màu trắng đen cổ điển, chất liệu da thật cao cấp kết hợp mũi T-toe da lộn.", 2790000, 3200000, 12, "/img/adidas-samba.jpg", 1, "Da thật full-grain", "Đức"),
+        ("Áo Khoác Nỉ Adidas Sakura Special Edition", "ao-khoac-ni-adidas-sakura-special-edition", "ADI-SAKURA-02", "Adidas Spring Collection", "Áo khoác hoodie nỉ bông phiên bản giới hạn Sakura hoa anh đào, chất nỉ 380gsm dày dặn dệt bo gấu tinh tế.", 1890000, 2200000, 14, "/img/adidas-sakura-hoodie.jpg", 2, "Nỉ bông cotton 100%", "Việt Nam"),
+        ("Giày Balenciaga Track 4.0 Tan/Beige Limited", "giay-balenciaga-track-40-tan-beige", "BAL-TRACK-03", "Balenciaga Track Series", "Giày thể thao Balenciaga Track 4.0 phối màu Tan/Beige thời thượng, kết cấu layer 128 chi tiết phức tạp chuẩn sàn diễn.", 24500000, 27000000, 9, "/img/balenciaga-track-beige.jpg", 1, "Da nhân tạo, lưới mesh kỹ thuật", "Ý"),
+        ("Giày Balenciaga Track Thug Edition Black", "giay-balenciaga-track-thug-edition-black", "BAL-TRACK-04", "Balenciaga Street Noir", "Thiết kế hầm hố phong cách goth streetwear, đế dày 3 tầng giảm xóc vượt trội cùng logo BB in nổi ở mũi giày.", 25900000, 28500000, 9, "/img/balenciaga-track-black.jpg", 1, "Mesh dệt, TPU cao cấp", "Ý"),
+        ("Quần Nỉ Balenciaga Paris Sweatpants White", "quan-ni-balenciaga-paris-sweatpants-white", "BAL-SWEAT-05", "Balenciaga Winter Capsule", "Quần nỉ ống suông phom rộng oversize Paris Edition, logo thêu chỉ kim tuyến tinh xảo ở đùi trái.", 16500000, 18500000, 10, "/img/balenciaga-track-street.jpg", 2, "Cotton da cá dệt dày dặn", "Bồ Đào Nha"),
+        ("Áo Khoác Oversized Ripped Balenciaga Denim", "ao-khoac-oversized-ripped-balenciaga", "BAL-DENIM-06", "Balenciaga Distressed", "Áo khoác bò wash bạc xé rách thủ công từng chi tiết, form drop-shoulder đậm chất đường phố avant-garde.", 34000000, 38000000, 10, "/img/balenciaga-ripped-jacket.jpg", 2, "Denim cotton Nhật Bản 14oz", "Nhật Bản"),
+        ("Giày Sneaker Gucci Ace Web Leather Original", "giay-sneaker-gucci-ace-web-leather", "GUC-ACE-07", "Gucci Epilogue", "Giày sneaker cổ thấp da bò Nappa trắng tinh khôi, dải ruy băng Web xanh đỏ kinh điển bên thân giày.", 18900000, 21000000, 10, "/img/gucci-sneaker.jpg", 1, "Da bò Nappa cao cấp Ý", "Ý"),
+        ("Kính Mát Gucci Double G Rectangular Cream Gold", "kinh-mat-gucci-double-g-rectangular", "GUC-GLASS-08", "Gucci Eyewear Couture", "Kính mát gọng chữ nhật màu kem phối logo GG mạ vàng sáng bóng, tròng chống chói quang học UV400 chuẩn châu Âu.", 11500000, 13000000, 11, "/img/gucci-runway.jpg", 3, "Acetate đúc nguyên khối, mắt kính CR-39", "Ý"),
+        ("Giày Thể Thao Puma Suede Classic Retro", "giay-the-thao-puma-suede-classic-retro", "PUM-SUEDE-09", "Puma Heritage Line", "Huyền thoại giày da lộn Puma Suede ra đời từ năm 1968, phối màu cổ điển êm ái cho mọi trang phục dạo phố.", 2190000, 2500000, 12, "/img/puma-shoes-fall.jpg", 1, "Da lộn cao cấp nguyên tấm", "Indonesia"),
+        ("Giày Nike Air Force 1 Low '07 Triple White", "giay-nike-air-force-1-low-07-white", "NIK-AF1-10", "Nike Sportswear Icons", "Huyền thoại bóng rổ đường phố 1982 với đệm Air-Sole êm ái, đế ngoài cao su rãnh tròn pivot-circle bám dính tốt.", 2990000, 3400000, 12, "/img/nike-summer-sneaker.jpg", 1, "Da bò trơn phủ bóng", "Việt Nam"),
+        ("Túi Xách Lady Dior Medium Cannage Lambskin", "tui-xach-lady-dior-medium-cannage", "DIO-LADY-11", "Dior Heritage Icons", "Chiếc túi gắn liền với Công nương Diana, da cừu non chần bông motif Cannage cùng bộ phụ kiện charm D.I.O.R mạ vàng.", 155000000, 170000000, 8, "/img/brands/dior/lady-dior-medium-cannage.jpg", 3, "Da cừu non cao cấp Cannage", "Pháp"),
+        ("Túi Xách Jackie 1961 Mini Hobo Leather", "tui-xach-jackie-1961-mini-hobo", "GUC-JACKIE-12", "Gucci 1961 Archival", "Biểu tượng thời trang thanh lịch với khóa chốt piston vàng bóng và quai đeo da tháo rời tiện lợi.", 62000000, 70000000, 11, "/img/brands/gucci/gucci-jackie-1961-mini.jpg", 3, "Da bê bóng thuộc thảo mộc", "Ý"),
+        ("Túi Xách Louis Vuitton Speedy Bandoulière 25", "tui-xach-louis-vuitton-speedy-25", "LV-SPEEDY-13", "Louis Vuitton Monogram Heritage", "Túi dáng trống kinh điển chế tác từ Canvas Monogram trứ danh, tay cầm bọc da Toron thủ công khâu tay tỉ mỉ.", 48500000, 55000000, 11, "/img/brands/louisvuitton/lv-speedy-bandouliere-25.jpg", 3, "Canvas Monogram chống thấm", "Pháp"),
+        ("Túi Xách Chanel Classic Double Flap Lambskin", "tui-xach-chanel-classic-double-flap", "CHA-FLAP-14", "Chanel Timeless", "Chiếc túi đắt giá nhất mọi thời đại chế tác thủ công bởi các nghệ nhân Paris, khóa xoay Mademoiselle mạ vàng.", 260000000, 280000000, 7, "/img/brands/chanel/chanel-classic-flap-bag.jpg", 3, "Da cừu mềm mại chần bông", "Pháp"),
+        ("Túi Xách Prada Re-Edition 2005 Re-Nylon", "tui-xach-prada-re-edition-2005-nylon", "PRA-RE05-15", "Prada Re-Nylon Archive", "Chiếc túi kẹp nách được săn đón toàn cầu, vải Re-Nylon tái sinh kết hợp viền da Saffiano và móc ví nhỏ.", 45000000, 50000000, 10, "/img/brands/prada/prada-re-edition-2005-nylon.jpg", 3, "Re-Nylon kháng nước, da Saffiano", "Ý"),
+        ("Túi Xách Hermès Birkin 30 Togo Gold Hardware", "tui-xach-hermes-birkin-30-togo", "HER-BIRKIN-16", "Hermès Exceptional Pieces", "Đỉnh cao túi xách xa xỉ thế giới, từng mũi khâu yên ngựa Saddle Stitch may tay hoàn toàn với 48 giờ chế tác.", 380000000, 420000000, 9, "/img/brands/hermes/hermes-birkin-30-togo-gold.jpg", 3, "Da bê Togo sần nguyên tấm", "Pháp"),
+        ("Túi Xách Saint Laurent LouLou Medium Quilted", "tui-xach-saint-laurent-loulou-medium", "YSL-LOULOU-17", "Saint Laurent Monogram", "Chất da bê mềm mịn may chần bông chữ Y đặc trưng, khóa kim loại lồng chữ YSL phủ lớp mạ bạc ánh kim.", 78000000, 86000000, 9, "/img/brands/saintlaurent/saintlaurent-loulou-medium-bag.jpg", 3, "Da bê bóng may chần cao cấp", "Ý"),
+        ("Túi Xách Fendi Baguette Medium Nappa Monogram", "tui-xach-fendi-baguette-medium-nappa", "FEN-BAGUETTE-18", "Fendi Baguette 1997", "Chiếc túi làm thay đổi lịch sử phụ kiện với dáng kẹp nách gọn gàng và khóa cài nam châm chữ FF mạ bóng.", 85000000, 93000000, 8, "/img/brands/fendi/fendi-baguette-medium-ff-bag.jpg", 3, "Da cừu nappa mềm dập nổi FF", "Ý"),
+        ("Túi Xách Bottega Veneta The Pouch Soft Calf", "tui-xach-bottega-veneta-the-pouch", "BOT-POUCH-19", "Bottega Veneta Wardrobe", "Thiết kế clutch cầm tay xếp nếp bồng bềnh mềm mại như mây không quai xách làm bùng nổ giới mộ điệu.", 78000000, 86000000, 9, "/img/brands/bottegaveneta/bottegaveneta-the-pouch-clutch.jpg", 3, "Da bê non nếp gấp thủ công", "Ý"),
+        ("Túi Xách Off-White Jitney 2.8 Quote Top Handle", "tui-xach-off-white-jitney-28-quote", "OFF-JITNEY-20", "Off-White Industrial Chic", "Phong cách streetwear nổi loạn của cố giám đốc sáng tạo Virgil Abloh, chữ in Typography và khóa mũi tên kim loại.", 38000000, 43000000, 11, "/img/brands/offwhite/offwhite-jitney-28-top-handle.jpg", 3, "Da bê trơn in chữ cá tính", "Ý")
+    ]
+
+    for name, slug, sku, col, desc, price, orig_price, disc, img, cat_num, mat, origin in manh_products:
+        cat_var = "catSneaker" if cat_num == 1 else ("catStreetwear" if cat_num == 2 else ("catAccessories" if cat_num == 3 else "catLiving"))
+        lines.append(f'            var p_{slug.replace("-", "_")} = new Product')
+        lines.append('            {')
+        lines.append('                SellerId = userManh.Id,')
+        lines.append(f'                CategoryId = {cat_var}.Id,')
+        lines.append(f'                Name = "{escape_str(name)}",')
+        lines.append(f'                Slug = "{slug}",')
+        lines.append(f'                Sku = "{sku}",')
+        lines.append(f'                CollectionName = "{escape_str(col)}",')
+        lines.append(f'                Description = "{escape_str(desc)}",')
+        lines.append(f'                BasePrice = {price}m,')
+        lines.append(f'                OriginalPrice = {orig_price}m,')
+        lines.append(f'                DiscountPercent = {disc},')
+        lines.append(f'                ImageUrl = "{img}",')
+        lines.append(f'                GalleryUrlsJson = JsonSerializer.Serialize(new[] {{ "{img}", "{img}", "{img}" }}),')
+        lines.append('                StockQuantity = 45,')
+        lines.append('                StockStatus = StockStatus.InStock,')
+        lines.append(f'                Material = "{escape_str(mat)}",')
+        lines.append('                CareInstructions = "Vệ sinh chuyên dụng bằng khăn mềm, tránh nhiệt độ cao và độ ẩm",')
+        lines.append('                PackagingDetails = "Hộp nguyên seal của hãng, túi vải chống bụi, thẻ bảo hành NFC chính hãng",')
+        lines.append(f'                CountryOfOrigin = "{origin}",')
+        lines.append('                Rating = 4.9,')
+        lines.append('                ReviewCount = 128,')
+        lines.append('                IsActive = true')
+        lines.append('            };')
+
+        if cat_num == 1:
+            lines.append(f'            p_{slug.replace("-", "_")}.Variants.Add(new ProductVariant {{ Sku = "{sku}-40", Size = "EU 40", Color = "Tiêu chuẩn", Price = {price}m, StockQuantity = 15 }});')
+            lines.append(f'            p_{slug.replace("-", "_")}.Variants.Add(new ProductVariant {{ Sku = "{sku}-41", Size = "EU 41", Color = "Tiêu chuẩn", Price = {price}m, StockQuantity = 20 }});')
+            lines.append(f'            p_{slug.replace("-", "_")}.Variants.Add(new ProductVariant {{ Sku = "{sku}-42", Size = "EU 42", Color = "Tiêu chuẩn", Price = {price}m, StockQuantity = 10 }});')
+        elif cat_num == 2:
+            lines.append(f'            p_{slug.replace("-", "_")}.Variants.Add(new ProductVariant {{ Sku = "{sku}-M", Size = "Size M", Color = "Tiêu chuẩn", Price = {price}m, StockQuantity = 18 }});')
+            lines.append(f'            p_{slug.replace("-", "_")}.Variants.Add(new ProductVariant {{ Sku = "{sku}-L", Size = "Size L", Color = "Tiêu chuẩn", Price = {price}m, StockQuantity = 15 }});')
+            lines.append(f'            p_{slug.replace("-", "_")}.Variants.Add(new ProductVariant {{ Sku = "{sku}-XL", Size = "Size XL", Color = "Tiêu chuẩn", Price = {price}m, StockQuantity = 12 }});')
+        else:
+            lines.append(f'            p_{slug.replace("-", "_")}.Variants.Add(new ProductVariant {{ Sku = "{sku}-STD", Size = "Freesize", Color = "Tiêu chuẩn", Price = {price}m, StockQuantity = 45 }});')
+
+        lines.append(f'            allProducts.Add(p_{slug.replace("-", "_")});')
+        lines.append('')
+
+    lines.append('            // --- B. 160 SẢN PHẨM CHUẨN CỦA 20 THƯƠNG HIỆU QUỐC TẾ ---')
+
+    for brand_key, brand_name, origin, default_cat_id, cat_name, items in BRANDS_DATA:
+        lines.append(f'            var seller_{brand_key} = dbUsers.First(u => u.Email == "{brand_key}@gmail.com");')
+        for prod_name, prod_slug, cat_idx, price, orig_price, mat, col_name in items:
+            img_path = f"/img/brands/{brand_key}/{prod_slug}.jpg"
+            cat_var = "catSneaker" if cat_idx == 1 else ("catStreetwear" if cat_idx == 2 else ("catAccessories" if cat_idx == 3 else "catLiving"))
+            p_var = f"prod_{brand_key}_{prod_slug.replace('-', '_')}"
+            sku_code = f"{brand_key.upper()[:3]}-{prod_slug.split('-')[-1].upper()[:4]}-{cat_idx}"
+            disc = int(round((orig_price - price) / orig_price * 100))
+
+            lines.append(f'            var {p_var} = new Product')
+            lines.append('            {')
+            lines.append(f'                SellerId = seller_{brand_key}.Id,')
+            lines.append(f'                CategoryId = {cat_var}.Id,')
+            lines.append(f'                Name = "{escape_str(prod_name)}",')
+            lines.append(f'                Slug = "{brand_key}-{prod_slug}",')
+            lines.append(f'                Sku = "{sku_code}",')
+            lines.append(f'                CollectionName = "{escape_str(col_name)}",')
+            lines.append(f'                Description = "{escape_str(prod_name)} chính hãng từ {brand_name}. Chế tác từ {escape_str(mat)} với quy trình kiểm định chất lượng nghiêm ngặt của nhà mốt.",')
+            lines.append(f'                BasePrice = {price}m,')
+            lines.append(f'                OriginalPrice = {orig_price}m,')
+            lines.append(f'                DiscountPercent = {disc},')
+            lines.append(f'                ImageUrl = "{img_path}",')
+            lines.append(f'                GalleryUrlsJson = JsonSerializer.Serialize(new[] {{ "{img_path}", "{img_path}", "{img_path}" }}),')
+            lines.append('                StockQuantity = 50,')
+            lines.append('                StockStatus = StockStatus.InStock,')
+            lines.append(f'                Material = "{escape_str(mat)}",')
+            lines.append('                CareInstructions = "Vệ sinh chuyên biệt, bảo quản trong túi vải thoáng khí tại nơi khô ráo",')
+            lines.append(f'                PackagingDetails = "Hộp quà tặng cao cấp của {brand_name}, túi bụi, ruy băng niêm phong và thẻ xác thực NFC",')
+            lines.append(f'                CountryOfOrigin = "{origin}",')
+            lines.append('                Rating = 4.9,')
+            lines.append('                ReviewCount = 86,')
+            lines.append('                IsActive = true')
+            lines.append('            };')
+
+            if cat_idx == 1:
+                lines.append(f'            {p_var}.Variants.Add(new ProductVariant {{ Sku = "{sku_code}-40", Size = "EU 40", Color = "Tiêu chuẩn", Price = {price}m, StockQuantity = 15 }});')
+                lines.append(f'            {p_var}.Variants.Add(new ProductVariant {{ Sku = "{sku_code}-41", Size = "EU 41", Color = "Tiêu chuẩn", Price = {price}m, StockQuantity = 20 }});')
+                lines.append(f'            {p_var}.Variants.Add(new ProductVariant {{ Sku = "{sku_code}-42", Size = "EU 42", Color = "Tiêu chuẩn", Price = {price}m, StockQuantity = 15 }});')
+            elif cat_idx == 2:
+                lines.append(f'            {p_var}.Variants.Add(new ProductVariant {{ Sku = "{sku_code}-S", Size = "Size S", Color = "Tiêu chuẩn", Price = {price}m, StockQuantity = 15 }});')
+                lines.append(f'            {p_var}.Variants.Add(new ProductVariant {{ Sku = "{sku_code}-M", Size = "Size M", Color = "Tiêu chuẩn", Price = {price}m, StockQuantity = 20 }});')
+                lines.append(f'            {p_var}.Variants.Add(new ProductVariant {{ Sku = "{sku_code}-L", Size = "Size L", Color = "Tiêu chuẩn", Price = {price}m, StockQuantity = 15 }});')
+            else:
+                lines.append(f'            {p_var}.Variants.Add(new ProductVariant {{ Sku = "{sku_code}-STD", Size = "Freesize", Color = "Tiêu chuẩn", Price = {price}m, StockQuantity = 50 }});')
+
+            lines.append(f'            allProducts.Add({p_var});')
+
+        lines.append('')
+
+    lines.append('            await context.Products.AddRangeAsync(allProducts);')
+    lines.append('            await context.SaveChangesAsync();')
+    lines.append('        }')
+    lines.append('')
+    lines.append('        // ==========================================')
+    lines.append('        // 5. SEED ORDERS & TRANSACTIONS')
+    lines.append('        // ==========================================')
+    lines.append('        if (!await context.Orders.AnyAsync())')
+    lines.append('        {')
+    lines.append('            var customer = await context.Users.FirstOrDefaultAsync(u => u.Email == "esther.howard@example.com");')
+    lines.append('            var products = await context.Products.Take(10).ToListAsync();')
+    lines.append('')
+    lines.append('            if (products.Count >= 3)')
+    lines.append('            {')
+    lines.append('                var order1 = new Order')
+    lines.append('                {')
+    lines.append('                    OrderCode = "AG-2024-7890",')
+    lines.append('                    UserId = customer?.Id,')
+    lines.append('                    CustomerName = "Esther Howard",')
+    lines.append('                    CustomerEmail = "esther.howard@example.com",')
+    lines.append('                    CustomerPhone = "+84 902 345 678",')
+    lines.append('                    ShippingAddress = "Villa 18, Vinhomes Riverside, Long Biên, Hà Nội",')
+    lines.append('                    PaymentMethod = "Thẻ Tín Dụng Quốc Tế (Visa Signature)",')
+    lines.append('                    Status = OrderStatus.Delivered,')
+    lines.append('                    PaymentStatus = PaymentStatus.Paid,')
+    lines.append('                    Carrier = "FedEx Priority Luxury Express",')
+    lines.append('                    TrackingCode = "FX-VN-882910384",')
+    lines.append('                    EstimatedDelivery = "Đã giao thành công",')
+    lines.append('                    LastUpdateLocation = "Kho trung chuyển Nội Bài - Đã ký nhận",')
+    lines.append('                    ProgressStep = 4,')
+    lines.append('                    Subtotal = products[0].BasePrice,')
+    lines.append('                    ShippingCharge = 0,')
+    lines.append('                    Taxes = 0,')
+    lines.append('                    Discount = 0,')
+    lines.append('                    TotalAmount = products[0].BasePrice')
+    lines.append('                };')
+    lines.append('                order1.Items.Add(new OrderItem')
+    lines.append('                {')
+    lines.append('                    ProductId = products[0].Id,')
+    lines.append('                    ProductName = products[0].Name,')
+    lines.append('                    Specs = "EU 41 / Da thật / Fullbox",')
+    lines.append('                    ImageUrl = products[0].ImageUrl,')
+    lines.append('                    Price = products[0].BasePrice,')
+    lines.append('                    Quantity = 1,')
+    lines.append('                    Subtotal = products[0].BasePrice')
+    lines.append('                });')
+    lines.append('')
+    lines.append('                var order2 = new Order')
+    lines.append('                {')
+    lines.append('                    OrderCode = "AG-2024-7891",')
+    lines.append('                    UserId = customer?.Id,')
+    lines.append('                    CustomerName = "Trần Thị Mai Phương",')
+    lines.append('                    CustomerEmail = "maiphuong.tran@gmail.com",')
+    lines.append('                    CustomerPhone = "+84 912 888 999",')
+    lines.append('                    ShippingAddress = "Penthouse 3201, Diamond Island, Quận 2, TP. Hồ Chí Minh",')
+    lines.append('                    PaymentMethod = "Chuyển Khoản Ngân Hàng Tức Thời (VietQR Pro)",')
+    lines.append('                    Status = OrderStatus.Shipped,')
+    lines.append('                    PaymentStatus = PaymentStatus.Paid,')
+    lines.append('                    Carrier = "Aethelgard White-Glove Courier",')
+    lines.append('                    TrackingCode = "AG-VIP-994812",')
+    lines.append('                    EstimatedDelivery = "Dự kiến giao trong 24 giờ",')
+    lines.append('                    LastUpdateLocation = "Trung tâm phân loại Tân Sơn Nhất - Đang luân chuyển",')
+    lines.append('                    ProgressStep = 3,')
+    lines.append('                    Subtotal = products[1].BasePrice,')
+    lines.append('                    ShippingCharge = 50000,')
+    lines.append('                    Taxes = 0,')
+    lines.append('                    Discount = 0,')
+    lines.append('                    TotalAmount = products[1].BasePrice + 50000')
+    lines.append('                };')
+    lines.append('                order2.Items.Add(new OrderItem')
+    lines.append('                {')
+    lines.append('                    ProductId = products[1].Id,')
+    lines.append('                    ProductName = products[1].Name,')
+    lines.append('                    Specs = "Size L / Bản giới hạn",')
+    lines.append('                    ImageUrl = products[1].ImageUrl,')
+    lines.append('                    Price = products[1].BasePrice,')
+    lines.append('                    Quantity = 1,')
+    lines.append('                    Subtotal = products[1].BasePrice')
+    lines.append('                });')
+    lines.append('')
+    lines.append('                var order3 = new Order')
+    lines.append('                {')
+    lines.append('                    OrderCode = "AG-2024-7892",')
+    lines.append('                    UserId = customer?.Id,')
+    lines.append('                    CustomerName = "Lê Hoàng Nam",')
+    lines.append('                    CustomerEmail = "hoangnam.le@vng.com.vn",')
+    lines.append('                    CustomerPhone = "+84 983 222 111",')
+    lines.append('                    ShippingAddress = "Tòa nhà Keangnam Landmark 72, Phạm Hùng, Cầu Giấy, Hà Nội",')
+    lines.append('                    PaymentMethod = "Thẻ Tín Dụng Quốc Tế (Mastercard World Elite)",')
+    lines.append('                    Status = OrderStatus.Confirmed,')
+    lines.append('                    PaymentStatus = PaymentStatus.Paid,')
+    lines.append('                    Carrier = "FedEx Priority Luxury Express",')
+    lines.append('                    TrackingCode = "FX-VN-900213441",')
+    lines.append('                    EstimatedDelivery = "Dự kiến giao ngày mai",')
+    lines.append('                    LastUpdateLocation = "Đã niêm phong gói hàng tại Boutique chính hãng",')
+    lines.append('                    ProgressStep = 2,')
+    lines.append('                    Subtotal = products[2].BasePrice,')
+    lines.append('                    ShippingCharge = 0,')
+    lines.append('                    Taxes = 0,')
+    lines.append('                    Discount = 0,')
+    lines.append('                    TotalAmount = products[2].BasePrice')
+    lines.append('                };')
+    lines.append('                order3.Items.Add(new OrderItem')
+    lines.append('                {')
+    lines.append('                    ProductId = products[2].Id,')
+    lines.append('                    ProductName = products[2].Name,')
+    lines.append('                    Specs = "EU 42 / Tiêu chuẩn",')
+    lines.append('                    ImageUrl = products[2].ImageUrl,')
+    lines.append('                    Price = products[2].BasePrice,')
+    lines.append('                    Quantity = 1,')
+    lines.append('                    Subtotal = products[2].BasePrice')
+    lines.append('                });')
+    lines.append('')
+    lines.append('                await context.Orders.AddRangeAsync(order1, order2, order3);')
+    lines.append('                await context.SaveChangesAsync();')
+    lines.append('')
+    lines.append('                var transactions = new List<TransactionRecord>')
+    lines.append('                {')
+    lines.append('                    new TransactionRecord { TransactionCode = "#TXN-04910", CustomerName = order1.CustomerName, ProductName = products[0].Name, Status = "Success", Quantity = 1, UnitPrice = products[0].BasePrice, TotalAmount = order1.TotalAmount },')
+    lines.append('                    new TransactionRecord { TransactionCode = "#TXN-04911", CustomerName = order2.CustomerName, ProductName = products[1].Name, Status = "Success", Quantity = 1, UnitPrice = products[1].BasePrice, TotalAmount = order2.TotalAmount },')
+    lines.append('                    new TransactionRecord { TransactionCode = "#TXN-04912", CustomerName = order3.CustomerName, ProductName = products[2].Name, Status = "Success", Quantity = 1, UnitPrice = products[2].BasePrice, TotalAmount = order3.TotalAmount }')
+    lines.append('                };')
+    lines.append('                await context.Transactions.AddRangeAsync(transactions);')
+    lines.append('                await context.SaveChangesAsync();')
+    lines.append('            }')
+    lines.append('        }')
+    lines.append('    }')
+    lines.append('}')
+
+    content = "\n".join(lines)
+    with open(SEEDER_PATH, "w", encoding="utf-8") as f:
+        f.write(content)
+    print(f"[OK] Đã ghi thành công DatabaseSeeder.cs với {len(lines)} dòng code!")
+
+if __name__ == "__main__":
+    generate()

@@ -1,12 +1,10 @@
 {
-  "name": "dm-fashion-mall-workspace",
+  "name": "aethelgard-main-runner",
   "version": "1.0.0",
-  "description": "Workspace for DM Fashion Mall and Team Branches",
+  "private": true,
   "scripts": {
-    "update-team": "powershell -ExecutionPolicy Bypass -File ./update-team.ps1",
-    "dev": "npm --prefix main/frontend run dev",
-    "build": "npm --prefix main/frontend run build",
-    "start": "npm --prefix main/frontend start",
-    "test": "npm --prefix main/frontend test"
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix frontend start"
   }
 }
