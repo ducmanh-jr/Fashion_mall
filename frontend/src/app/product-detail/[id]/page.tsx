@@ -18,6 +18,11 @@ interface ProductData {
   rating: string;
   ratingScore: string;
   reviewCount: number;
+  material?: string;
+  countryOfOrigin?: string;
+  careInstructions?: string;
+  packagingDetails?: string;
+  storeAvailability?: { storeName: string; city: string; stock: number; address: string }[];
 }
 
 const productDatabase: Record<string, ProductData> = {
@@ -145,8 +150,17 @@ export default function ProductDetailPage() {
                 ? p.variants.map((v: any) => v.size || 'Freesize')
                 : ['39 EU', '40 EU', '41 EU', '42 EU'],
               rating: '★★★★★',
-              ratingScore: String(p.rating || '5.0'),
-              reviewCount: p.reviewCount || 48
+              ratingScore: String(p.rating || '4.9'),
+              reviewCount: p.reviewCount || 128,
+              material: p.material || '100% Da bê non Ý Calfskin nguyên tấm, lót lụa Mulberry Silk',
+              countryOfOrigin: p.countryOfOrigin || 'Made in Italy',
+              careInstructions: p.careInstructions || 'Vệ sinh chuyên dụng bằng khăn mềm khô. Tránh nhiệt độ cao và độ ẩm.',
+              packagingDetails: p.packagingDetails || 'Hộp cứng nắp nam châm Aethelgard Signature Box, túi vải dustbag, thẻ bảo hành NFC',
+              storeAvailability: [
+                { storeName: 'Boutique Tràng Tiền Plaza', city: 'Hà Nội', stock: Math.floor((p.stockQuantity || 25) * 0.45) || 5, address: 'Tầng 1 & 2, Tràng Tiền Plaza, 24 Hai Bà Trưng, Hà Nội' },
+                { storeName: 'Boutique Sheraton Saigon', city: 'TP. Hồ Chí Minh', stock: Math.floor((p.stockQuantity || 25) * 0.35) || 4, address: 'Khách sạn Sheraton Saigon, 88 Đồng Khởi, Quận 1' },
+                { storeName: 'Boutique Union Square', city: 'TP. Hồ Chí Minh', stock: Math.floor((p.stockQuantity || 25) * 0.20) || 2, address: 'Union Square, 171 Đồng Khởi, Bến Nghé, Quận 1' }
+              ]
             };
             setProd(realProd);
             setActiveImage(realProd.images[0].src);
@@ -467,6 +481,70 @@ export default function ProductDetailPage() {
               <span className="trust-subtext">Cam kết chuẩn hàng authentic</span>
             </div>
           </div>
+
+          {/* STORE & BOUTIQUE AVAILABILITY */}
+          {prod.storeAvailability && prod.storeAvailability.length > 0 && (
+            <div
+              style={{
+                marginTop: '24px',
+                background: '#FFFFFF',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius-md)',
+                padding: '16px',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.05)'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '12px' }}>
+                <span style={{ fontWeight: 800, fontSize: '0.88rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>🏬</span>
+                  <span>Tình Trạng Có Sẵn Tại Boutique</span>
+                </span>
+                <span style={{ fontSize: '0.75rem', color: '#16A34A', fontWeight: 700, background: '#DCFCE7', padding: '2px 8px', borderRadius: '4px' }}>
+                  ● Đang mở cửa
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                {prod.storeAvailability.map((st, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '10px 12px',
+                      background: '#F8FAFC',
+                      borderRadius: '8px',
+                      border: '1px solid #E2E8F0'
+                    }}
+                  >
+                    <div>
+                      <div style={{ fontWeight: 700, fontSize: '0.85rem', color: '#0F172A' }}>
+                        {st.storeName} ({st.city})
+                      </div>
+                      <div style={{ fontSize: '0.75rem', color: '#64748B', marginTop: '2px' }}>
+                        📍 {st.address}
+                      </div>
+                    </div>
+                    <div style={{ textAlign: 'right' }}>
+                      <span
+                        style={{
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          color: st.stock > 0 ? '#15803D' : '#DC2626',
+                          background: st.stock > 0 ? '#F0FDF4' : '#FEF2F2',
+                          padding: '3px 8px',
+                          borderRadius: '6px',
+                          border: `1px solid ${st.stock > 0 ? '#BBF7D0' : '#FECACA'}`
+                        }}
+                      >
+                        {st.stock > 0 ? `Còn ${st.stock} chiếc` : 'Tạm hết'}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -549,15 +627,29 @@ export default function ProductDetailPage() {
         {/* TAB 2: MATERIALS */}
         {activeTab === 'materials' && (
           <div id="tab-materials" className="tab-pane-content active">
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px', marginBottom: '20px' }}>
+              <div style={{ background: '#F8FAFC', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: '6px' }}>🧵 Thành Phần Chất Liệu</div>
+                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)' }}>{prod.material || '100% Chất liệu cao cấp chuẩn kiểm định quốc tế'}</div>
+              </div>
+              <div style={{ background: '#F8FAFC', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: '6px' }}>🌍 Nguồn Gốc Xuất Xứ</div>
+                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)' }}>{prod.countryOfOrigin || 'Chế tác thủ công tại Châu Âu'}</div>
+              </div>
+              <div style={{ background: '#F8FAFC', padding: '16px', borderRadius: '10px', border: '1px solid var(--border)' }}>
+                <div style={{ fontSize: '0.8rem', fontWeight: 800, color: '#64748B', textTransform: 'uppercase', marginBottom: '6px' }}>🎁 Quy Cách Đóng Gói</div>
+                <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-main)' }}>{prod.packagingDetails || 'Hộp nắp nam châm Signature Box kèm túi bụi lụa'}</div>
+              </div>
+            </div>
+
             <p className="tab-text-lead">
-              <strong>Thành phần:</strong> 100% Cotton chải kỹ (Combed Cotton) định lượng 450 GSM.<br />
-              <strong>Hướng dẫn bảo quản:</strong>
+              <strong>Hướng dẫn bảo quản & chăm sóc xa xỉ:</strong>
             </p>
             <ul className="tab-feature-bullets">
-              <li><span className="bullet-icon">✓</span> Giặt máy ở chế độ nước lạnh (dưới 30°C) và lộn trái áo trước khi giặt.</li>
-              <li><span className="bullet-icon">✓</span> Không sử dụng chất tẩy clo mạnh để bảo toàn màu sắc nguyên bản.</li>
-              <li><span className="bullet-icon">✓</span> Phơi trong bóng râm, tránh ánh nắng gắt trực tiếp làm khô sợi vải.</li>
-              <li><span className="bullet-icon">✓</span> Ủi ở nhiệt độ trung bình (110°C - 150°C), không ủi trực tiếp lên nhãn ép nhiệt.</li>
+              <li><span className="bullet-icon">✓</span> {prod.careInstructions || 'Vệ sinh chuyên dụng bằng khăn mềm khô, tránh chất tẩy rửa mạnh.'}</li>
+              <li><span className="bullet-icon">✓</span> Tránh tiếp xúc trực tiếp với nước hoa, cồn, dầu và nguồn nhiệt cao quá 40°C.</li>
+              <li><span className="bullet-icon">✓</span> Khi không sử dụng, hãy giữ phom sản phẩm bằng giấy định hình và bảo quản trong túi vải chống bụi (dustbag).</li>
+              <li><span className="bullet-icon">✓</span> Hỗ trợ dịch vụ làm sạch & phục hồi miễn phí trọn đời tại hệ thống Boutique chính hãng.</li>
             </ul>
           </div>
         )}

@@ -9,6 +9,8 @@ interface SellerDrawerProps {
   product: Product | null;
   onClose: () => void;
   onShowToast: (message: string) => void;
+  onEditProduct?: (product: Product) => void;
+  onDeleteProduct?: (product: Product) => void;
 }
 
 export const SellerDrawer: React.FC<SellerDrawerProps> = ({
@@ -16,6 +18,8 @@ export const SellerDrawer: React.FC<SellerDrawerProps> = ({
   product,
   onClose,
   onShowToast,
+  onEditProduct,
+  onDeleteProduct,
 }) => {
   const brandName = useMemo(() => {
     if (!product) return 'AETHELGARD';
@@ -301,20 +305,37 @@ export const SellerDrawer: React.FC<SellerDrawerProps> = ({
             </div>
           </div>
 
-          <div className="seller-drawer-actions">
+          <div className="seller-drawer-actions flex flex-col gap-2">
             <a
               href={`/product-detail/${product.id}`}
               className="btn-seller-primary no-underline flex items-center justify-center gap-2"
             >
               Xem Trang Sản Phẩm Khách Hàng &rarr;
             </a>
-            <button
-              className="btn-seller-secondary"
-              onClick={() => onShowToast('Mở trình biên tập niêm yết sản phẩm đối tác!')}
-              type="button"
-            >
-              Chỉnh Sửa Niêm Yết Sản Phẩm
-            </button>
+            <div className="flex gap-2">
+              <button
+                className="btn-seller-secondary flex-1"
+                onClick={() => {
+                  onClose();
+                  onEditProduct?.(product);
+                }}
+                type="button"
+              >
+                Chỉnh Sửa Niêm Yết
+              </button>
+              {onDeleteProduct && (
+                <button
+                  className="px-4 py-2.5 rounded-lg border border-red-200 bg-red-50 text-red-600 font-bold text-xs hover:bg-red-100 transition-colors"
+                  onClick={() => {
+                    onClose();
+                    onDeleteProduct(product);
+                  }}
+                  type="button"
+                >
+                  Xóa
+                </button>
+              )}
+            </div>
           </div>
         </div>
       </div>

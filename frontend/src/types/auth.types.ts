@@ -42,3 +42,11 @@ export interface ResetPasswordRequest {
   otp: string;
   newPassword: string;
 }
+
+export interface ApplySellerRequest {
+  storeName: string;
+  phoneNumber?: string;
+  address?: string;
+  description?: string;
+}
+

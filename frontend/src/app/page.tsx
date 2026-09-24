@@ -1,27 +1,31 @@
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { fallbackProducts } from '@/lib/mock-data';
-import type { Product } from '@/types';
+import { fallbackProducts, fallbackCategories } from '@/lib/mock-data';
+import type { Product, Category } from '@/types';
 import { productService } from '@/services/product.service';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/useToast';
+import { Plus, Store, Sparkles } from 'lucide-react';
+import { useConfirmDialog } from '@/components/ui/ConfirmDialog';
 import {
   SellerProductCard,
   SellerDrawer,
   ProductFilters,
   HeroSection,
-  RecommendationsSection,
-  CartModal,
-  CheckoutModal,
-  type CartItem,
+  HomeAnalyticsStrip,
+  BrandCinematicShowcase,
+  ProductEditorModal,
+  SellerRegisterModal,
 } from '@/components/seller';
 
 export default function HomePage() {
   const { user } = useAuth();
   const { showToast } = useToast();
+  const { confirm, confirmDialog } = useConfirmDialog();
 
   const [products, setProducts] = useState<Product[]>(fallbackProducts);
+  const [categories, setCategories] = useState<Category[]>(fallbackCategories);
   const [categoryFilter, setCategoryFilter] = useState<string>('');
   const [quickFilterType, setQuickFilterType] = useState<string>('');
   const [minPrice, setMinPrice] = useState<string>('');
@@ -29,14 +33,25 @@ export default function HomePage() {
   const [sortOrder, setSortOrder] = useState<string>('newest');
   const [searchTerm, setSearchTerm] = useState<string>('');
 
-  // Cart & Modals
-  const [cart, setCart] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
+  // Modals
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [drawerProduct, setDrawerProduct] = useState<Product | null>(fallbackProducts[0] || null);
+  const [isEditorOpen, setIsEditorOpen] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
   const sellerTitle = user?.fullName || user?.email?.split('@')[0]?.toUpperCase() || '';
+  const isSellerRole = user?.role === 'Seller' || user?.role === 'Admin';
+
+  // Tải danh mục thực tế từ backend API
+  useEffect(() => {
+    productService
+      .getCategories()
+      .then((cats) => {
+        if (cats && cats.length > 0) setCategories(cats);
+      })
+      .catch(() => {});
+  }, []);
 
   // Tải danh sách sản phẩm từ backend API qua productService
   useEffect(() => {
@@ -56,9 +71,7 @@ export default function HomePage() {
           }
         }
       })
-      .catch(() => {
-        // Fallback tự động trong productService
-      });
+      .catch(() => {});
 
     return () => {
       isMounted = false;
@@ -92,7 +105,7 @@ export default function HomePage() {
     }
 
     if (quickFilterType === 'bestseller') {
-      list.sort((a, b) => b.reviewCount - a.reviewCount);
+      list.sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0));
     } else if (quickFilterType === 'discount') {
       list.sort((a, b) => (b.discountPercent || 0) - (a.discountPercent || 0));
     } else if (sortOrder === 'price_asc') {
@@ -115,12 +128,49 @@ export default function HomePage() {
     setIsDrawerOpen(false);
   };
 
-  const removeFromCart = (id: number) => {
-    setCart((prev) => prev.filter((item) => item.product.id !== id));
+  const handleOpenCreateModal = () => {
+    setEditingProduct(null);
+    setIsEditorOpen(true);
   };
 
-  const totalCartQty = cart.reduce((sum, item) => sum + item.quantity, 0);
-  const totalCartAmount = cart.reduce((sum, item) => sum + item.product.basePrice * item.quantity, 0);
+  const handleOpenEditModal = (p: Product) => {
+    setEditingProduct(p);
+    setIsEditorOpen(true);
+  };
+
+  const handleDeleteProduct = async (p: Product) => {
+    const isConfirmed = await confirm({
+      title: 'Xóa Niêm Yết Sản Phẩm',
+      message: `Bạn có chắc chắn muốn xóa sản phẩm "${p.name}" (SKU: ${p.sku}) khỏi gian hàng? Hành động này sẽ gỡ bỏ sản phẩm khỏi sàn mua sắm.`,
+      confirmText: 'Xóa Vĩnh Viễn',
+      cancelText: 'Giữ Lại',
+      tone: 'danger',
+    });
+
+    if (!isConfirmed) return;
+
+    try {
+      await productService.deleteProduct(p.id);
+      setProducts((prev) => prev.filter((item) => item.id !== p.id));
+      showToast(`Đã xóa sản phẩm "${p.name}" thành công.`);
+      if (drawerProduct?.id === p.id) {
+        setIsDrawerOpen(false);
+      }
+    } catch (err: any) {
+      showToast(err.response?.data?.message || err.message || 'Không thể xóa sản phẩm.');
+    }
+  };
+
+  const handleProductSaved = (savedProduct: Product, isEdit: boolean) => {
+    if (isEdit) {
+      setProducts((prev) => prev.map((p) => (p.id === savedProduct.id ? savedProduct : p)));
+      showToast(`Đã cập nhật sản phẩm "${savedProduct.name}" thành công!`);
+    } else {
+      setProducts((prev) => [savedProduct, ...prev]);
+      showToast(`Đã thêm mới và niêm yết sản phẩm "${savedProduct.name}" lên sàn!`);
+    }
+    setDrawerProduct(savedProduct);
+  };
 
   const resetFilters = () => {
     setCategoryFilter('');
@@ -138,6 +188,15 @@ export default function HomePage() {
     }
   };
 
+  const handleExploreProduct = (keyword: string) => {
+    const matched = products.find((p) => p.name.toLowerCase().includes(keyword.toLowerCase()));
+    if (matched) {
+      openSellerDrawer(matched);
+    } else {
+      scrollToCatalog();
+    }
+  };
+
   return (
     <>
       {/* 1. HERO BANNER */}
@@ -147,11 +206,22 @@ export default function HomePage() {
         onScrollToCatalog={scrollToCatalog}
       />
 
-      {/* 2. CATALOG & SIDEBAR FILTERS */}
+      {/* 2. SƠ ĐỒ DOANH SỐ & PHÂN RÃ DOANH THU (1/4 CUỐI MẶT ĐẦU) */}
+      <HomeAnalyticsStrip />
+
+      {/* 3. BRAND CINEMATIC SHOWCASE (SÂN KHẤU ẢNH CHÍNH ĐỔI 10S/LẦN) */}
+      <BrandCinematicShowcase
+        shopName={sellerTitle || 'Aethelgard Store'}
+        products={products}
+        onExploreProduct={handleExploreProduct}
+        onScrollToCatalog={scrollToCatalog}
+      />
+
+      {/* 3. SHOWROOM SẢN PHẨM CỬA HÀNG */}
       <section className="page-section shop-section" id="catalog">
         <main className="main-layout">
           <ProductFilters
-            categories={[]}
+            categories={categories}
             totalProductsCount={products.length}
             categoryFilter={categoryFilter}
             onCategoryChange={setCategoryFilter}
@@ -168,16 +238,39 @@ export default function HomePage() {
 
           {/* Product Grid */}
           <section className="catalog-section">
-            <div className="catalog-header">
+            <div className="catalog-header flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pb-4">
               <div>
-                <h2 id="catalog-title">
+                <h2 id="catalog-title" className="text-xl sm:text-2xl font-bold text-slate-900">
                   {sellerTitle
-                    ? `Bộ Sưu Tập Chính Hãng — ${sellerTitle}`
-                    : 'Danh Sách Sản Phẩm Aethelgard Mall'}
+                    ? `Gian Trưng Bày — ${sellerTitle}`
+                    : 'Sản Phẩm Đang Niêm Yết Trên Sàn'}
                 </h2>
-                <span id="results-count" className="results-tag">
-                  Hiển thị {filteredProducts.length} sản phẩm
+                <span id="results-count" className="results-tag text-xs text-slate-500 font-medium">
+                  Hiển thị {filteredProducts.length} sản phẩm thực tế
                 </span>
+              </div>
+
+              {/* ACTION BUTTONS: THÊM SẢN PHẨM MỚI / MỞ GIAN HÀNG */}
+              <div className="flex items-center gap-2">
+                {!isSellerRole && (
+                  <button
+                    type="button"
+                    onClick={() => setIsRegisterOpen(true)}
+                    className="flex items-center gap-2 px-4 py-2.5 rounded-xl border border-indigo-200 bg-indigo-50 text-indigo-700 text-xs font-bold hover:bg-indigo-100 transition-colors shadow-sm cursor-pointer"
+                  >
+                    <Store className="w-4 h-4" />
+                    <span>Mở Gian Hàng Seller</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleOpenCreateModal}
+                  className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold shadow-md shadow-indigo-200 transition-all cursor-pointer"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Thêm Sản Phẩm Mới</span>
+                </button>
               </div>
             </div>
 
@@ -190,104 +283,41 @@ export default function HomePage() {
                 />
               ))}
             </div>
-
-            {/* Pagination Controls */}
-            <div className="pagination-bar">
-              <button className="pagination-btn pagination-prev" type="button">
-                &larr; Previous
-              </button>
-              <div className="pagination-numbers">
-                <span className="page-num active">1</span>
-                <span className="page-num">2</span>
-                <span className="page-num">3</span>
-                <span className="page-dots">...</span>
-                <span className="page-num">10</span>
-              </div>
-              <button className="pagination-btn pagination-next" type="button">
-                Next &rarr;
-              </button>
-            </div>
           </section>
         </main>
       </section>
 
-      {/* 3. RECOMMENDATIONS CAROUSEL */}
-      <RecommendationsSection
-        products={products}
-        onOpenDrawer={openSellerDrawer}
-        onShowToast={showToast}
-      />
-
-      {/* 4. NEWSLETTER BANNER */}
-      <section className="page-section newsletter-section">
-        <div className="newsletter-card">
-          <div className="newsletter-content">
-            <h2 className="newsletter-heading">Ready to Get Our New Stuff?</h2>
-            <form
-              className="newsletter-form"
-              onSubmit={(e) => {
-                e.preventDefault();
-                showToast('Cảm ơn bạn đã đăng ký nhận bản tin!');
-              }}
-            >
-              <input
-                type="email"
-                required
-                placeholder="Your Email"
-                aria-label="Email subscription"
-                className="newsletter-input"
-              />
-              <button type="submit" className="btn-newsletter-send">
-                Send
-              </button>
-            </form>
-          </div>
-          <div className="newsletter-subtext">
-            <p className="brand-subtext-bold">SE.Bus for Homes and Needs</p>
-            <p>
-              We&apos;ll listen to your needs, identify the best approach, and then create a bespoke
-              smart EV charging solution that&apos;s right for you.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* 5. MODALS & SLIDING DRAWER */}
-      <CartModal
-        isOpen={isCartOpen}
-        cart={cart}
-        totalQty={totalCartQty}
-        totalAmount={totalCartAmount}
-        onClose={() => setIsCartOpen(false)}
-        onRemoveItem={removeFromCart}
-        onClearCart={() => setCart([])}
-        onProceedCheckout={() => {
-          if (cart.length === 0) {
-            showToast('Giỏ hàng trống!');
-            return;
-          }
-          setIsCartOpen(false);
-          setIsCheckoutOpen(true);
-        }}
-      />
-
-      <CheckoutModal
-        isOpen={isCheckoutOpen}
-        totalAmount={totalCartAmount}
-        onClose={() => setIsCheckoutOpen(false)}
-        onSuccess={() => {
-          showToast('Đặt hàng thành công! Cảm ơn bạn đã mua sắm tại Aethelgard Mall.');
-          setCart([]);
-          setIsCheckoutOpen(false);
-        }}
-      />
-
+      {/* 5. SELLER DRAWER — Chỉnh sửa & Xóa sản phẩm */}
       <SellerDrawer
         isOpen={isDrawerOpen}
         product={drawerProduct}
         onClose={closeSellerDrawer}
         onShowToast={showToast}
+        onEditProduct={handleOpenEditModal}
+        onDeleteProduct={handleDeleteProduct}
       />
+
+      {/* 6. MODAL THÊM / SỬA SẢN PHẨM ĐA BƯỚC */}
+      <ProductEditorModal
+        isOpen={isEditorOpen}
+        onClose={() => setIsEditorOpen(false)}
+        onSuccess={handleProductSaved}
+        initialProduct={editingProduct}
+        categories={categories}
+      />
+
+      {/* 7. MODAL ĐĂNG KÝ GIAN HÀNG SELLER */}
+      <SellerRegisterModal
+        isOpen={isRegisterOpen}
+        onClose={() => setIsRegisterOpen(false)}
+        user={user}
+        onSuccess={() => {
+          showToast('Chúc mừng bạn đã trở thành Người Bán chính thức!');
+        }}
+      />
+
+      {/* 8. DIALOG XÁC NHẬN AN TOÀN */}
+      {confirmDialog}
     </>
   );
 }

@@ -29,6 +29,20 @@ public class AuthController : ControllerBase
         return Ok(result);
     }
 
+    [HttpPost("google-login")]
+    public async Task<ActionResult<LoginResponseDto>> GoogleLogin([FromBody] GoogleLoginRequestDto request)
+    {
+        var result = await _authService.GoogleLoginAsync(request);
+        return Ok(result);
+    }
+
+    [HttpPost("apply-seller/{userId:int}")]
+    public async Task<ActionResult<LoginResponseDto>> ApplySeller(int userId, [FromBody] ApplySellerDto request)
+    {
+        var result = await _authService.ApplySellerAsync(userId, request);
+        return Ok(result);
+    }
+
     [HttpPost("forgot-password")]
     public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto request)
     {

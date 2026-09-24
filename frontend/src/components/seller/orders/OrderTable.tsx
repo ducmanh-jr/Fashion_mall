@@ -7,6 +7,10 @@ import { formatVND } from '@/lib/utils';
 interface OrderTableProps {
   orders: Order[];
   onSelectOrder: (order: Order) => void;
+  onConfirmOrder?: (order: Order) => void;
+  onShipOrder?: (order: Order) => void;
+  onDeliverOrder?: (order: Order) => void;
+  onCancelOrder?: (order: Order) => void;
 }
 
 export const OrderTable: React.FC<OrderTableProps> = ({ orders, onSelectOrder }) => {

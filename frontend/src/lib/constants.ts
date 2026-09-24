@@ -27,6 +27,8 @@ export const ROUTES = {
     INVENTORY: '/inventory',
     ORDERS: '/orders',
     INCOME: '/income-statistics',
+    VOUCHERS: '/vouchers',
+    TRANSACTIONS: '/transactions',
     SHOP_PROFILE: '/shop-profile',
   },
 } as const;
@@ -34,9 +36,11 @@ export const ROUTES = {
 /** Seller Navbar Links */
 export const SELLER_NAV_LINKS = [
   { name: 'Home', href: '/' },
-  { name: 'Inventory', href: '/inventory' },
   { name: 'Orders', href: '/orders' },
+  { name: 'Inventory', href: '/inventory' },
   { name: 'Income Statistics', href: '/income-statistics' },
+  { name: 'Vouchers', href: '/vouchers' },
+  { name: 'Transactions', href: '/transactions' },
   { name: 'Shop Profile', href: '/shop-profile' },
 ] as const;
 

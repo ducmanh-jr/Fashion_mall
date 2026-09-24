@@ -8,7 +8,12 @@ interface OrderTrackingDrawerProps {
   isOpen: boolean;
   order: Order | null;
   onClose: () => void;
-  onLookup: (id: string) => void;
+  onLookup?: (id: string) => void;
+  onShowToast?: (message: string) => void;
+  onConfirmOrder?: (order: Order) => void;
+  onShipOrder?: (order: Order) => void;
+  onDeliverOrder?: (order: Order) => void;
+  onCancelOrder?: (order: Order) => void;
 }
 
 export const OrderTrackingDrawer: React.FC<OrderTrackingDrawerProps> = ({
@@ -16,6 +21,11 @@ export const OrderTrackingDrawer: React.FC<OrderTrackingDrawerProps> = ({
   order,
   onClose,
   onLookup,
+  onShowToast,
+  onConfirmOrder,
+  onShipOrder,
+  onDeliverOrder,
+  onCancelOrder,
 }) => {
   const [lookupId, setLookupId] = useState('');
 
@@ -24,7 +34,7 @@ export const OrderTrackingDrawer: React.FC<OrderTrackingDrawerProps> = ({
   const handleLookupSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (lookupId.trim()) {
-      onLookup(lookupId.trim());
+      onLookup?.(lookupId.trim());
     }
   };
 
@@ -274,6 +284,61 @@ export const OrderTrackingDrawer: React.FC<OrderTrackingDrawerProps> = ({
                   <span>TỔNG CỘNG:</span>
                   <span className="text-purple-600">{formatVND(order.totalAmount)}</span>
                 </div>
+              </div>
+
+              {/* Action Buttons Toolbar */}
+              <div className="pt-4 border-t border-slate-200 flex flex-wrap gap-2 justify-end">
+                {order.status === 'PENDING' && onConfirmOrder && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onConfirmOrder(order);
+                      onClose();
+                    }}
+                    className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all shadow-sm cursor-pointer"
+                  >
+                    Xác Nhận Đơn Hàng
+                  </button>
+                )}
+
+                {(order.status === 'CONFIRMED' || order.status === 'PROCESSING') && onShipOrder && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onShipOrder(order);
+                      onClose();
+                    }}
+                    className="px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs transition-all shadow-sm cursor-pointer"
+                  >
+                    Giao Vận Chuyển FedEx
+                  </button>
+                )}
+
+                {order.status === 'SHIPPED' && onDeliverOrder && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onDeliverOrder(order);
+                      onClose();
+                    }}
+                    className="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-sm cursor-pointer"
+                  >
+                    Xác Nhận Đã Giao
+                  </button>
+                )}
+
+                {order.status !== 'DELIVERED' && order.status !== 'CANCELLED' && onCancelOrder && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onCancelOrder(order);
+                      onClose();
+                    }}
+                    className="px-4 py-2 rounded-xl border border-red-200 bg-red-50 hover:bg-red-100 text-red-600 font-bold text-xs transition-all cursor-pointer"
+                  >
+                    Hủy Đơn Hàng
+                  </button>
+                )}
               </div>
             </div>
           </div>

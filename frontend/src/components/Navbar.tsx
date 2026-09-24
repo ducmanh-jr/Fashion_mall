@@ -1,15 +1,16 @@
 'use client';
-
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { LogOut } from 'lucide-react';
+import { LogOut, Store } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { SELLER_NAV_LINKS } from '@/lib/constants';
+import { SellerRegisterModal } from '@/components/seller/onboarding/SellerRegisterModal';
 
 export default function Navbar() {
   const pathname = usePathname();
   const { user, token, isLoading, logout } = useAuth();
+  const [isRegisterOpen, setIsRegisterOpen] = useState(false);
 
   // Không hiển thị Navbar trên trang login hoặc khi chưa xác thực xong
   if (pathname === '/login' || (!isLoading && !token)) {
@@ -18,6 +19,7 @@ export default function Navbar() {
 
   const displayName = user?.fullName || user?.email?.split('@')[0]?.toUpperCase() || 'Seller';
   const initial = displayName.charAt(0).toUpperCase();
+  const isCustomer = user?.role === 'Customer';
 
   return (
     <header className="navbar">
@@ -47,6 +49,7 @@ export default function Navbar() {
               <Link
                 key={item.name}
                 href={item.href}
+                prefetch={true}
                 className={`nav-link ${isActive ? 'active' : ''}`}
               >
                 {item.name}
@@ -67,6 +70,17 @@ export default function Navbar() {
         >
           {user ? (
             <>
+              {isCustomer && (
+                <button
+                  type="button"
+                  onClick={() => setIsRegisterOpen(true)}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-700 text-xs font-bold hover:bg-indigo-100 transition-colors cursor-pointer"
+                >
+                  <Store className="w-3.5 h-3.5" />
+                  <span>Mở Gian Hàng</span>
+                </button>
+              )}
+
               <div
                 title={`Tài khoản: ${displayName}`}
                 style={{
@@ -139,6 +153,15 @@ export default function Navbar() {
           )}
         </div>
       </div>
+
+      <SellerRegisterModal
+        isOpen={isRegisterOpen}
+        onClose={() => setIsRegisterOpen(false)}
+        user={user}
+        onSuccess={() => {
+          setIsRegisterOpen(false);
+        }}
+      />
     </header>
   );
 }

@@ -23,4 +23,5 @@ export interface InventorySummary {
 export interface RestockRequest {
   productId: number;
   additionalQuantity: number;
+  note?: string;
 }

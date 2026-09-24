@@ -26,4 +26,14 @@ export const authService = {
     const res = await apiClient.post('/auth/reset-password', data);
     return res.data;
   },
+
+  async googleLogin(credential: string): Promise<LoginResponse> {
+    const res = await apiClient.post('/auth/google-login', { credential });
+    return res.data;
+  },
+
+  async applySeller(userId: number, data: { storeName: string; phoneNumber?: string; address?: string; description?: string }): Promise<LoginResponse> {
+    const res = await apiClient.post(`/auth/apply-seller/${userId}`, data);
+    return res.data;
+  },
 };

@@ -1,4 +1,4 @@
-﻿using Ecommerce.Common.Enums;
+using Ecommerce.Common.Enums;
 
 namespace Ecommerce.Common.DTOs;
 
@@ -43,3 +43,17 @@ public class ResetPasswordDto
     public string Otp { get; set; } = string.Empty;
     public string NewPassword { get; set; } = string.Empty;
 }
+
+public class GoogleLoginRequestDto
+{
+    public string Credential { get; set; } = string.Empty;
+}
+
+public class ApplySellerDto
+{
+    public string StoreName { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; }
+    public string? Address { get; set; }
+    public string? Description { get; set; }
+}
+

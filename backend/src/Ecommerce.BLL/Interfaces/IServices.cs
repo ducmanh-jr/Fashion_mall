@@ -7,6 +7,8 @@ public interface IAuthService
 {
     Task<LoginResponseDto> LoginAsync(LoginRequestDto request);
     Task<LoginResponseDto> RegisterAsync(RegisterRequestDto request);
+    Task<LoginResponseDto> GoogleLoginAsync(GoogleLoginRequestDto request);
+    Task<LoginResponseDto> ApplySellerAsync(int userId, ApplySellerDto request);
     Task<bool> SendPasswordResetOtpAsync(ForgotPasswordDto request);
     Task<bool> VerifyOtpAsync(VerifyOtpDto request);
     Task<bool> ResetPasswordAsync(ResetPasswordDto request);
